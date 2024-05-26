@@ -1,0 +1,51 @@
+.toggleChatButton {
+    position: relative;
+    height: 4.5rem;
+    width: 4.5rem;
+    font-size: 1.8rem;
+    color: rgb(166, 0, 255);
+    background-color: rgb(236, 236, 236);
+    right: 1.5rem;
+    z-index: 1000;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  
+  .toggleChatButton:hover {
+    transform: scale(1.08);
+    background-color: rgb(166, 0, 255);
+    color: white;
+  }
+  
+  .iconContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .toggleIcon {
+    position: absolute;
+    transition: opacity 0.3s ease;
+  }
+  
+  .fadeIn {
+    opacity: 1;
+  }
+  
+  .fadeOut {
+    opacity: 0;
+  }
+  
+  @media screen and (max-width: 992px) {
+    .toggleChatButton {
+        height: 3.5rem;
+        width: 3.5rem;
+    }
+}
