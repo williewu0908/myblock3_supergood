@@ -5,7 +5,8 @@ import PythonFlowchart from "@/components/flowchart/pythonFlowchart";
 export default function Test() {
     return (
         <>
-            <PythonFlowchart code="def greet(name):\n    print(f'Hello, {name}!')" />
+            <DevNavBar />
+            <CodeEditor />
         </>
     );
 }
