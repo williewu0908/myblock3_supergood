@@ -1,22 +1,17 @@
 import Head from 'next/head'
 import Script from 'next/script';
 import styles from './blockly.module.css';
-import blockly_compressed from 'blockly/blockly_compressed'
-import blocks_compressed from 'blockly/blocks_compressed'
-import javascript_compressed from 'blockly/javascript_compressed'
-import python_compressed from 'blockly/python_compressed'
-import php_compressed from 'blockly/php_compressed'
-import lua_compressed from 'blockly/lua_compressed'
-import dart_compressed from 'blockly/dart_compressed'
+import blockly_compressed from 'blockly/blockly_compressed';
+import blocks_compressed from 'blockly/blocks_compressed';
+import javascript_compressed from 'blockly/javascript_compressed';
+import python_compressed from 'blockly/python_compressed';
+// import './script.js';
 
 if (typeof window !== "undefined") {
   window.Blockly = blockly_compressed;
   window.blocks = blocks_compressed;
   window.javascript = javascript_compressed;
   window.python = python_compressed;
-  window.php = php_compressed;
-  window.lua = lua_compressed;
-  window.dart = dart_compressed;
 }
 
 
@@ -331,26 +326,14 @@ function Tabs() {
           <td id="tab_blocks" className={styles.tabon}>
             積木
           </td>
-          <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
+          {/* <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
           <td id="tab_javascript" className={styles.taboff + ' ' + styles.tab_collapse}>
             JavaScript
           </td>
           <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
           <td id="tab_python" className={styles.taboff + ' ' + styles.tab_collapse}>
             Python
-          </td>
-          <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
-          <td id="tab_php" className={styles.taboff + ' ' + styles.tab_collapse}>
-            PHP
-          </td>
-          <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
-          <td id="tab_lua" className={styles.taboff + ' ' + styles.tab_collapse}>
-            Lua
-          </td>
-          <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
-          <td id="tab_dart" className={styles.taboff + ' ' + styles.tab_collapse}>
-            Dart
-          </td>
+          </td> */}
           <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
           <td id="tab_xml" className={styles.taboff + ' ' + styles.tab_collapse}>
             XML
@@ -365,13 +348,13 @@ function Tabs() {
           </td>
           <td className={styles.tabmax}>
             <button id="trashButton" className={styles.notext} title="...">
-              <img src="media/1x1.gif" className={styles.trash + ' ' + styles.icon21} />
+              <img src="blockly/media/1x1.gif" className={styles.trash + ' ' + styles.icon21} />
             </button>
             <button id="linkButton" className={styles.notext} title="...">
-              <img src="media/1x1.gif" className={styles.link + ' ' + styles.icon21} />
+              <img src="blockly/media/1x1.gif" className={styles.link + ' ' + styles.icon21} />
             </button>
             <button id="runButton" className={styles.notext + ' ' + styles.primary} title="...">
-              <img src="media/1x1.gif" className={styles.run + ' ' + styles.icon21} />
+              <img src="blockly/media/1x1.gif" className={styles.run + ' ' + styles.icon21} />
             </button>
           </td>
         </tr>
@@ -384,11 +367,6 @@ function Content() {
   return (
     <>
       <div id="content_blocks" className={styles.content} />
-      <pre id="content_javascript" className={styles.content + ' prettyprint lang-js'} />
-      <pre id="content_python" className={styles.content + ' prettyprint lang-py'} />
-      <pre id="content_php" className={styles.content + ' prettyprint lang-php'} />
-      <pre id="content_lua" className={styles.content + ' prettyprint lang-lua'} />
-      <pre id="content_dart" className={styles.content + ' prettyprint lang-dart'} />
       <textarea id="content_xml" className={styles.content} wrap="off" defaultValue={""} />
       <textarea id="content_json" className={styles.content} wrap="off" defaultValue={""} />
     </>
@@ -406,7 +384,7 @@ function Header() {
       </Head>
       
       <Script
-        src="/src/blocklyScript.js"
+        src="/blockly/src/blocklyScript.js"
         strategy="lazyOnload"
         onLoad={() =>
           console.log(`JavaScript正確地載入，blocklyScript.js 已被定義`)
@@ -419,23 +397,13 @@ function Header() {
 
 export default function HomePage() {
   return (
-    <>
+    <div id='blockly_block' width="99%" height="100%">
       <Header/>
-      <table width="100%" height="100%">
+      <table height="100%" id="blockly_table">
         <tbody>
           <tr>
-            <td>
-              <h1>
-                <a href="https://developers.google.com/blockly/">Blockly</a>‏ &gt;
-                <a href="../index.html">Demos</a>‏ &gt;
-                <span id="title">...</span>
-              </h1>
-            </td>
             <td className={styles.farSide}>
               <select id="languageMenu" />
-              <a className={styles.privacyLink} href="https://policies.google.com/privacy">
-                Privacy
-              </a>
             </td>
           </tr>
           <tr>
@@ -444,13 +412,12 @@ export default function HomePage() {
             </td>
           </tr>
           <tr>
-            <td height="99%" colSpan={2} id="content_area"></td>
+            <td width="99%" height="99%" colSpan={2} id="content_area"></td>
           </tr>
         </tbody>
       </table>
       <Content/>
-
       <BlocklyToolBox/>
-    </>
-  )
+    </div>
+  );
 }

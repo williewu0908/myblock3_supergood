@@ -5,7 +5,7 @@ import Blockly from "../blockly/blockly";
 export default function ThreeEqualBoxes() {
     return (
         <Box sx={{ width: '100%', height: '500px', display: 'flex' }}>
-            <Box sx={{ width: '33.333%', height: '100%', backgroundColor: '#FF5733' }}>
+            <Box id='blockly_container' sx={{ width: '33.333%', height: '100%', backgroundColor: '#FF5733' }}>
                 <Blockly />
             </Box>
             <Box sx={{ width: '33.333%', height: '100%', backgroundColor: '#33C1FF' }}></Box>

@@ -99,7 +99,7 @@ pre.content {
 .icon21 {
   height: 21px;
   width: 21px;
-  background-image: url(/icons.png);
+  background-image: url(/blockly/icons.png);
 }
 .trash {
   background-position: 0px 0px;

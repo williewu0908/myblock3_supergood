@@ -16,6 +16,7 @@
  * Create a namespace for the application.
  */
 var Code = {};
+var db;
 
 /**
  * Lookup for names of supported languages.  Keys should be in ISO 639 format.
@@ -253,7 +254,7 @@ Code.LANG = Code.getLang();
  * @private
  */
 Code.TABS_ = [
-  'blocks', 'javascript', 'php', 'python', 'dart', 'lua', 'xml', 'json'
+  'blocks', 'xml', 'json'
 ];
 
 /**
@@ -261,7 +262,7 @@ Code.TABS_ = [
  * @private
  */
 Code.TABS_DISPLAY_ = [
-  'Blocks', 'JavaScript', 'PHP', 'Python', 'Dart', 'Lua', 'XML', 'JSON'
+  'Blocks', 'XML', 'JSON'
 ];
 
 Code.selected = 'blocks';
@@ -368,16 +369,6 @@ Code.renderContent = function() {
     jsonTextarea.value = JSON.stringify(
         Blockly.serialization.workspaces.save(Code.workspace), null, 2);
     jsonTextarea.focus();
-  } else if (content.id === 'content_javascript') {
-    Code.attemptCodeGeneration(javascript.javascriptGenerator);
-  } else if (content.id === 'content_python') {
-    Code.attemptCodeGeneration(python.pythonGenerator);
-  } else if (content.id === 'content_php') {
-    Code.attemptCodeGeneration(php.phpGenerator);
-  } else if (content.id === 'content_dart') {
-    Code.attemptCodeGeneration(dart.dartGenerator);
-  } else if (content.id === 'content_lua') {
-    Code.attemptCodeGeneration(lua.luaGenerator);
   }
   if (typeof PR === 'object') {
     PR.prettyPrint();
@@ -393,9 +384,13 @@ Code.attemptCodeGeneration = function(generator) {
   content.textContent = '';
   if (Code.checkAllGeneratorFunctionsDefined(generator)) {
     var code = generator.workspaceToCode(Code.workspace);
-    content.textContent = code;
-    // Remove the 'prettyprinted' class, so that Prettify will recalculate.
-    content.className = content.className.replace('prettyprinted', '');
+    if (generator == python.pythonGenerator){
+      saveCodeToIndexedDB(code);
+    } else{
+      content.textContent = code;
+      // Remove the 'prettyprinted' class, so that Prettify will recalculate.
+      content.className = content.className.replace('prettyprinted', '');
+    }
   }
 };
 
@@ -431,8 +426,17 @@ Code.init = function() {
   Code.initLanguage();
 
   var rtl = Code.isRtl();
+  var blockly_container = document.getElementById('blockly_container');
   var container = document.getElementById('content_area');
   var onresize = function(e) {
+    var blocklyBox = Code.getBBox_(blockly_container);
+    var blockly_block = document.getElementById('blockly_block');
+    blockly_block.style.height = blocklyBox.height + 'px';
+    blockly_block.style.width = blocklyBox.width + 'px';
+
+    var blockly_table = document.getElementById('blockly_table')
+    blockly_table.style.width = blocklyBox.width + 'px';
+
     var bBox = Code.getBBox_(container);
     for (var i = 0; i < Code.TABS_.length; i++) {
       var el = document.getElementById('content_' + Code.TABS_[i]);
@@ -440,11 +444,11 @@ Code.init = function() {
       el.style.left = bBox.x + 'px';
       // Height and width need to be set, read back, then set again to
       // compensate for scrollbars.
-      // el.style.height = bBox.height + 'px';
-      el.style.height = '460px';
+      el.style.height = bBox.height + 'px';
       el.style.height = (2 * bBox.height - el.offsetHeight) + 'px';
       el.style.width = bBox.width + 'px';
       el.style.width = (2 * bBox.width - el.offsetWidth) + 'px';
+      el.style.overflow = 'hidden';
     }
     // Make the 'Blocks' tab line up with the toolbox.
     if (Code.workspace && Code.workspace.getToolbox().width) {
@@ -481,7 +485,7 @@ Code.init = function() {
            length: 3,
            colour: '#ccc',
            snap: true},
-       media: '../../media/',
+       media: '/blockly/media/',
        rtl: rtl,
        toolbox: toolboxXml,
        zoom:
@@ -536,6 +540,9 @@ Code.init = function() {
 
   // Lazy-load the syntax-highlighting.
   window.setTimeout(Code.importPrettify, 1);
+
+  // Add a listener for change events
+  Code.workspace.addChangeListener(onWorkspaceChange);
 };
 
 /**
@@ -583,7 +590,6 @@ Code.initLanguage = function() {
 
   // Inject language strings.
   document.title += ' ' + MSG['title'];
-  document.getElementById('title').textContent = MSG['title'];
   document.getElementById('tab_blocks').textContent = MSG['blocks'];
 
   document.getElementById('linkButton').title = MSG['linkTooltip'];
@@ -632,19 +638,67 @@ Code.discard = function() {
   }
 };
 
+function initIndexedDB() {
+  var request = indexedDB.open('codeDatabase', 1);
+
+  request.onupgradeneeded = function(event) {
+    db = event.target.result;
+    var objectStore = db.createObjectStore('codeStore', { keyPath: 'id', autoIncrement: true });
+    objectStore.createIndex('code', 'code', { unique: false });
+  };
+
+  request.onsuccess = function(event) {
+    db = event.target.result;
+  };
+
+  request.onerror = function(event) {
+    console.error('IndexedDB error:', event.target.errorCode);
+  };
+}
+
+// Store code in IndexedDB
+function saveCodeToIndexedDB(code) {
+  // Open transaction
+  var transaction = db.transaction(['codeStore'], 'readwrite');
+  var objectStore = transaction.objectStore('codeStore');
+
+  // Use fixed keys to store data
+  var request = objectStore.put({ id: 'python_code', code: code });
+
+  request.onsuccess = function(event) {
+    console.log('Code saved to IndexedDB');
+  };
+
+  request.onerror = function(event) {
+    console.error('Error saving code to IndexedDB:', event.target.errorCode);
+  };
+}
+
+// Generate and store Python code when Blockly workspace changes
+function onWorkspaceChange(event) {
+  if (event.type !== Blockly.Events.UI) {  // Ignore UI events
+    var code = python.pythonGenerator.workspaceToCode(Code.workspace);
+    saveCodeToIndexedDB(code);
+  }
+}
+
 if (typeof document !== 'undefined') {
   // Load the Code demo's language strings.
   var script1 = document.createElement('script');
-  script1.src = '/msg/' + Code.LANG + '.js';
+  script1.src = '/blockly/msg/' + Code.LANG + '.js';
   script1.defer = true;
   document.head.appendChild(script1);
 
   // Load Blockly's language strings.
   var script2 = document.createElement('script');
-  script2.src = '/build/msg/' + Code.LANG + '.js';
+  script2.src = '/blockly/build/msg/' + Code.LANG + '.js';
   script2.onload = function() {
     window.addEventListener('load', Code.init());
   }
+
+  //init indexedDB.
+  initIndexedDB();
+
   script2.defer = true;
   document.head.appendChild(script2);
 }
