@@ -1,13 +1,17 @@
 import Blockly from "../components/blockly/blockly";
 import ChatWithAI from "../components/chatAI/ChatWithAI"
+import DevNavBar from "@/components/dev-components/dev-nav";
+import CodeEditor from '@/components/dev-components/code-editor'
 
 export default function Home() {
     return (
-        <div className="container">
-            <ChatWithAI/>
-            <h1>測驗與開發介面的入口應該在這裡
+        <>
+            <div className="container">
+                <DevNavBar />
+                <ChatWithAI />
+                <CodeEditor />
                 <Blockly />
-            </h1>
-        </div>
+            </div>
+        </>
     );
 }
