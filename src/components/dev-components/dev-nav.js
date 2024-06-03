@@ -21,7 +21,7 @@ export default function DevNavBar() {
         >
             <List
                 subheader={
-                    <ListSubheader component="div" style={{backgroundColor:'black', color:'white'}}>
+                    <ListSubheader component="div" style={{backgroundColor:'#E3E1E1', color:'black'}}>
                         專案目錄
                     </ListSubheader>
                 }
@@ -45,7 +45,7 @@ export default function DevNavBar() {
     return (
         <>
             <CssBaseline />
-            <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#1b1c20' }}>
+            <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color:'black' }}>
                 <Toolbar sx={{ p: 0, m: 0 }}>
                     <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -62,8 +62,8 @@ export default function DevNavBar() {
                 onClose={toggleDrawer(false)}
                 PaperProps={{
                     sx: {
-                        backgroundColor: "#1b1c20",
-                        color: "white",
+                        backgroundColor: "#E3E1E1",
+                        color: "black",
                     }
                 }}
             >
