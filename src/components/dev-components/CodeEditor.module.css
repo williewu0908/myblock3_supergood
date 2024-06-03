@@ -1,0 +1,12 @@
+.boxtitle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10%;
+}
+
+.boxcontainer {
+    display: flex;
+    justify-content: center;
+    height: 90%;
+}
