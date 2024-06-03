@@ -40,3 +40,7 @@
         border-radius: 10px;
     }
 }
+
+.transparentArea{
+    pointer-events: none;
+}

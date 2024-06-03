@@ -11,7 +11,7 @@ function ChatWithAI() {
   };
 
   return (
-    <div className={styles.buttonChatContainer}>
+    <div className={`${styles.buttonChatContainer} ${!showChat && styles.transparentArea }`}>
       <div className={styles.buttonContainer}>
         <ToggleButton showChat={showChat} toggleChat={toggleChat}/>
       </div>
