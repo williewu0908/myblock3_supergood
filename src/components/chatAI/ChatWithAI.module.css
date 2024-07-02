@@ -3,7 +3,7 @@
     right: 0px;
     display: flex;
     width: 500px;
-    height: 100%;
+    height: 90%;
     flex-direction: column-reverse;
     z-index: 9999;
 }
@@ -37,7 +37,13 @@
         width: 100%;
     }
     .chatInterfaceContainer {
-        border-radius: 10px;
+        border-radius: 0 0 10px 10px;
+    }
+}
+
+@media screen and (max-height: 450px) {
+    .buttonChatContainer {
+        height: 85%;
     }
 }
 

@@ -14,7 +14,7 @@ export default function DevNavBar() {
 
     const drawerContent = (
         <Box
-            sx={{ width: 250, display: 'flex', flexDirection: 'column' }}
+            sx={{ width: 250, display: 'flex', flexDirection: 'column', position:'fixed' }}
             role="presentation"
             onClick={toggleDrawer(false)}
             onKeyDown={toggleDrawer(false)}

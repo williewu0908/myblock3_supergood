@@ -1,0 +1,176 @@
+@keyframes hightlight {
+    from {
+        color:  rgb(45, 201, 167);
+    }
+
+    to {
+        color: rgb(137, 137, 137);
+    }
+}
+
+/*
+選單線
+*/
+.line {
+    width: 30px;
+    height: 30px;
+    /* background: #FFF; */
+    cursor: pointer;
+    display: block;
+    /* padding: 20px; */
+    float: right;
+    position: relative;
+    z-index: 2;
+    top: 14px;
+    right: 20px;
+}
+
+.line .menuButton,
+.line .menuButton::before,
+.line .menuButton::after {
+    background: rgb(137, 137, 137);
+    content: '';
+    display: block;
+    height: 3px;
+    position: absolute;
+    transition: background ease .15s, top ease .15s .15s, transform ease .15s;
+    width: 30px;
+}
+
+.line .menuButton {
+    top: 14px;
+}
+
+.line .menuButton::before {
+    top: -10px;
+}
+
+.line .menuButton::after {
+    top: 10px;
+}
+
+/*
+點選選單變叉叉
+*/
+#menuButton:checked+.line .menuButton {
+    background: transparent;
+}
+
+#menuButton:checked+.line .menuButton::before {
+    transform: rotate(45deg);
+}
+
+#menuButton:checked+.line .menuButton::after {
+    transform: rotate(-45deg);
+}
+
+#menuButton:checked+.line .menuButton::before,
+#menuButton:checked+.line .menuButton::after {
+    top: 0;
+    transition: top ease .15s, transform ease .15s .15s;
+}
+
+#menuButton {
+    display: none;
+}
+
+/* 選單 */
+.menuList {
+    border: 1px solid rgb(233, 233, 233);
+    border-top: none;
+    position: absolute;
+    /* width: 200px; */
+    width: 100%;
+    max-height: 0px;
+    overflow: hidden;
+    background-color: rgb(228, 225, 225);
+    float: right;
+    top: 59px;
+    right: 0px;
+    z-index: 1000;
+    transition: max-height ease-out 0.5s;
+}
+
+/*選單開合*/
+#menuButton:checked~.menuList {
+    max-height: 500px;
+}
+
+/*選單向外推*/
+.menuList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menuList ul>li {
+    text-align: center;
+    color: rgb(99, 99, 99);
+    margin: 0;
+    position: relative;
+    transition: ease-out 0.2s;
+}
+
+/* 大標題 */
+.menuList>ul>li>a {
+    padding: 10px;
+    display: block;
+    font-size: 1.1em;
+    text-decoration: none;
+}
+
+.menuList>ul>li:hover {
+    background-color: rgb(235, 235, 235);
+    color: rgb(40, 187, 155);
+}
+
+/* 分隔線 */
+.menuList>ul>li+li::before {
+    content: "";
+    border-top: 1px solid white;
+    position: absolute;
+    left: 50px;
+    right: 50px;
+    top: 0;
+}
+
+.secondMenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.secondMenu li {
+    background-color: white;
+    overflow: hidden;
+    transition: 0.3s ease-in-out;
+    max-height: 0;
+}
+
+.secondMenu a {
+    color: rgb(86, 86, 86);
+    padding: 10px;
+    display: block;
+    font-size: 1.1em;
+    text-decoration: none;
+    transition: 0.1s ease-in;
+}
+
+.secondMenu a:hover {
+    color: rgb(49, 49, 49);
+    transform: scale(1.05);
+}
+
+.secondMenu a:active {
+    transform: scale(1);
+}
+
+#Delete {
+    color: darkred;
+    cursor: pointer;
+}
+
+/* 滑鼠移至標題時，展開下面的子標題 */
+.menuList>ul>li:hover .secondMenu li {
+    max-height: 50px;
+}
