@@ -7,9 +7,9 @@ export default function Home() {
         <>
             <div className="container">
                 <DevNavBar />
+                <ChatWithAI />
                 <CodeEditor />
             </div>
-            {/* <ChatWithAI /> */}
         </>
     );
 }
