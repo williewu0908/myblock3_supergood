@@ -145,7 +145,7 @@ function ChatInterface() {
     <div className={styles.container}>
       <div className={styles.titleContainer}>
         <DropDownMenu onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} />
-        <Image src="/media/robot.jpg" width={40} height={40} className={styles.characterTitleImg} alt="robot" />
+        <Image src="/blockly/media/robot.jpg" width={40} height={40} className={styles.characterTitleImg} alt="robot" />
         <h1 className={styles.title}>Chat with AI</h1>
         <div className={styles.subtitle}><span id={styles.showCharacter}>{character}</span>（<span id={styles.showModel}>{model}</span>）</div>
       </div>
@@ -154,7 +154,7 @@ function ChatInterface() {
           <div key={index} className={`${styles[`${content.role}ReplyContainer`]}`}>
             {content.role === 'assistant' && (
               <div>
-                <Image src="/media/robot.jpg" width={30} height={30} className={styles.characterImg} alt="robot" />
+                <Image src="/blockly/media/robot.jpg" width={30} height={30} className={styles.characterImg} alt="robot" />
                 <p className={styles.characterName}>AI-robot</p>
               </div>
             )}

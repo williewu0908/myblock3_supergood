@@ -36,14 +36,14 @@
     .buttonChatContainer {
         width: 100%;
     }
-    .chatInterfaceContainer {
-        border-radius: 0 0 10px 10px;
-    }
 }
 
 @media screen and (max-height: 450px) {
     .buttonChatContainer {
         height: 85%;
+    }
+    .chatInterfaceContainer {
+        border-radius: 0 0 10px 10px;
     }
 }
 
