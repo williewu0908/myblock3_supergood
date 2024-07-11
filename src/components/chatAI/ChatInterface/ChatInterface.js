@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -18,6 +18,7 @@ function ChatInterface() {
   const [model, setModel] = useState('llama3');
   const [character, setCharacter] = useState('CodingExpert');
   const [showModal, setShowModal] = useState(false);
+  const chatLogRef = useRef(null);
 
   // 設定語言模型
   const handleModel = (model) => {
@@ -68,6 +69,12 @@ function ChatInterface() {
             hljs.highlightElement(block);
           });
         }
+      };
+      //自動捲動到底部
+      const current = chatLogRef.current;
+      console.log(current.scrollHeight);
+      if (current) {
+        current.scrollTo({ top: current.scrollHeight, behavior: 'smooth' });
       }
     });
   }, [chatLog]);
@@ -105,7 +112,7 @@ function ChatInterface() {
     saveChatLog(newChatLog);
 
     const requestBody = {
-      chatLog: newChatLog.filter(message => message.role !== 'assistant' || message.message !== 'loading'),
+      chatLog: newChatLog.filter(message => message.role !== 'assistant' || message.content !== 'loading'),
       selectedCharacter: character,
       model: model
     };
@@ -145,16 +152,16 @@ function ChatInterface() {
     <div className={styles.container}>
       <div className={styles.titleContainer}>
         <DropDownMenu onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} />
-        <Image src="/blockly/media/robot.jpg" width={40} height={40} className={styles.characterTitleImg} alt="robot" />
+        <Image src="/AIchat/media/robot.jpg" width={40} height={40} className={styles.characterTitleImg} alt="robot" />
         <h1 className={styles.title}>Chat with AI</h1>
         <div className={styles.subtitle}><span id={styles.showCharacter}>{character}</span>（<span id={styles.showModel}>{model}</span>）</div>
       </div>
-      <div id={styles.chatlog}>
+      <div id={styles.chatlog} ref={chatLogRef}>
         {chatLog.map((content, index) => (
           <div key={index} className={`${styles[`${content.role}ReplyContainer`]}`}>
             {content.role === 'assistant' && (
               <div>
-                <Image src="/blockly/media/robot.jpg" width={30} height={30} className={styles.characterImg} alt="robot" />
+                <Image src="/AIchat/media/robot.jpg" width={30} height={30} className={styles.characterImg} alt="robot" />
                 <p className={styles.characterName}>AI-robot</p>
               </div>
             )}
