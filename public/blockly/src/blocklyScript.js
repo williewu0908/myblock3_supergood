@@ -97,11 +97,6 @@ Code.getStringParamFromUrl = function(name, defaultValue) {
   
 };
 
-// Code.getStringParamFromUrl = useEffect((name, defaultValue) => {
-//   var val = location.search.match(new RegExp('[?&]' + name + '=([^&]+)'));
-//   return val ? decodeURIComponent(val[1].replace(/\+/g, '%20')) : defaultValue;
-// });
-
 /**
  * Get the language of this user from the URL.
  * @return {string} User's language.
@@ -254,7 +249,7 @@ Code.LANG = Code.getLang();
  * @private
  */
 Code.TABS_ = [
-  'blocks', 'xml', 'json'
+  'blocks', 'javascript', 'python', 'xml', 'json'
 ];
 
 /**
@@ -262,7 +257,7 @@ Code.TABS_ = [
  * @private
  */
 Code.TABS_DISPLAY_ = [
-  'Blocks', 'XML', 'JSON'
+  'Blocks', 'JavaScript', 'Python', 'XML', 'JSON'
 ];
 
 Code.selected = 'blocks';
@@ -333,14 +328,6 @@ Code.tabClick = function(clickedName) {
   document.getElementById('content_' + clickedName).style.visibility =
       'visible';
   Code.renderContent();
-  // The code menu tab is on if the blocks tab is off.
-  var codeMenuTab = document.getElementById('tab_code');
-  if (clickedName === 'blocks') {
-    Code.workspace.setVisible(true);
-    codeMenuTab.className = 'taboff';
-  } else {
-    codeMenuTab.className = 'tabon';
-  }
   // Sync the menu's value with the clicked tab value if needed.
   var codeMenu = document.getElementById('code_menu');
   for (var i = 0; i < codeMenu.options.length; i++) {
@@ -369,7 +356,11 @@ Code.renderContent = function() {
     jsonTextarea.value = JSON.stringify(
         Blockly.serialization.workspaces.save(Code.workspace), null, 2);
     jsonTextarea.focus();
-  }
+      } else if (content.id === 'content_javascript') {
+    Code.attemptCodeGeneration(javascript.javascriptGenerator);
+  } else if (content.id === 'content_python') {
+    Code.attemptCodeGeneration(python.pythonGenerator);
+  } 
   if (typeof PR === 'object') {
     PR.prettyPrint();
   }
@@ -433,9 +424,6 @@ Code.init = function() {
     var blockly_block = document.getElementById('blockly_block');
     blockly_block.style.height = blocklyBox.height + 'px';
     blockly_block.style.width = blocklyBox.width + 'px';
-
-    var blockly_table = document.getElementById('blockly_table')
-    blockly_table.style.width = blocklyBox.width + 'px';
 
     var bBox = Code.getBBox_(container);
     for (var i = 0; i < Code.TABS_.length; i++) {
@@ -527,13 +515,6 @@ Code.init = function() {
     Code.bindClick('tab_' + name,
         function(name_) {return function() {Code.tabClick(name_);};}(name));
   }
-  Code.bindClick('tab_code', function(e) {
-    if (e.target !== document.getElementById('tab_code')) {
-      // Prevent clicks on child codeMenu from triggering a tab click.
-      return;
-    }
-    Code.changeCodingLanguage();
-  });
 
   onresize();
   Blockly.svgResize(Code.workspace);

@@ -22,7 +22,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
 
     return (
         <Box sx={{ width: '100%', height: '100%', display: 'flex' }}>
-            <Box sx={{ width: '33.333%', height: '100%', backgroundColor: '#F8F8F8' }}>
+            <Box sx={{ flex: 1, width:0, height: '100%', backgroundColor: '#F8F8F8' }}>
                 <div className={styles.boxtitle}>
                     <h1>Blockly</h1>
                 </div>
@@ -30,7 +30,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
                     <Blockly onUpdate={handleCodeUpdate} />
                 </div>
             </Box>
-            <Box sx={{ width: '33.333%', height: '100%', backgroundColor: '#F8F8F8' }}>
+            <Box sx={{ flex: 1, flexBasis:1, height: '100%', backgroundColor: '#F8F8F8' }}>
                 <div className={styles.boxtitle}>
                     <h1>FlowChart</h1>
                 </div>
@@ -38,7 +38,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
                     <PythonFlowchart code={code} />
                 </div>
             </Box>
-            <Box sx={{ width: '33.333%', height: '100%', backgroundColor: '#F8F8F8' }}>
+            <Box sx={{ flex: 1, flexBasis:1, height: '100%', backgroundColor: '#F8F8F8' }}>
                 <div className={styles.boxtitle}>
                     <h1>Code</h1>
                 </div>

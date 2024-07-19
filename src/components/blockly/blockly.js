@@ -320,56 +320,42 @@ function BlocklyToolBox() {
 
 function Tabs() {
   return (
-    <table width="100%">
-      <tbody>
-        <tr id="tabRow" height="1em">
-          <td id="tab_blocks" className={styles.tabon}>
-            積木
-          </td>
-          {/* <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
-          <td id="tab_javascript" className={styles.taboff + ' ' + styles.tab_collapse}>
-            JavaScript
-          </td>
-          <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
-          <td id="tab_python" className={styles.taboff + ' ' + styles.tab_collapse}>
-            Python
-          </td> */}
-          <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
-          <td id="tab_xml" className={styles.taboff + ' ' + styles.tab_collapse}>
-            XML
-          </td>
-          <td className={styles.tabmin + ' ' + styles.tab_collapse}>&nbsp;</td>
-          <td id="tab_json" className={styles.taboff + ' ' + styles.tab_collapse}>
-            JSON
-          </td>
-          <td className={styles.tabmin}>&nbsp;</td>
-          <td id="tab_code" className={styles.taboff}>
-            <select id="code_menu" />
-          </td>
-          <td className={styles.tabmax}>
-            <button id="trashButton" className={styles.notext} title="...">
-              <img src="blockly/media/1x1.gif" className={styles.trash + ' ' + styles.icon21} />
-            </button>
-            <button id="linkButton" className={styles.notext} title="...">
-              <img src="blockly/media/1x1.gif" className={styles.link + ' ' + styles.icon21} />
-            </button>
-            <button id="runButton" className={styles.notext + ' ' + styles.primary} title="...">
-              <img src="blockly/media/1x1.gif" className={styles.run + ' ' + styles.icon21} />
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div className={styles.tabButtons}>
+      <button id="tab_blocks" className={styles.tabon + ' ' + styles.tabButton}>積木</button>
+      <button id="tab_javascript" className={styles.taboff + ' ' + styles.tabButton}>javascript</button>
+      <button id="tab_python" className={styles.taboff + ' ' + styles.tabButton}>Python</button>
+      <button id="tab_xml" className={styles.taboff + ' ' + styles.tabButton}>XML</button>
+      <button id="tab_json" className={styles.taboff + ' ' + styles.tabButton}>JSON</button>
+      <div id="tab_code" className={styles.tabCode}>
+        <select id="code_menu" />
+      </div>
+      <div>
+        <button id="trashButton" className={styles.notext} title="...">
+          <img src="blockly/media/1x1.gif" className={styles.trash + ' ' + styles.icon21} />
+        </button>
+        <button id="linkButton" className={styles.notext} title="...">
+          <img src="blockly/media/1x1.gif" className={styles.link + ' ' + styles.icon21} />
+        </button>
+        <button id="runButton" className={styles.notext + ' ' + styles.primary} title="...">
+          <img src="blockly/media/1x1.gif" className={styles.run + ' ' + styles.icon21} />
+        </button>
+      </div>
+    </div>
   )
 }
 
 function Content() {
   return (
-    <>
+    <div className={styles.contentContainer}>
       <div id="content_blocks" className={styles.content} />
+      <pre id="content_javascript" className={styles.content + ' prettyprint lang-js'} />
+      <pre id="content_python" className={styles.content + ' prettyprint lang-py'} />
+      <pre id="content_php" className={styles.content + ' prettyprint lang-php'} />
+      <pre id="content_lua" className={styles.content + ' prettyprint lang-lua'} />
+      <pre id="content_dart" className={styles.content + ' prettyprint lang-dart'} />
       <textarea id="content_xml" className={styles.content} wrap="off" defaultValue={""} />
       <textarea id="content_json" className={styles.content} wrap="off" defaultValue={""} />
-    </>
+    </div>
   )
 }
 
@@ -382,7 +368,7 @@ function Header() {
         <meta name="google" value="notranslate" />
         <title>Blockly Demo:</title>
       </Head>
-      
+
       <Script
         src="/blockly/src/blocklyScript.js"
         strategy="lazyOnload"
@@ -398,26 +384,12 @@ function Header() {
 export default function HomePage() {
   return (
     <div id='blockly_block' width="99%" height="100%">
-      <Header/>
-      <table height="100%" id="blockly_table">
-        <tbody>
-          <tr>
-            <td className={styles.farSide}>
-              <select id="languageMenu" />
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={2}>
-              <Tabs/>
-            </td>
-          </tr>
-          <tr>
-            <td width="99%" height="99%" colSpan={2} id="content_area"></td>
-          </tr>
-        </tbody>
-      </table>
-      <Content/>
-      <BlocklyToolBox/>
+      <Header />
+      <select id="languageMenu" />
+      <Tabs />
+      <div width="99%" height="99%" id="content_area"></div>
+      <Content />
+      <BlocklyToolBox />
     </div>
   );
 }

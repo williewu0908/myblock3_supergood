@@ -7,6 +7,21 @@ html[dir="RTL"] .farSide {
 }
 
 /* Buttons */
+.tabButtons{
+  display: flex;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.tabButton{
+  flex: 1;
+  cursor: pointer;
+  color: rgb(58, 58, 58);
+  border: 1px solid rgb(233, 233, 233);
+  border-radius: 0;
+}
+.tabButton:hover{
+  background-color: rgb(184, 184, 184);;
+}
 button.primary {
   border: 1px solid #dd4b39;
   background-color: #dd4b39;
@@ -25,42 +40,26 @@ button.notext {
   font-size: 10%;
 }
 /* Tabs */
-#tabRow>td {
-  border: 1px solid #ccc;
-  border-bottom: none;
-}
-td.tabon {
+.tabon {
   border-bottom-color: #ddd !important;
   background-color: #ddd;
   padding: 5px 19px;
   white-space: nowrap;
 }
-td.taboff {
+.taboff {
   cursor: pointer;
   padding: 5px 19px;
-}
-td.taboff:hover {
-  background-color: #eee;
-}
-td.tabmin {
-  border-top-style: none !important;
-  border-left-style: none !important;
-  border-right-style: none !important;
-}
-td.tabmax {
-  border-top-style: none !important;
-  border-left-style: none !important;
-  border-right-style: none !important;
-  width: 99%;
-  padding-left: 10px;
-  padding-right: 10px;
-  text-align: right;
 }
 html[dir=rtl] td.tabmax {
   text-align: left;
 }
-#tab_code {
-  display: none;
+.tabCode{
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+.contentContainer{
+  height: 100%;
 }
 .content {
   visibility: hidden;
@@ -68,6 +67,8 @@ html[dir=rtl] td.tabmax {
   padding: 1ex;
   position: absolute;
   direction: ltr;
+  height: 100% !important;
+  resize: 'none'
 }
 pre.content {
   border: 1px solid #ccc;
@@ -109,15 +110,6 @@ pre.content {
 }
 .run {
   background-position: -42px 0px;
-}
-
-@media (max-width: 710px) {
-  .tab_collapse {
-    display: none;
-  }
-  #tab_code {
-    display: table-cell;
-  }
 }
 
 /* Privacy link */
