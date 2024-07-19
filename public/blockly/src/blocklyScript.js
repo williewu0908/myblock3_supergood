@@ -658,21 +658,21 @@ function initIndexedDB() {
 
 // Store code in IndexedDB
 function saveCodeToIndexedDB(code) {
-  // Open transaction
   var transaction = db.transaction(['codeStore'], 'readwrite');
   var objectStore = transaction.objectStore('codeStore');
-
-  // Use fixed keys to store data
   var request = objectStore.put({ id: 'python_code', code: code });
 
   request.onsuccess = function(event) {
     console.log('Code saved to IndexedDB');
+    // Emit an event to notify that the code has been updated
+    window.dispatchEvent(new CustomEvent('codeUpdated'));
   };
 
   request.onerror = function(event) {
     console.error('Error saving code to IndexedDB:', event.target.errorCode);
   };
 }
+
 
 // Generate and store Python code when Blockly workspace changes
 function onWorkspaceChange(event) {

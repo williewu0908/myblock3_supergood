@@ -9,7 +9,7 @@ export default function Home() {
                 <DevNavBar />
                 <CodeEditor />
             </div>
-            {/* <ChatWithAI /> */}
+            <ChatWithAI />
         </>
     );
 }
