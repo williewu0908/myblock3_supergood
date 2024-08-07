@@ -95,6 +95,7 @@ const PythonFlowchart = () => {
                     if (response.ok) {
                         const { diagramCode } = await response.json();
                         initFlowchart(diagramCode); // 使用後端返回的流程圖程式碼渲染流程圖
+                        console.log('diagramcode', diagramCode);
                     } else {
                         console.error('Failed to fetch diagram code:', response.statusText);
                     }

@@ -10,10 +10,6 @@ export default function Home() {
                 <ChatWithAI />
                 <CodeEditor />
             </div>
-<<<<<<< HEAD
-            <ChatWithAI />
-=======
->>>>>>> b528e83deee143ff920e891b27d01012712fa0ab
         </>
     );
 }

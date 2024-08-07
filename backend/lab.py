@@ -6,12 +6,7 @@ def code_to_flowchart(code):
 
 
 python_code = """
-a = 1
-b = 2
-if a < b:
-    print("a is less than b")
-else:
-    print("a is not less than b")
+x = 123
 """
 
 flowchart_text = code_to_flowchart(python_code)
