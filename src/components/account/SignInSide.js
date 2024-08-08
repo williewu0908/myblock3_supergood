@@ -16,7 +16,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import AppleIcon from '@mui/icons-material/Apple';
-import loginpng from '../../../public/img/login.jpg';
 
 function Copyright(props) {
   return (
@@ -30,8 +29,6 @@ function Copyright(props) {
     </Typography>
   );
 }
-
-// TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 
@@ -55,11 +52,10 @@ export default function SignInSide() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: `url(${loginpng})`,
+            backgroundImage: `url(/img/login.svg)`,
             backgroundRepeat: 'no-repeat',
-            backgroundColor: (t) =>
-              t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-            backgroundSize: 'cover',
+            backgroundColor: '#9d9cf0', // Light blue color
+            backgroundSize: '50%', // Adjust size of the image
             backgroundPosition: 'center',
           }}
         />

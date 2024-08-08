@@ -60,7 +60,7 @@ const PythonFlowchart = () => {
     }, [contextCode]);
 
     return (
-        <div style={{ width: '100%', minHeight: '300px', border: '1px solid #ccc', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ width: '100%', border: '1px solid #ccc', display: 'flex', justifyContent: 'center' }}>
             <div ref={ref} />
         </div>
     );
