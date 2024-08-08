@@ -30,8 +30,6 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
@@ -54,11 +52,10 @@ export default function SignInSide() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
+            backgroundImage: `url(/img/login.svg)`,
             backgroundRepeat: 'no-repeat',
-            backgroundColor: (t) =>
-              t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-            backgroundSize: 'cover',
+            backgroundColor: '#9d9cf0', // Light blue color
+            backgroundSize: '50%', // Adjust size of the image
             backgroundPosition: 'center',
           }}
         />

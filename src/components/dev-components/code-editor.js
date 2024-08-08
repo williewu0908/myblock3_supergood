@@ -4,6 +4,7 @@ import Blockly from "../blockly/blockly";
 import styles from './CodeEditor.module.css';
 import PythonEditor from '../pythonEditor/pythonEditor';
 import PythonFlowchart from '../flowchart/pythonFlowchart';
+import { CodeProvider } from './CodeContext';
 
 export default function CodeEditor() {
     const [code, setCode] = useState(`def add_numbers(num1, num2):
@@ -22,30 +23,32 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
 
     return (
         <Box sx={{ width: '100%', height: '100%', display: 'flex' }}>
-            <Box sx={{ flex: 1, width:0, height: '100%', backgroundColor: '#F8F8F8' }}>
-                <div className={styles.boxtitle}>
-                    <h1>Blockly</h1>
-                </div>
-                <div className={styles.boxcontainer} id='blockly_container'>
-                    <Blockly onUpdate={handleCodeUpdate} />
-                </div>
-            </Box>
-            <Box sx={{ flex: 1, flexBasis:1, height: '100%', backgroundColor: '#F8F8F8' }}>
-                <div className={styles.boxtitle}>
-                    <h1>FlowChart</h1>
-                </div>
-                <div className={styles.boxcontainer}>
-                    <PythonFlowchart code={code} />
-                </div>
-            </Box>
-            <Box sx={{ flex: 1, flexBasis:1, height: '100%', backgroundColor: '#F8F8F8' }}>
-                <div className={styles.boxtitle}>
-                    <h1>Code</h1>
-                </div>
-                <div className={styles.boxcontainer}>
-                    <PythonEditor code={code} onUpdate={handleCodeUpdate} />
-                </div>
-            </Box>
+            <CodeProvider>
+                <Box sx={{ flex: 1, width: 0, height: '100%', backgroundColor: '#F8F8F8' }}>
+                    <div className={styles.boxtitle}>
+                        <h1>Blockly</h1>
+                    </div>
+                    <div className={styles.boxcontainer} id='blockly_container'>
+                        <Blockly onUpdate={handleCodeUpdate} />
+                    </div>
+                </Box>
+                <Box sx={{ flex: 1, flexBasis: 1, height: '100%', backgroundColor: '#F8F8F8' }}>
+                    <div className={styles.boxtitle}>
+                        <h1>FlowChart</h1>
+                    </div>
+                    <div className={styles.boxcontainer}>
+                        <PythonFlowchart code={code} />
+                    </div>
+                </Box>
+                <Box sx={{ flex: 1, flexBasis: 1, height: '100%', backgroundColor: '#F8F8F8' }}>
+                    <div className={styles.boxtitle}>
+                        <h1>Code</h1>
+                    </div>
+                    <div className={styles.boxcontainer}>
+                        <PythonEditor code={code} onUpdate={handleCodeUpdate} />
+                    </div>
+                </Box>
+            </CodeProvider>
         </Box>
     );
 }

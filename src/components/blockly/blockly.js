@@ -320,7 +320,7 @@ function BlocklyToolBox() {
 
 function Tabs() {
   return (
-    <div className={styles.tabButtons}>
+    <div className={styles.tabButtons} style={{display:'none'}}>
       <button id="tab_blocks" className={styles.tabon + ' ' + styles.tabButton}>積木</button>
       <button id="tab_javascript" className={styles.taboff + ' ' + styles.tabButton}>javascript</button>
       <button id="tab_python" className={styles.taboff + ' ' + styles.tabButton}>Python</button>

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import AceEditor from 'react-ace';
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-github";
+import { CodeContext } from '../dev-components/CodeContext';
 
 const getPythonCodeFromIndexedDB = async () => {
     return new Promise((resolve, reject) => {
@@ -44,11 +45,13 @@ const getPythonCodeFromIndexedDB = async () => {
 
 function PythonEditor() {
     const [code, setCode] = useState("# Write your Python code here\n");
+    const { setContextCode } = useContext(CodeContext);
 
     useEffect(() => {
         const fetchCode = async () => {
             const fetchedCode = await getPythonCodeFromIndexedDB();
             setCode(fetchedCode);
+            setContextCode(fetchedCode);
         };
 
         fetchCode().catch(console.error);
