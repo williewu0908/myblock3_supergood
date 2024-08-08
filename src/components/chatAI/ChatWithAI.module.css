@@ -5,7 +5,7 @@
     width: 500px;
     height: 90%;
     flex-direction: column-reverse;
-    z-index: 9999;
+    z-index: 9996;
 }
 
 .chatInterfaceContainer {
