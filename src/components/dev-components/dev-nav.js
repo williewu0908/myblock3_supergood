@@ -45,7 +45,7 @@ export default function DevNavBar() {
                     <Button color="inherit" onClick={toggleDrawer(true)}>專案</Button>
                 </Toolbar>
             </AppBar>
-            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} />
+            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchData={fetchData}/>
         </>
     );
 }

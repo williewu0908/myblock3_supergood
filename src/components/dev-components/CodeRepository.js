@@ -23,22 +23,64 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { useJSON } from '../blockly/JSONContext';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function NewCodeDialog({ open, handleClose }) {
+function NewCodeDialog({ open, handleClose, fetchProject }) {
+    const [userInput, setUserInput] = React.useState('');
+    const { getJSON } = useJSON(); // 獲取getJSON方法
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const trimmedUserInput = userInput.trim();
+        if (!trimmedUserInput) return;
+
+        try {
+            const requestBody = {
+                projectname: trimmedUserInput,
+                JSONcode: getJSON()
+            };
+
+            const response = await fetch("http://127.0.0.1:5000/addToDB", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                withCredentials: true, // 設置為 include 以確保憑證被包含在請求中
+                body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Project added:", data);
+                // Optionally update the UI or state to reflect the added project
+                fetchProject();
+            } else {
+                console.error("Failed to add project:", data);
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+        }
+
+        setUserInput('');
+        handleClose();
+    };
+
     return (
         <Dialog
             open={open}
             onClose={handleClose}
             sx={{ zIndex: 9999 }}
-            maxWidth="xs"  // 可以設定 maxWidth 为 'xs', 'sm', 'md', 'lg', 'xl' 或 false 以禁用最大寬度
-            fullWidth  // 使 Dialog 占滿其容器的寬度
+            maxWidth="xs"
+            fullWidth
             PaperProps={{
                 sx: {
-                    padding: 1,  // 設定 Dialog 的padding
+                    padding: 1,
                 }
             }}
         >
@@ -52,22 +94,73 @@ function NewCodeDialog({ open, handleClose }) {
                     margin="dense"
                     id="name"
                     label="專案名稱"
-                    type="email"
+                    type="text"
                     fullWidth
                     variant="standard"
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
                 />
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>取消</Button>
-                <Button onClick={handleClose}>儲存</Button>
+                <Button onClick={handleSubmit}>儲存</Button>
             </DialogActions>
         </Dialog>
     );
 }
 
-export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData }) {
+function RenameDialog({ open, handleClose, selectedProject, renameProject }) {
+    const [newName, setNewName] = React.useState('');
+
+    const handleRename = () => {
+        if (newName.trim()) {
+            renameProject(selectedProject, newName);
+        }
+    };
+
+    return (
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            sx={{ zIndex: 9999 }}
+            maxWidth="xs"
+            fullWidth
+            PaperProps={{
+                sx: {
+                    padding: 1,
+                }
+            }}
+        >
+            <DialogTitle>更改名稱</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    專案名稱請不要超過255個字
+                </DialogContentText>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="專案名稱"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>取消</Button>
+                <Button onClick={handleRename}>儲存</Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
+export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData, fetchData }) {
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [selectedProject, setSelectedProject] = React.useState(null); 
+    const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
     const open = Boolean(anchorEl);
 
     const handleDialogOpen = () => {
@@ -78,12 +171,71 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
         setDialogOpen(false);
     };
 
-    const handleMenuClick = (event) => {
+    const handleMenuClick = (event, key) => {
+        setSelectedProject(key);
         setAnchorEl(event.currentTarget);
     };
 
     const handleMenuClose = () => {
         setAnchorEl(null);
+        setSelectedProject(null);
+    };
+
+    const handleRenameDialogOpen = (project) => {
+        setSelectedProject(project);
+        setRenameDialogOpen(true);
+    };
+
+    const handleRenameDialogClose = () => {
+        setRenameDialogOpen(false);
+    };
+
+    const deleteProject = async (projectName) => {
+        try {
+            const response = await fetch("http://127.0.0.1:5000/deleteFromDB", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ projectname: projectName })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Project deleted:", data);
+                fetchData(); // Refresh data
+            } else {
+                console.error("Failed to delete project:", data);
+            }
+        } catch (error) {
+            console.error("Error deleting project:", error);
+        }
+        handleMenuClose();
+    };
+
+    const renameProject = async (oldProjectName, newProjectName) => {
+        console.log('Renaming project:', oldProjectName, newProjectName);
+        try {
+            const response = await fetch("http://127.0.0.1:5000/changeProjectName", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ oldProjectName, newProjectName })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Project renamed:", data);
+                fetchData(); // Refresh data
+            } else {
+                console.error("Failed to rename project:", data);
+            }
+        } catch (error) {
+            console.error("Error renaming project:", error);
+        }
+        handleRenameDialogClose();
+        handleMenuClose();
     };
 
     const Search = styled('div')(({ theme }) => ({
@@ -117,7 +269,6 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
         color: 'inherit',
         '& .MuiInputBase-input': {
             padding: theme.spacing(1, 1, 1, 0),
-            // vertical padding + font size from searchIcon
             paddingLeft: `calc(1em + ${theme.spacing(4)})`,
             transition: theme.transitions.create('width'),
             width: '100%',
@@ -129,7 +280,7 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
 
     const list = () => (
         <Box
-            sx={{ width: 250, }}
+            sx={{ width: 250 }}
             role="presentation"
         >
             <Search>
@@ -152,7 +303,7 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                 {repositoryData.map((text, index) => (
                     <ListItem disablePadding key={text}
                         secondaryAction={
-                            <IconButton edge="end" id="option-button" aria-controls="option-menu" aria-haspopup="true" aria-expanded={open ? 'true' : undefined} onClick={handleMenuClick}>
+                            <IconButton edge="end" id="option-button" aria-controls="option-menu" aria-haspopup="true" aria-expanded={open ? 'true' : undefined} onClick={(event) => handleMenuClick(event, text)}>
                                 <MoreVertIcon />
                             </IconButton>
                         }>
@@ -174,8 +325,8 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                         boxShadow: 1
                     }}
                 >
-                    <MenuItem onClick={handleMenuClose}>刪除專案</MenuItem>
-                    <MenuItem onClick={handleMenuClose}>更改名稱</MenuItem>
+                    <MenuItem onClick={() => deleteProject(selectedProject)}>刪除專案</MenuItem>
+                    <MenuItem onClick={() => handleRenameDialogOpen(selectedProject)}>更改名稱</MenuItem>
                 </Menu>
             </List>
         </Box>
@@ -197,7 +348,8 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                 }}
             >
                 {list()}
-                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} />
+                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProject={fetchData}/>
+                <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} selectedProject={selectedProject} renameProject={renameProject} />
             </Drawer>
         </>
     );
