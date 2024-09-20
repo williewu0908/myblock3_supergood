@@ -154,6 +154,69 @@ def changeProjectName():
     except Exception as e:
         print(f"Error during database update: {e}")
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/loadProject', methods=['POST', 'OPTIONS'])
+def loadProject():
+    if request.method.lower() == 'options':
+        return '', 200
+
+    try:
+        data = request.get_json()
+        project_name = data.get('projectname')
+        
+        if not project_name:
+            return jsonify({"error": "Invalid input"}), 400
+
+        # 查詢專案並回傳 json_code
+        with engine.begin() as conn:
+            query = sqlalchemy.text("SELECT `json_code` FROM `projects` WHERE `user_id`=1 AND `project_name`=:project_name")
+            result = conn.execute(query, {'project_name': project_name}).fetchone()
+
+        if result:
+            # 回傳查詢到的 json_code
+            json_code = result[0]
+            return jsonify(json_code), 200
+        else:
+            # 如果沒有找到專案，回傳錯誤訊息
+            return jsonify({"error": "Project not found"}), 404
+
+    except Exception as e:
+        print(f"Error during database search: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/saveProject', methods=['POST', 'OPTIONS'])
+def saveProject():
+    if request.method.lower() == 'options':
+        return '', 200
+    
+    try:
+        data = request.get_json()
+        project_name = data.get('projectname')
+        json_code = data.get('JSONcode')
+        
+        print(f"Received project_name: {project_name}")
+        print(f"Received json_code: {json_code}")
+        
+        if not project_name or not json_code:
+            return jsonify({"error": "Invalid input"}), 400
+        
+        # 開始事務，更新專案的 json_code
+        with engine.begin() as conn:
+            query = sqlalchemy.text("""
+                UPDATE `projects` 
+                SET `json_code` = :json_code 
+                WHERE `user_id` = 1 AND `project_name` = :project_name
+            """)
+            conn.execute(query, {'project_name': project_name, 'json_code': json_code})
+        
+        return jsonify({"message": "Project updated successfully"}), 200
+    
+    except Exception as e:
+        print(f"Error during database query: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
