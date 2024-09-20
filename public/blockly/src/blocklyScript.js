@@ -489,20 +489,6 @@ const toolbox = {
             },
           },
         },
-        {
-          kind: 'block',
-          type: 'add_text',
-          inputs: {
-            TEXT: {
-              shadow: {
-                type: 'text',
-                fields: {
-                  TEXT: 'abc',
-                },
-              },
-            },
-          },
-        },
       ],
     },
     {

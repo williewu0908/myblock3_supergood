@@ -23,26 +23,37 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Skeleton from '@mui/material/Skeleton';
 import { useJSON } from '../blockly/JSONContext';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function NewCodeDialog({ open, handleClose, fetchProject }) {
+// 新增專案
+function NewCodeDialog({ open, handleClose, fetchProject, existingProjects, setOriginJSON }) {
     const [userInput, setUserInput] = React.useState('');
+    const [isExist, setIsExist] = React.useState(false);
     const { getJSON } = useJSON(); // 獲取getJSON方法
 
+    // 儲存到資料庫
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         const trimmedUserInput = userInput.trim();
         if (!trimmedUserInput) return;
 
+        // 檢查輸入的名稱是否存在
+        const projectExists = existingProjects.includes(trimmedUserInput || 'Myblock3');
+        if (projectExists) {
+            setIsExist(true);
+            return;
+        }
+
         try {
             const requestBody = {
                 projectname: trimmedUserInput,
-                JSONcode: getJSON()
+                JSONcode: getJSON() // 獲取當前工作區的JSON
             };
 
             const response = await fetch("http://127.0.0.1:5000/addToDB", {
@@ -57,7 +68,9 @@ function NewCodeDialog({ open, handleClose, fetchProject }) {
             const data = await response.json();
             if (response.ok) {
                 console.log("Project added:", data);
-                // Optionally update the UI or state to reflect the added project
+                // 設置新增專案的初始 JSON
+                setOriginJSON(getJSON());
+                // 更新專案列表
                 fetchProject();
             } else {
                 console.error("Failed to add project:", data);
@@ -99,7 +112,10 @@ function NewCodeDialog({ open, handleClose, fetchProject }) {
                     variant="standard"
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
+                    error={isExist}
+                    helperText={isExist ? "專案名稱已存在" : ""}
                 />
+
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>取消</Button>
@@ -156,40 +172,51 @@ function RenameDialog({ open, handleClose, selectedProject, renameProject }) {
     );
 }
 
-export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData, fetchData }) {
+export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData, fetchData, loading, setCurrentProject, setOriginJSON }) {
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [selectedProject, setSelectedProject] = React.useState(null); 
+    const [selectedProject, setSelectedProject] = React.useState(null);
     const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
+    const { getJSON } = useJSON(); // 獲取getJSON方法
+    const { setJSON } = useJSON(); // 獲取getJSON方法
     const open = Boolean(anchorEl);
+    const [searchQuery, setSearchQuery] = React.useState(''); // 搜尋狀態
+    const searchInputRef = React.useRef(null);
 
+    // 打開輸入新專案名稱的視窗
     const handleDialogOpen = () => {
         setDialogOpen(true);
     };
 
+    // 關閉輸入新專案名稱的視窗
     const handleDialogClose = () => {
         setDialogOpen(false);
     };
 
+    // 點擊專案名稱，取得專案名稱
     const handleMenuClick = (event, key) => {
         setSelectedProject(key);
         setAnchorEl(event.currentTarget);
     };
 
+    // 關閉專案目錄
     const handleMenuClose = () => {
         setAnchorEl(null);
         setSelectedProject(null);
     };
 
+    // 打開更改專案名稱的視窗
     const handleRenameDialogOpen = (project) => {
         setSelectedProject(project);
         setRenameDialogOpen(true);
     };
 
+    // 關閉更改專案名稱的視窗
     const handleRenameDialogClose = () => {
         setRenameDialogOpen(false);
     };
 
+    // 刪除選擇專案
     const deleteProject = async (projectName) => {
         try {
             const response = await fetch("http://127.0.0.1:5000/deleteFromDB", {
@@ -214,7 +241,6 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
     };
 
     const renameProject = async (oldProjectName, newProjectName) => {
-        console.log('Renaming project:', oldProjectName, newProjectName);
         try {
             const response = await fetch("http://127.0.0.1:5000/changeProjectName", {
                 method: "POST",
@@ -237,6 +263,45 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
         handleRenameDialogClose();
         handleMenuClose();
     };
+
+    // 載入先前的專案
+    const loadProject = async (projectName) => {
+        try {
+            const response = await fetch("http://127.0.0.1:5000/loadProject", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ projectname: projectName })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Project loaded:", data);
+                setJSON(data);
+                // 設置載入專案後的初始 JSON
+                // setOriginJSON(getJSON());
+                setCurrentProject(projectName);
+            } else {
+                console.error("Failed to load project:", data);
+            }
+        } catch (error) {
+            console.error("Error loading project:", error);
+        }
+        handleMenuClose();
+    };
+
+    // 搜尋過濾專案
+    const filteredProjects = repositoryData.filter((project) =>
+        project.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // 更新輸入框時自動獲取焦點
+    React.useEffect(() => {
+        if (searchInputRef.current) {
+            searchInputRef.current.focus();
+        }
+    }, [searchQuery]);
 
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
@@ -290,6 +355,9 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                 <StyledInputBase
                     placeholder="搜尋專案庫"
                     inputProps={{ 'aria-label': 'search' }}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    inputRef={searchInputRef} // 綁定 ref
                 />
             </Search>
             <List>
@@ -300,18 +368,34 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                     </Button>
                 </ListSubheader>
                 <Divider />
-                {repositoryData.map((text, index) => (
-                    <ListItem disablePadding key={text}
-                        secondaryAction={
-                            <IconButton edge="end" id="option-button" aria-controls="option-menu" aria-haspopup="true" aria-expanded={open ? 'true' : undefined} onClick={(event) => handleMenuClick(event, text)}>
-                                <MoreVertIcon />
-                            </IconButton>
-                        }>
-                        <ListItemButton>
-                            <ListItemText primary={text} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
+                {loading ? (
+                    Array.from(new Array(5)).map((_, index) => (
+                        <Box
+                            key={index}
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: '100%'
+                            }}
+                        >
+                            <Skeleton animation="wave" variant="rounded" width={220} height={46} sx={{ marginTop: 2 }} />
+                        </Box>
+                    ))
+                ) : (
+                    filteredProjects.map((text, index) => (
+                        <ListItem disablePadding key={text}
+                            secondaryAction={
+                                <IconButton edge="end" id="option-button" aria-controls="option-menu" aria-haspopup="true" aria-expanded={open ? 'true' : undefined} onClick={(event) => handleMenuClick(event, text)}>
+                                    <MoreVertIcon />
+                                </IconButton>
+                            }>
+                            <ListItemButton onClick={() => loadProject(text)}>
+                                <ListItemText primary={text} />
+                            </ListItemButton>
+                        </ListItem>
+                    ))
+                )}
                 <Menu
                     id="option-menu"
                     anchorEl={anchorEl}
@@ -348,8 +432,8 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                 }}
             >
                 {list()}
-                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProject={fetchData}/>
-                <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} selectedProject={selectedProject} renameProject={renameProject} />
+                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProject={fetchData} existingProjects={repositoryData} setOriginJSON={setOriginJSON}/>
+                <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} renameProject={renameProject} selectedProject={selectedProject} />
             </Drawer>
         </>
     );
