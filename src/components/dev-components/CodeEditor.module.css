@@ -1,8 +1,11 @@
 .boxtitle {
     display: flex;
-    justify-content: center;
+    padding-left: 0.5em;
+    /* justify-content: center; */
     align-items: center;
     height: 10%;
+    font-size: 16px;
+    color: rgb(99, 99, 99);
 }
 
 .boxcontainer {

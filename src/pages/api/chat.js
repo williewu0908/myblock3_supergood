@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     let apiKey = "sk-proj-8Dgv78LfKmanRLsGDtozT3BlbkFJxKYlo5HiyExq6j1pQcMe";
 
     if (model === 'Llama3-8B') {
-      url = 'http://127.0.0.1:8000/v1/';
+      url = 'http://192.168.194.39:8000/v1/';
       apiKey = 'sk-no-key-required'; // llama3 不需要 API key
     } else if(model === 'GPT3.5'){
       model = 'gpt-3.5-turbo-0125';

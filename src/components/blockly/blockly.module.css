@@ -64,7 +64,7 @@ html[dir=rtl] td.tabmax {
 .content {
   visibility: hidden;
   margin: 0;
-  padding: 1ex;
+  /* padding: 1ex; */
   position: absolute;
   direction: ltr;
   height: 100% !important;

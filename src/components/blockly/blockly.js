@@ -112,11 +112,11 @@ function Header() {
 
 export default function HomePage() {
   return (
-    <div id='blockly_block' width="99%" height="100%">
+    <div id='blockly_block' width="100%" height="100%">
       <Header />
-      <select id="languageMenu" />
+      <select id="languageMenu" style={{display:'none'}}/>
       <Tabs />
-      <div width="99%" height="99%" id="content_area"></div>
+      <div width="100%" height="100%" id="content_area"></div>
       <Content />
     </div>
   );
