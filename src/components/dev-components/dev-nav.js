@@ -105,7 +105,7 @@ export default function DevNavBar({ toggleViewState }) {
     // 取得現在所有專案的名字
     const fetchData = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/searchDB');
+            const response = await fetch('http://localhost:5000/searchDB?username=${username}');
             if (response.ok) {
                 const data = await response.json();
                 setRepositoryData(data); // 更新狀態
