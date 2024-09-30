@@ -7,6 +7,7 @@ bp = Blueprint('main', __name__)
 def flowchart():
     data = request.get_json()
     python_code = data.get('code', '')
+    print('發送flowchart')
     return generate_flowchart(python_code)
 
 @bp.route('/test', methods=['POST'])
@@ -54,3 +55,8 @@ def save_project_route():
         return '', 200
     data = request.get_json()
     return save_project(data)
+
+
+@bp.route('/test', methods=['GET', 'OPTIONS'])
+def test_route():
+    return jsonify({"message": "Test successful"}), 200
