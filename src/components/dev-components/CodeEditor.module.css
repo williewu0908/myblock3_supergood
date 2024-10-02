@@ -8,6 +8,31 @@
     color: rgb(99, 99, 99);
 }
 
+.boxtitle button {
+    margin-left: auto; /* 保持按鈕在右側 */
+    margin-right: 10px; /* 控制按鈕與右邊的距離 */
+    padding: 10px 20px; /* 增加內部空間，讓按鈕看起來更大氣 */
+    background: linear-gradient(135deg, #6BC6FF, #0063FF); /* 漸變背景，從淡藍到深藍 */
+    color: white; /* 文字顏色為白色 */
+    border: none; /* 移除邊框 */
+    border-radius: 8px; /* 圓角效果 */
+    font-size: 16px; /* 讓文字稍微大一點 */
+    font-weight: bold; /* 字體加粗 */
+    cursor: pointer; /* 滑鼠懸停時顯示手形圖標 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加陰影，讓按鈕更有立體感 */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* 增加動畫效果 */
+}
+
+.boxtitle button:hover {
+    transform: translateY(-3px); /* 滑鼠懸停時讓按鈕稍微上移 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* 增強陰影效果 */
+}
+
+.boxtitle button:active {
+    transform: translateY(0); /* 點擊時讓按鈕回到原位 */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* 點擊時陰影變弱 */
+}
+
 .boxcontainer {
     display: flex;
     justify-content: center;
