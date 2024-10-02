@@ -1245,7 +1245,8 @@ function saveCodeToIndexedDB(code) {
   request.onsuccess = function(event) {
     console.log('Code saved to IndexedDB');
     // Emit an event to notify that the code has been updated
-    window.dispatchEvent(new CustomEvent('codeUpdated'));
+    // window.dispatchEvent(new CustomEvent('codeUpdated'));
+    // Changed to components/dev-components/code-editor.js/ by.Tsai
   };
 
   request.onerror = function(event) {

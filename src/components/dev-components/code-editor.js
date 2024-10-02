@@ -26,6 +26,11 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Blockly ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
             <h2>Blockly</h2>
+            <button onClick={() => {
+                window.dispatchEvent(new CustomEvent('codeUpdated'));
+              }}>
+                Update Code
+            </button>
           </div>
           <div className={styles.boxcontainer} id='blockly_container'>
             <Blockly onUpdate={handleCodeUpdate} />

@@ -50,7 +50,7 @@ function PythonEditor() {
     useEffect(() => {
         const fetchCode = async () => {
             const fetchedCode = await getPythonCodeFromIndexedDB();
-            setCode(fetchedCode);
+            setCode(oldCode => oldCode + '\n\n#Code from Blockly\n' +fetchedCode); // 將新的 fetchedCode 加到現有的 code 後面
             setContextCode(fetchedCode);
         };
 
