@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from views import bp
+from myblock3.backend.oldbackend.views import bp
 
 
 app = Flask(__name__)
