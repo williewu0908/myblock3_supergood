@@ -40,6 +40,11 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.FlowChart ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
             <h2>流程圖</h2>
+            <button onClick={() => {
+                window.dispatchEvent(new CustomEvent('exportFlowchart'));
+              }}>
+                Export Flowchart
+            </button>
           </div>
           <div className={styles.boxcontainer}>
             <PythonFlowchart code={code} />
