@@ -55,7 +55,7 @@ function PythonEditor() {
         };
 
         fetchCode().catch(console.error);
-
+ 
         const handleCodeUpdate = () => {
             fetchCode().catch(console.error);
         };
