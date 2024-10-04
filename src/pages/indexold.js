@@ -1,4 +1,4 @@
-import Blockly from "../components/blockly/blockly";
+import Blockly from "../components/blockly/BlocklyComponent";
 import ChatWithAI from "../components/chatAI/ChatWithAI"
 import DevNavBar from "@/components/dev-components/dev-nav";
 import CodeEditor from '@/components/dev-components/code-editor'

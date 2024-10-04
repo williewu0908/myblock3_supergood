@@ -1,13 +1,17 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useRef } from 'react';
+import BlocklyComponent from './BlocklyComponent'; // 引入 BlocklyComponent
+
 
 const JSONContext = createContext();
 
 // Provider Component
 export const JSONProvider = ({ children }) => {
+  const BlocklyRef = useRef(); // 用於存儲 BlocklyComponent 的引用
   const getJSON = () => {
     try {
       // 獲取當前工作區的JSON
-      const json = JSON.stringify(Blockly.serialization.workspaces.save(Code.workspace), null, 2);
+      const json = BlocklyRef.current.saveCode();
+
       console.log("Workspace JSON:", json);
       return json;
     } catch (error) {
@@ -20,7 +24,7 @@ export const JSONProvider = ({ children }) => {
     try {
       // 將json加載回工作區
       const parsedJSON = JSON.parse(json);
-      Blockly.serialization.workspaces.load(parsedJSON, Code.workspace);
+      BlocklyRef.current.loadCode(parsedJSON);
       console.log("Workspace loaded from JSON:", json);
     } catch (error) {
       console.error("Error loading workspace from JSON:", error);
@@ -29,6 +33,7 @@ export const JSONProvider = ({ children }) => {
 
   return (
     <JSONContext.Provider value={{ getJSON, setJSON }}>
+      <BlocklyComponent ref={BlocklyRef} /> {/* 傳入ref */}
       {children}
     </JSONContext.Provider>
   );

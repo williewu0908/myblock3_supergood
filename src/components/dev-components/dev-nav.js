@@ -10,6 +10,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import Divider from '@mui/material/Divider';
+import Blockly from 'blockly/core'; // 確保導入 Blockly
 
 function SwitchesGroup({ state, handleChange }) {
     return (
@@ -209,7 +210,7 @@ export default function DevNavBar({ toggleViewState }) {
                         {showSuccess ? <CheckCircleIcon color="success" /> : <SaveIcon />}
                     </Button>
                     <Divider orientation="vertical" variant="middle" flexItem />
-                    <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)'}}>
+                    <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)' }}>
                         {currentProject}
                     </Box>
                 </Toolbar>
