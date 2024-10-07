@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from .config import Config
+from flask import jsonify
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -13,17 +14,20 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "supports_credentials": True}})
 
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
 
-    # 添加這個 user_loader 裝飾器
     @login_manager.user_loader
     def load_user(user_id):
-        from .models.user import User  # 避免循環導入
+        from .models.user import User
         return User.query.get(int(user_id))
+    
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        return jsonify({"error": "Unauthorized"}), 401
 
     from .views import auth, project
     app.register_blueprint(auth.bp)

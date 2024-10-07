@@ -1,3 +1,4 @@
+// components/account/SignInSide.js
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -12,10 +13,6 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-import GoogleIcon from '@mui/icons-material/Google';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import AppleIcon from '@mui/icons-material/Apple';
 
 function Copyright(props) {
   return (
@@ -32,14 +29,19 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
-export default function SignInSide() {
+export default function SignInSide({ onSubmit, error }) {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const username = data.get('username');
+    const password = data.get('password');
+  
+    if (!username || !password) {
+      console.error('Username and password are required');
+      return;
+    }
+  
+    onSubmit(username, password);
   };
 
   return (
@@ -54,8 +56,8 @@ export default function SignInSide() {
           sx={{
             backgroundImage: `url(/img/login.svg)`,
             backgroundRepeat: 'no-repeat',
-            backgroundColor: '#9d9cf0', // Light blue color
-            backgroundSize: '50%', // Adjust size of the image
+            backgroundColor: '#9d9cf0',
+            backgroundSize: '50%',
             backgroundPosition: 'center',
           }}
         />
@@ -80,10 +82,10 @@ export default function SignInSide() {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="電子郵件"
-                name="email"
-                autoComplete="email"
+                id="username"
+                label="使用者名稱"
+                name="username"
+                autoComplete="username"
                 autoFocus
               />
               <TextField
@@ -100,6 +102,11 @@ export default function SignInSide() {
                 control={<Checkbox value="remember" color="primary" />}
                 label="記住我"
               />
+              {error && (
+                <Typography color="error" align="center" sx={{ mt: 2 }}>
+                  {error}
+                </Typography>
+              )}
               <Button
                 type="submit"
                 fullWidth
@@ -120,27 +127,6 @@ export default function SignInSide() {
                   </Link>
                 </Grid>
               </Grid>
-
-              <div style={{ margin: '20px 0 0 0' }}></div>
-
-              <Grid container justifyContent="center" spacing={3}>
-                <Grid item>
-                  <Link href="#" variant="body2">
-                    <GoogleIcon />
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link href="#" variant="body2">
-                    <FacebookIcon />
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link href="#" variant="body2">
-                    <AppleIcon />
-                  </Link>
-                </Grid>
-              </Grid>
-
               <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
