@@ -1,29 +1,25 @@
-import ChatWithAI from "../components/chatAI/ChatWithAI";
-import DevNavBar from "@/components/dev-components/dev-nav";
-import CodeEditor from '@/components/dev-components/code-editor';
-import { JSONProvider } from "@/components/blockly/JSONContext";
-import { useState } from 'react';
+import { withSessionSsr } from "../lib/session";
+import Home from '../components/global-components/Home';
 
-export default function Home() {
-  const [viewState, setViewState] = useState({
-    Blockly: true,
-    FlowChart: true,
-    Code: true,
-  });
+export const getServerSideProps = withSessionSsr(
+  async function getServerSideProps({ req }) {
+    const user = req.session.user;
 
-  const toggleViewState = (newState) => {
-    setViewState(newState);
-  };
+    if (user === undefined) {
+      return {
+        redirect: {
+          destination: '/login',
+          permanent: false,
+        },
+      };
+    }
 
-  return (
-    <>
-      <div className="container">
-        <JSONProvider>
-          <DevNavBar toggleViewState={toggleViewState} />
-          <ChatWithAI />
-          <CodeEditor viewState={viewState} />
-        </JSONProvider>
-      </div>
-    </>
-  );
+    return {
+      props: { user },
+    };
+  }
+);
+
+export default function Index({ user }) {
+  return <Home user={user} />;
 }

@@ -53,7 +53,7 @@ def login():
         return jsonify({"message": "Logged in successfully"}), 200
         
     else:
-        return jsonify({"error": "Invalid username or password"}), 401
+        return jsonify({"error": "帳號或密碼錯誤"}), 401
 
 @bp.route('/logout', methods=['POST'])
 @login_required
