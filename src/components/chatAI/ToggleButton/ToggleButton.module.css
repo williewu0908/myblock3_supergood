@@ -1,6 +1,6 @@
 .toggleChatButton {
   position: fixed; /* 改為 fixed，讓按鈕固定在視窗中 */
-  bottom: 1.5rem; /* 距離視窗底部 1.5rem */
+  bottom: 0.5rem; /* 距離視窗底部 1.5rem */
   right: 1.5rem;  /* 距離視窗右邊 1.5rem */
   height: 4.5rem;
   width: 4.5rem;
