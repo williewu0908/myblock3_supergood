@@ -11,33 +11,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import Divider from '@mui/material/Divider';
 import Blockly from 'blockly/core'; // 確保導入 Blockly
-
-function SwitchesGroup({ state, handleChange }) {
-    return (
-        <FormControl component="fieldset" variant="standard">
-            <FormGroup sx={{ paddingLeft: 2 }}>
-                <FormControlLabel
-                    control={
-                        <Switch checked={state.Blockly} onChange={handleChange} name="Blockly" />
-                    }
-                    label="積木"
-                />
-                <FormControlLabel
-                    control={
-                        <Switch checked={state.FlowChart} onChange={handleChange} name="FlowChart" />
-                    }
-                    label="活動圖"
-                />
-                <FormControlLabel
-                    control={
-                        <Switch checked={state.Code} onChange={handleChange} name="Code" />
-                    }
-                    label="程式碼"
-                />
-            </FormGroup>
-        </FormControl>
-    );
-}
+import styles from './DevNav.module.css';
 
 export default function DevNavBar({ toggleViewState }) {
     const [isOpen, setIsOpen] = React.useState(false); // 狀態控制Drawer是否打開
@@ -189,23 +163,35 @@ export default function DevNavBar({ toggleViewState }) {
                         </Typography>
                     </Box>
                     <Box sx={{ flexGrow: 1, display: 'flex', height: 80, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
-                        <Button color="inherit" sx={{backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3, fontWeight: 'bold'}}>
-                            首頁
-                        </Button>
-                        <Button color="inherit" onClick={toggleDrawer(true)} sx={{backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3, fontWeight: 'bold'}}>
-                            專案
-                        </Button>
-                        <Menu
-                            id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
+                        <Button 
+                            color="inherit" 
+                            sx={{
+                                backgroundColor: '#F2F3F4', 
+                                width: 0.08, maxHeight: 0.5, 
+                                marginX: 3, 
+                                fontWeight: 'bold', 
+                                '&:hover': {
+                                    backgroundColor: '#e0e0e0', // 設定 hover 狀態的背景顏色
+                                }
                             }}
                         >
-                            <SwitchesGroup state={state} handleChange={handleChange} />
-                        </Menu>
+                            首頁
+                        </Button>
+                        <Button 
+                            color="inherit" 
+                            onClick={toggleDrawer(true)} 
+                            sx={{
+                                backgroundColor: '#F2F3F4', 
+                                width: 0.08, maxHeight: 0.5, 
+                                marginX: 3, 
+                                fontWeight: 'bold',
+                                '&:hover': {
+                                    backgroundColor: '#e0e0e0', // 設定 hover 狀態的背景顏色
+                                }
+                            }}
+                        >
+                            專案
+                        </Button>
                         <Button disabled={canSave} loading={isSaving} onClick={() => saveProject(currentProject)} sx={{ transition: '0.3s ease', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3 }}>
                             {showSuccess ? <CheckCircleIcon color="success" /> : <SaveIcon />}
                         </Button>
