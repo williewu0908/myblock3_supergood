@@ -630,11 +630,11 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
   }
 
   return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex' }}>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', borderRadius: '.3rem .3rem .0rem .0rem' }}>
       <CodeProvider>
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Blockly ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
-            <h2>Blockly</h2>
+            <h2>積木</h2>
             <button onClick={() => {
               handleBlocklyCode();
             }}>
@@ -674,7 +674,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
 
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.FlowChart ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
-            <h2>流程圖</h2>
+            <h2>活動圖</h2>
             <button onClick={() => {
                 window.dispatchEvent(new CustomEvent('exportFlowchart'));
               }}>

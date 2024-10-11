@@ -20,13 +20,13 @@ function SwitchesGroup({ state, handleChange }) {
                     control={
                         <Switch checked={state.Blockly} onChange={handleChange} name="Blockly" />
                     }
-                    label="Blockly"
+                    label="積木"
                 />
                 <FormControlLabel
                     control={
                         <Switch checked={state.FlowChart} onChange={handleChange} name="FlowChart" />
                     }
-                    label="流程圖"
+                    label="活動圖"
                 />
                 <FormControlLabel
                     control={
@@ -176,42 +176,46 @@ export default function DevNavBar({ toggleViewState }) {
         <>
             <CssBaseline />
             <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)' }}>
-                <Toolbar sx={{ p: 0, m: 0 }}>
-                    <Box sx={{ flexGrow: 1, display: 'flex', height: 52, float: 'left', flexDirection: 'column', justifyContent: 'center' }}>
-                        <Typography variant="h1" component="div" sx={{ fontSize: 26 }}>
-                            MyBlock 3
+                <Toolbar sx={{ p: 0, m: 0 ,flexDirection: 'column', backgroundColor: '#333E51', width: '100%', paddingLeft: '0px !important', paddingRight: '0px !important' }}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', height: 60, float: 'left', justifyContent: 'center', alignItems: 'flex-end', width: '100%', background: 'linear-gradient(90deg, #f3f4f6 0%, #eae9e3 100%)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '.0rem .0rem .3rem .3rem' }}>
+                        <Typography variant="h1" component="div" sx={{ fontSize: 32, paddingLeft: 3, paddingBottom: 1.75, fontWeight: 'bold', color: '#333',fontFamily: '"Aref Ruqaa Ink", system-ui'}}>
+                            myBlock3
                         </Typography>
-                        <Typography variant="h6" component="div" sx={{ color: 'rgb(90, 90, 90)', fontSize: 10, paddingTop: 0.5 }}>
-                            一款入門的線上編譯諮詢系統 v3.00-20240928
+                        <Typography variant="h3" component="div" sx={{ color: '#5a5a5a', fontSize: 16, paddingLeft: 2, paddingBottom: 1.5}}>
+                            利用 AI 來幫您編寫程式碼
+                        </Typography>
+                        <Typography variant="h5" component="div" sx={{ color: '#5a5a5a', fontSize: 10, paddingLeft: 1, paddingBottom: 1.5 }}>
+                            v3.00 - 20241010
                         </Typography>
                     </Box>
-                    <Button color="inherit">首頁</Button>
-                    <Button color="inherit" onClick={toggleDrawer(true)}>專案</Button>
-                    <Button
-                        aria-haspopup="true"
-                        color="inherit"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleSwitchOpen}
-                    >
-                        畫面選項
-                    </Button>
-                    <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                        }}
-                    >
-                        <SwitchesGroup state={state} handleChange={handleChange} />
-                    </Menu>
-                    <Button disabled={canSave} loading={isSaving} onClick={() => saveProject(currentProject)} sx={{ transition: '0.3s ease' }}>
-                        {showSuccess ? <CheckCircleIcon color="success" /> : <SaveIcon />}
-                    </Button>
-                    <Divider orientation="vertical" variant="middle" flexItem />
-                    <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)' }}>
-                        {currentProject}
+                    <Box sx={{ flexGrow: 1, display: 'flex', height: 100, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
+                        <Button color="inherit" sx={{backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3, fontWeight: 'bold'}}>
+                            首頁
+                        </Button>
+                        <Button color="inherit" onClick={toggleDrawer(true)} sx={{backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3, fontWeight: 'bold'}}>
+                            專案
+                        </Button>
+                        <Button aria-haspopup="true" color="inherit" aria-expanded={open ? 'true' : undefined} onClick={handleSwitchOpen} sx={{backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3, fontWeight: 'bold'}}>
+                            畫面選項
+                        </Button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                        >
+                            <SwitchesGroup state={state} handleChange={handleChange} />
+                        </Menu>
+                        <Button disabled={canSave} loading={isSaving} onClick={() => saveProject(currentProject)} sx={{ transition: '0.3s ease', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3 }}>
+                            {showSuccess ? <CheckCircleIcon color="success" /> : <SaveIcon />}
+                        </Button>
+                        <Divider orientation="vertical" variant="middle" flexItem />
+                        <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3 }}>
+                            {currentProject}
+                        </Box>
                     </Box>
                 </Toolbar>
             </AppBar>
