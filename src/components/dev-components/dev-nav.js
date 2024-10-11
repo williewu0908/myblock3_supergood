@@ -188,15 +188,12 @@ export default function DevNavBar({ toggleViewState }) {
                             v3.00 - 20241010
                         </Typography>
                     </Box>
-                    <Box sx={{ flexGrow: 1, display: 'flex', height: 100, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', height: 80, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
                         <Button color="inherit" sx={{backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3, fontWeight: 'bold'}}>
                             首頁
                         </Button>
                         <Button color="inherit" onClick={toggleDrawer(true)} sx={{backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3, fontWeight: 'bold'}}>
                             專案
-                        </Button>
-                        <Button aria-haspopup="true" color="inherit" aria-expanded={open ? 'true' : undefined} onClick={handleSwitchOpen} sx={{backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3, fontWeight: 'bold'}}>
-                            畫面選項
                         </Button>
                         <Menu
                             id="basic-menu"
@@ -216,6 +213,39 @@ export default function DevNavBar({ toggleViewState }) {
                         <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3 }}>
                             {currentProject}
                         </Box>
+                    </Box>
+                    <Box sx={{ flexGrow: 1, display: 'flex', height: 50, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
+                        <FormControl component="fieldset" variant="standard">
+                            <FormGroup row sx={{ paddingLeft: 2 }}>
+                                <FormControlLabel
+                                    control={
+                                        <Switch checked={state.Blockly} onChange={handleChange} name="Blockly" />
+                                    }
+                                    label="積木"
+                                    sx={{ 
+                                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                                    }}
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Switch checked={state.FlowChart} onChange={handleChange} name="FlowChart" />
+                                    }
+                                    label="活動圖"
+                                    sx={{ 
+                                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                                    }}
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Switch checked={state.Code} onChange={handleChange} name="Code" />
+                                    }
+                                    label="程式碼"
+                                    sx={{ 
+                                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                                    }}
+                                />
+                            </FormGroup>
+                        </FormControl>
                     </Box>
                 </Toolbar>
             </AppBar>
