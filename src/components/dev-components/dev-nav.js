@@ -13,6 +13,42 @@ import Divider from '@mui/material/Divider';
 import Blockly from 'blockly/core'; // 確保導入 Blockly
 import styles from './DevNav.module.css';
 
+function SwitchesGroup({ state, handleChange }) {
+    return (
+        <FormControl component="fieldset" variant="standard">
+            <FormGroup row sx={{ paddingLeft: 2 }}>
+                <FormControlLabel
+                    control={
+                        <Switch checked={state.Blockly} onChange={handleChange} name="Blockly" />
+                    }
+                    label="積木"
+                    sx={{ 
+                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                    }}
+                />
+                <FormControlLabel
+                    control={
+                        <Switch checked={state.FlowChart} onChange={handleChange} name="FlowChart" />
+                    }
+                    label="活動圖"
+                    sx={{ 
+                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                    }}
+                />
+                <FormControlLabel
+                    control={
+                        <Switch checked={state.Code} onChange={handleChange} name="Code" />
+                    }
+                    label="程式碼"
+                    sx={{ 
+                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                    }}
+                />
+            </FormGroup>
+        </FormControl>
+    );
+}
+
 export default function DevNavBar({ toggleViewState }) {
     const [isOpen, setIsOpen] = React.useState(false); // 狀態控制Drawer是否打開
     const [repositoryData, setRepositoryData] = React.useState([]); // 用於儲存後端取得的資料
@@ -201,37 +237,7 @@ export default function DevNavBar({ toggleViewState }) {
                         </Box>
                     </Box>
                     <Box sx={{ flexGrow: 1, display: 'flex', height: 50, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
-                        <FormControl component="fieldset" variant="standard">
-                            <FormGroup row sx={{ paddingLeft: 2 }}>
-                                <FormControlLabel
-                                    control={
-                                        <Switch checked={state.Blockly} onChange={handleChange} name="Blockly" />
-                                    }
-                                    label="積木"
-                                    sx={{ 
-                                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                                    }}
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Switch checked={state.FlowChart} onChange={handleChange} name="FlowChart" />
-                                    }
-                                    label="活動圖"
-                                    sx={{ 
-                                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                                    }}
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Switch checked={state.Code} onChange={handleChange} name="Code" />
-                                    }
-                                    label="程式碼"
-                                    sx={{ 
-                                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                                    }}
-                                />
-                            </FormGroup>
-                        </FormControl>
+                        <SwitchesGroup state={state} handleChange={handleChange} />
                     </Box>
                 </Toolbar>
             </AppBar>
