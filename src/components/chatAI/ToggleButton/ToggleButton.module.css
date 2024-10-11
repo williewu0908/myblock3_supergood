@@ -1,52 +1,61 @@
 .toggleChatButton {
-    position: relative;
-    height: 4.5rem;
-    width: 4.5rem;
-    font-size: 1.8rem;
-    color: rgb(166, 0, 255);
-    background-color: rgb(236, 236, 236);
-    right: 1.5rem;
-    z-index: 1000;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s, color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
-    pointer-events: auto;
-  }
+  position: fixed; /* 改為 fixed，讓按鈕固定在視窗中 */
+  bottom: 0.5rem; /* 距離視窗底部 1.5rem */
+  right: 1.5rem;  /* 距離視窗右邊 1.5rem */
+  height: 4.5rem;
+  width: 4.5rem;
+  font-size: 1.8rem;
+  color: rgb(166, 0, 255);
+  background-color: rgb(236, 236, 236);
+  z-index: 1000;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  pointer-events: auto;
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
+}
   
-  .toggleChatButton:hover {
-    transform: scale(1.08);
-    background-color: rgb(166, 0, 255);
-    color: white;
-  }
+.toggleChatButton:hover {
+  transform: scale(1.08);
+  background-color: rgb(166, 0, 255);
+  color: white;
+}
+
+.iconContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.toggleIcon {
+  position: absolute;
+  transition: opacity 0.3s ease;
+}
+
+.fadeIn {
+  opacity: 1;
+}
+
+.fadeOut {
+  opacity: 0;
+}
   
-  .iconContainer {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+@media screen and (max-width: 992px) {
+  .toggleChatButton {
+      height: 3.5rem;
+      width: 3.5rem;
   }
-  
-  .toggleIcon {
-    position: absolute;
-    transition: opacity 0.3s ease;
-  }
-  
-  .fadeIn {
-    opacity: 1;
-  }
-  
-  .fadeOut {
-    opacity: 0;
-  }
-  
-  @media screen and (max-width: 992px) {
-    .toggleChatButton {
-        height: 3.5rem;
-        width: 3.5rem;
-    }
 }
