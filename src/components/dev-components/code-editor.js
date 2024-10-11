@@ -630,7 +630,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
   }
 
   return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', borderRadius: '.3rem .3rem .0rem .0rem' }}>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex'}}>
       <CodeProvider>
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Blockly ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
