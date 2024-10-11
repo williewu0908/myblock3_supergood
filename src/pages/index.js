@@ -9,6 +9,7 @@ export default function Home() {
     Blockly: true,
     FlowChart: true,
     Code: true,
+    ChatToggle: true,
   });
 
   const toggleViewState = (newState) => {
@@ -19,8 +20,8 @@ export default function Home() {
     <>
       <div className="container">
         <JSONProvider>
+          <ChatWithAI viewState={viewState} />
           <DevNavBar toggleViewState={toggleViewState} />
-          <ChatWithAI />
           <CodeEditor viewState={viewState} />
         </JSONProvider>
       </div>
