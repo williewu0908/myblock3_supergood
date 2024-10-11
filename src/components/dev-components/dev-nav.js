@@ -4,7 +4,6 @@ import CodeRepository from './CodeRepository';
 import { useJSON } from '../blockly/JSONContext';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import Menu from '@mui/material/Menu';
 import Switch from '@mui/material/Switch';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -43,6 +42,15 @@ function SwitchesGroup({ state, handleChange }) {
                         '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
                     }}
                 />
+                <FormControlLabel
+                    control={
+                        <Switch checked={state.ChatToggle} onChange={handleChange} name="ChatToggle" />
+                    }
+                    label="AI聊天室"
+                    sx={{ 
+                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                    }}
+                />
             </FormGroup>
         </FormControl>
     );
@@ -62,6 +70,7 @@ export default function DevNavBar({ toggleViewState }) {
         Blockly: true,
         FlowChart: true,
         Code: true,
+        ChatToggle: true,
     });
 
     // React.useEffect(() => {
@@ -187,7 +196,7 @@ export default function DevNavBar({ toggleViewState }) {
             <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)' }}>
                 <Toolbar sx={{ p: 0, m: 0 ,flexDirection: 'column', backgroundColor: '#333E51', width: '100%', paddingLeft: '0px !important', paddingRight: '0px !important' }}>
                     <Box sx={{ flexGrow: 1, display: 'flex', height: 60, float: 'left', justifyContent: 'center', alignItems: 'flex-end', width: '100%', background: 'linear-gradient(90deg, #f3f4f6 0%, #eae9e3 100%)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '.0rem .0rem .3rem .3rem' }}>
-                        <Typography variant="h1" component="div" sx={{ fontSize: 32, paddingLeft: 3, paddingBottom: 1.75, fontWeight: 'bold', color: '#333',fontFamily: '"Aref Ruqaa Ink", system-ui'}}>
+                        <Typography variant="h1" component="div" sx={{ fontSize: 45, paddingLeft: 3, paddingBottom: 1.75, fontWeight: 'bold', color: '#333',fontFamily: '"Aref Ruqaa Ink", system-ui'}}>
                             myBlock3
                         </Typography>
                         <Typography variant="h3" component="div" sx={{ color: '#5a5a5a', fontSize: 16, paddingLeft: 2, paddingBottom: 1.5}}>
