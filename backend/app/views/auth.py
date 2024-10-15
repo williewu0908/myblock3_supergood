@@ -8,7 +8,16 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/check-auth', methods=['GET'])
 def check_auth():
     print("Checking auth...")
+    
+    # 打印所有收到的 headers
+    print("Request headers:", request.headers)
+    
+    # 打印所有收到的 cookies
+    print("Request cookies:", request.cookies)
+    
+    # 驗證是否登入
     print("Is authenticated:", current_user.is_authenticated)
+    
     if current_user.is_authenticated:
         print("User:", current_user.username)
         return jsonify({"authenticated": True, "user": current_user.username}), 200
