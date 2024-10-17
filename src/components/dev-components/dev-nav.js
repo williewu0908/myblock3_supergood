@@ -44,7 +44,7 @@ function SwitchesGroup({ state, handleChange }) {
                 />
                 <FormControlLabel
                     control={
-                        <Switch checked={state.ChatToggle} onChange={handleChange} name="ChatToggle" />
+                        <Switch checked={state.ChatWithAI} onChange={handleChange} name="ChatWithAI" />
                     }
                     label="AI聊天室"
                     sx={{ 
@@ -70,7 +70,7 @@ export default function DevNavBar({ toggleViewState }) {
         Blockly: true,
         FlowChart: true,
         Code: true,
-        ChatToggle: true,
+        ChatWithAI: true,
     });
 
     // React.useEffect(() => {

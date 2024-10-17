@@ -8,7 +8,8 @@ import Modal from './Modal';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
 
-function ChatInterface() {
+function ChatInterface({ viewState }) {
+  const countTrueValues = Object.values(viewState).filter(value => value === true).length;
   const defaultChat = [
     { role: 'assistant', content: '你好，有什麼需要幫助的嗎？' }
   ];
@@ -151,10 +152,7 @@ function ChatInterface() {
   return (
     <div className={styles.container}>
       <div className={styles.titleContainer}>
-        <DropDownMenu onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} />
-        <Image src="/AIchat/media/robot.jpg" width={40} height={40} className={styles.characterTitleImg} alt="robot" />
-        <h1 className={styles.title}>Chat with AI</h1>
-        <div className={styles.subtitle}><span id={styles.showCharacter}>{character}</span>（<span id={styles.showModel}>{model}</span>）</div>
+        <DropDownMenu character={character} model={model} countTrueValues={countTrueValues} onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} />
       </div>
       <div id={styles.chatlog} ref={chatLogRef}>
         {chatLog.map((content, index) => (
@@ -179,7 +177,7 @@ function ChatInterface() {
         ))}
       </div>
       <form id={styles.chatform} onSubmit={handleSubmit}>
-        <div className={styles.formGroup}>
+      <div className={styles.formGroup} style={{ width: `${(1 / countTrueValues) * 100}%` }}> {/* 動態調整.formGroup的寬度*/}
           <div className={styles.inputContainer}>
             <textarea
               type="text"

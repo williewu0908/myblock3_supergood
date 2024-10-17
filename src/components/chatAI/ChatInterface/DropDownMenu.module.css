@@ -21,7 +21,7 @@
     float: right;
     position: relative;
     z-index: 2;
-    top: 14px;
+    top: -44px;
     right: 20px;
 }
 
@@ -80,12 +80,12 @@
     border-top: none;
     position: absolute;
     /* width: 200px; */
-    width: 100%;
+    /* width: 25%; */
     max-height: 0px;
     overflow: hidden;
     background-color: rgb(228, 225, 225);
     float: right;
-    top: 59px;
+    top: 253px;
     right: 0px;
     z-index: 1000;
     transition: max-height ease-out 0.5s;
@@ -173,4 +173,33 @@
 /* 滑鼠移至標題時，展開下面的子標題 */
 .menuList>ul>li:hover .secondMenu li {
     max-height: 50px;
+}
+
+.characterTitleImg {
+    box-sizing: border-box;
+    margin: 10px;
+    float: left;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgb(233, 233, 233);
+    border-radius: 50%;
+}
+
+.title {
+    color: rgb(99, 99, 99);
+    font-size: 1.7em;
+    line-height: 1.4em;
+    font-weight: 600;
+    margin: 0;
+}
+
+.subtitle {
+    color: rgb(137, 137, 137);
+    font-size: 14px;
+}
+
+.navBox {
+    display: flex;
+    align-items: center; /* 垂直居中對齊 */
+    justify-content: space-between; /* 左右分布 */
 }

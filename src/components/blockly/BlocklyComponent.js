@@ -148,7 +148,14 @@ const BlocklyComponent = forwardRef((props, ref) => {
     blocklyDivElement.style.left = x + 'px';
     blocklyDivElement.style.top = y + 'px';
     blocklyDivElement.style.width = element.offsetWidth + 'px';
-    blocklyDivElement.style.height = element.offsetHeight + 'px';
+    
+    if (element.offsetHeight > 0){
+      blocklyDivElement.style.height = element.offsetHeight - 160 + 'px';
+    } else {
+      blocklyDivElement.style.height = element.offsetHeight + 'px';
+    }
+    
+    
 
     // Make the Blockly workspace resize to fit its parent's dimensions.
     Blockly.svgResize(primaryWorkspace.current);
