@@ -14,7 +14,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "supports_credentials": True}})
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"], "supports_credentials": True}})
 
     db.init_app(app)
     bcrypt.init_app(app)
@@ -28,9 +28,11 @@ def create_app():
     @login_manager.unauthorized_handler
     def unauthorized():
         return jsonify({"error": "Unauthorized"}), 401
+    
 
     from .views import auth, project
     app.register_blueprint(auth.bp)
     app.register_blueprint(project.bp)
+
 
     return app

@@ -1,35 +1,21 @@
-// components/account/SignInSide.js
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        高師大
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { useState } from 'react';
 
 const defaultTheme = createTheme();
 
-export default function SignInSide({ onSubmit, error }) {
+export default function SignInSide({ onSubmit, loginError }) {
+  const [formError, setFormError] = useState('');
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -37,10 +23,11 @@ export default function SignInSide({ onSubmit, error }) {
     const password = data.get('password');
   
     if (!username || !password) {
-      console.error('Username and password are required');
+      setFormError('用戶名和密碼都是必填項');
       return;
     }
   
+    setFormError('');
     onSubmit(username, password);
   };
 
@@ -98,13 +85,9 @@ export default function SignInSide({ onSubmit, error }) {
                 id="password"
                 autoComplete="current-password"
               />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="記住我"
-              />
-              {error && (
-                <Typography color="error" align="center" sx={{ mt: 2 }}>
-                  {error}
+              {(formError || loginError) && (
+                <Typography color="error" variant="body2">
+                  {formError || loginError}
                 </Typography>
               )}
               <Button
@@ -115,19 +98,6 @@ export default function SignInSide({ onSubmit, error }) {
               >
                 登入
               </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    忘記密碼
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link href="#" variant="body2">
-                    {"註冊"}
-                  </Link>
-                </Grid>
-              </Grid>
-              <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
         </Grid>

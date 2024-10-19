@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
 # 測試帳號：
 # {
-#     "username": "testuser",
-#     "email": "testuser@example.com",
-#     "password": "securepassword123"
+#   "username": "testuser",
+#   "email": "testuser@example.com",
+#   "password": "testpassword"
 # }

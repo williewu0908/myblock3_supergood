@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
 import SignInSide from "../components/account/SignInSide";
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 export default function LoginPage() {
-    const [error, setError] = useState('');
     const router = useRouter();
+    const [loginError, setLoginError] = useState('');
 
     const handleLogin = async (username, password) => {
         try {
-            const response = await fetch('/api/login', {
+            const response = await fetch('http://127.0.0.1:5000/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -16,20 +16,23 @@ export default function LoginPage() {
                 body: JSON.stringify({ username, password }),
             });
 
-            const data = await response.json();
-
-            if (response.ok && data.isLoggedIn) {
-                router.push('/'); // Redirect to home page after successful login
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('username', data.username);
+                localStorage.setItem('email', data.email);
+                localStorage.setItem('encoded_data', data.encoded_data);
+                router.push('/');
             } else {
-                setError(data.error || '登入失敗');
+                const errorData = await response.json();
+                setLoginError(errorData.message || '登入失敗，請檢查您的用戶名和密碼。');
             }
         } catch (error) {
-            console.error('Login error:', error);
-            setError('發生了意外錯誤');
+            console.error('Error during login:', error);
+            setLoginError('登入失敗，請檢查您的用戶名和密碼。');
         }
     };
 
     return (
-        <SignInSide onSubmit={handleLogin} error={error} />
+        <SignInSide onSubmit={handleLogin} loginError={loginError} />
     );
 }
