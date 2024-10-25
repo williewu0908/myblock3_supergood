@@ -126,11 +126,17 @@ const BlocklyComponent = forwardRef((props, ref) => {
     });
   }
 
+  function cleanGeneratedPythonCode(code) {
+    // 移除將變數初始化為 `None` 的語句，並去除僅跟在「變數名稱 = None」後的空白行
+    code = code.replace(/^\s*\w+\s*=\s*None\s*\n(\s*\n)*/gm, '');
+    return code;
+  }
+
   const handleWorkspaceChange = useCallback(() => {
     const code = pythonGenerator.workspaceToCode(primaryWorkspace.current);
     const xml = Blockly.Xml.workspaceToDom(primaryWorkspace.current);
     saveWorkspaceToIndexedDB(xml);
-    saveCodeToIndexedDB(code)
+    saveCodeToIndexedDB(cleanGeneratedPythonCode(code))
       .then(() => {
         window.dispatchEvent(new CustomEvent('blockUpdated', {
           detail: {
