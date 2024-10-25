@@ -9,6 +9,7 @@ CORS(bp, supports_credentials=True)
 
 @bp.route('/check-auth', methods=['POST'])
 def check_auth():
+    print('檢查登入狀態')
     data = request.get_json()
     username = data.get('username')
     email = data.get('email')
