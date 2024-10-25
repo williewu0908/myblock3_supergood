@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import ChatWithAI from "../components/chatAI/ChatWithAI";
+import { useState} from 'react';
 import DevNavBar from "../components/dev-components/dev-nav";
 import CodeEditor from '../components/dev-components/code-editor';
 import { JSONProvider } from "../components/blockly/JSONContext";
