@@ -5,6 +5,8 @@ import { pythonGenerator } from 'blockly/python';
 import * as locale from 'blockly/msg/zh-hant';
 
 import 'blockly/blocks';
+import { BlockMirrorTextToBlocks } from './blocks/text_to_blocks'
+
 
 // 設定Blockly的語言
 Blockly.setLocale(locale);
@@ -30,44 +32,45 @@ function initIndexedDB(callback) {
   };
 }
 
-// 儲存python到IndexedDB
-function saveCodeToIndexedDB(code) {
-  var transaction = db.transaction(['codeStore'], 'readwrite');
-  var objectStore = transaction.objectStore('codeStore');
-  var request = objectStore.put({ id: 'python_code', code: code });
+// // 儲存python到IndexedDB
+// function saveCodeToIndexedDB(code) {
+//   var transaction = db.transaction(['codeStore'], 'readwrite');
+//   var objectStore = transaction.objectStore('codeStore');
+//   var request = objectStore.put({ id: 'python_code', code: code });
 
-  request.onsuccess = function (event) {
-    console.log('Code saved to IndexedDB');
-    // Emit an event to notify that the code has been updated
-    window.dispatchEvent(new CustomEvent('codeUpdated'));
-  };
+//   request.onsuccess = function (event) {
+//     console.log('Code saved to IndexedDB');
+//     // Emit an event to notify that the code has been updated
+//     window.dispatchEvent(new CustomEvent('codeUpdated'));
+//   };
 
-  request.onerror = function (event) {
-    console.error('Error saving code to IndexedDB:', event.target.errorCode);
-  };
-}
+//   request.onerror = function (event) {
+//     console.error('Error saving code to IndexedDB:', event.target.errorCode);
+//   };
+// }
 
-// 儲存Blockly產生的json到IndexedDB
-function saveWorkspaceToIndexedDB(workspaceJSON) {
+// 儲存Blockly產生的xml到IndexedDB
+function saveWorkspaceToIndexedDB(workspaceXML) {
   if (!db) {
     console.error('IndexedDB is not initialized');
     return;
   }
 
+  const xmlString = new XMLSerializer().serializeToString(workspaceXML);
   var transaction = db.transaction(['codeStore'], 'readwrite');
   var objectStore = transaction.objectStore('codeStore');
-  var request = objectStore.put({ id: 'workspace_json', code: workspaceJSON });
+  var request = objectStore.put({ id: 'workspace_xml', code: xmlString });
 
   request.onsuccess = function () {
-    console.log('Workspace JSON saved to IndexedDB successfully');
+    console.log('Workspace XML saved to IndexedDB successfully');
   };
 
   request.onerror = function (event) {
-    console.error('Error saving workspace JSON to IndexedDB:', event.target.errorCode);
+    console.error('Error saving workspace XML to IndexedDB:', event.target.errorCode);
   };
 }
 
-// 載入IndexedDB儲存的json到Blockly
+// 載入IndexedDB儲存的xml到Blockly
 function loadWorkspaceFromIndexedDB(callback) {
   if (!db) {
     console.error('IndexedDB is not initialized');
@@ -77,21 +80,24 @@ function loadWorkspaceFromIndexedDB(callback) {
 
   var transaction = db.transaction(['codeStore'], 'readonly');
   var objectStore = transaction.objectStore('codeStore');
-  var request = objectStore.get('workspace_json');
+  var request = objectStore.get('workspace_xml');
 
   request.onsuccess = function (event) {
     const result = event.target.result;
     if (result && result.code) {
-      console.log('Workspace JSON loaded from IndexedDB:', result.code);
+      console.log('Workspace XML loaded from IndexedDB:', result.code);
+      // 使用 DOMParser 將字符串轉換回 XML
+      // const parser = new DOMParser();
+      // const workspaceXML = parser.parseFromString(result.code, 'text/xml');
       callback(result.code);  // 將工作區的數據傳回去
     } else {
-      console.log('No workspace JSON found in IndexedDB');
+      console.log('No workspace XML found in IndexedDB');
       callback(null);
     }
   };
 
   request.onerror = function (event) {
-    console.error('Error loading workspace JSON from IndexedDB:', event.target.errorCode);
+    console.error('Error loading workspace XML from IndexedDB:', event.target.errorCode);
     callback(null);
   };
 }
@@ -102,17 +108,72 @@ const BlocklyComponent = forwardRef((props, ref) => {
   const toolbox = useRef(); // 參考工具箱容器
   let primaryWorkspace = useRef(); // 儲存主要的Blockly工作區
 
+  function saveCodeToIndexedDB(code) {
+    return new Promise((resolve, reject) => {
+      var transaction = db.transaction(['codeStore'], 'readwrite');
+      var objectStore = transaction.objectStore('codeStore');
+      var request = objectStore.put({ id: 'python_code', code: code });
+
+      request.onsuccess = function (event) {
+        console.log('Code saved to IndexedDB');
+        resolve();
+      };
+
+      request.onerror = function (event) {
+        console.error('Error saving code to IndexedDB:', event.target.errorCode);
+        reject(event.target.errorCode);
+      };
+    });
+  }
+
+  const handleWorkspaceChange = useCallback(() => {
+    const code = pythonGenerator.workspaceToCode(primaryWorkspace.current);
+    const xml = Blockly.Xml.workspaceToDom(primaryWorkspace.current);
+    saveWorkspaceToIndexedDB(xml);
+    saveCodeToIndexedDB(code)
+      .then(() => {
+        window.dispatchEvent(new CustomEvent('blockUpdated', {
+          detail: {
+            code: code,
+            source: 'BlocklyComponent'
+          }
+        }));
+      });
+  }, []);
+
+  const handlePythonCodeUpdate = (newCode) => {
+    if (primaryWorkspace.current) {
+      try {
+        // 清除現有的塊
+        primaryWorkspace.current.clear();
+
+        // 使用 BlockMirrorTextToBlocks 將 Python 代碼轉換為積木
+        const converter = new BlockMirrorTextToBlocks();
+        const blocks = converter.convertSource('', newCode);
+
+        // 將轉換後的積木加載到工作區
+        console.log(blocks.xml);
+        const xml = Blockly.utils.xml.textToDom(blocks.xml);
+        Blockly.Xml.domToWorkspace(xml, primaryWorkspace.current);
+      } catch (error) {
+        console.error('Error converting Python to blocks:', error);
+      }
+    }
+  };
+
+  // 曝露給父組件的方法
   useImperativeHandle(ref, () => ({
     pythonCode: () => {
       generateCode();
     },
     saveCode: () => {
-      const json = JSON.stringify(Blockly.serialization.workspaces.save(primaryWorkspace.current), null, 2);
-      console.log(json);
-      return json;
+      const xml = Blockly.Xml.workspaceToDom(primaryWorkspace.current);
+      console.log(xml);
+      return xml;
     },
-    loadCode: (json) => {
-      Blockly.serialization.workspaces.load(json, primaryWorkspace.current);
+    loadCode: (xml) => {
+      const xmlText = Blockly.utils.xml.textToDom(blocks.xml);
+      Blockly.Xml.domToWorkspace(xmlText, primaryWorkspace.current);
     }
   }));
 
@@ -123,13 +184,14 @@ const BlocklyComponent = forwardRef((props, ref) => {
     console.log(code);
   };
 
-  const restoreWorkspaceState = useCallback((json) => {
-    if (primaryWorkspace.current && json) {
-      const state = JSON.parse(json);
-      Blockly.serialization.workspaces.load(state, primaryWorkspace.current);
+  const restoreWorkspaceState = useCallback((xml) => {
+    if (primaryWorkspace.current && xml) {
+      const xmlText = Blockly.utils.xml.textToDom(xml);
+      Blockly.Xml.domToWorkspace(xmlText, primaryWorkspace.current);
     }
   }, []);
 
+  // 根據畫面大小自適應blockly工作區大小
   const resizeBlocklyWorkspace = () => {
     const element = blocklyArea.current;
     const blocklyDivElement = blocklyDiv.current;
@@ -153,59 +215,71 @@ const BlocklyComponent = forwardRef((props, ref) => {
     // Make the Blockly workspace resize to fit its parent's dimensions.
     Blockly.svgResize(primaryWorkspace.current);
   };
+  const handleCodeUpdate = (event) => {
+    if (event.detail && event.detail.source === 'pythonEditor') {
+      const newCode = event.detail.code;
+      // 在這裡執行你想要的方法
+      handlePythonCodeUpdate(newCode);
+    }
+  };
 
   useEffect(() => {
-    const { initialXml, children, ...rest } = props;
-  
-    // 初始化 IndexedDB，並在初始化完成後進行後續操作
-    initIndexedDB(() => {
-      // 初始化 Blockly 工作區
-      primaryWorkspace.current = Blockly.inject(blocklyDiv.current, {
-        toolbox: toolbox.current,
-        ...rest,
-      });
-  
-      // 嘗試從 IndexedDB 中載入已儲存的工作區狀態
-      loadWorkspaceFromIndexedDB((workspaceJSON) => {
-        if (workspaceJSON) {
-          restoreWorkspaceState(workspaceJSON);
+    // if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      const { initialXml, children, ...rest } = props;
+
+      // 初始化 IndexedDB，並在初始化完成後進行後續操作
+      initIndexedDB(() => {
+        // 初始化 Blockly 工作區
+        primaryWorkspace.current = Blockly.inject(blocklyDiv.current, {
+          toolbox: toolbox.current,
+          ...rest,
+        });
+
+        // 嘗試從 IndexedDB 中載入已儲存的工作區狀態
+        loadWorkspaceFromIndexedDB((workspaceXML) => {
+          if (workspaceXML) {
+            restoreWorkspaceState(workspaceXML);
+          }
+        });
+
+        // 當窗口大小改變時調用 `resizeBlocklyWorkspace`
+        window.addEventListener('resize', resizeBlocklyWorkspace);
+        window.addEventListener('codeUpdated', handleCodeUpdate);
+
+
+        // 初始化時立即調用 `resizeBlocklyWorkspace`
+        resizeBlocklyWorkspace();
+
+        // 註冊變化監聽器，確保 workspace 已初始化
+        if (primaryWorkspace.current) {
+          primaryWorkspace.current.addChangeListener(handleWorkspaceChange);
         }
       });
-  
-      // 當窗口大小改變時調用 `resizeBlocklyWorkspace`
-      window.addEventListener('resize', resizeBlocklyWorkspace);
-  
-      // 初始化時立即調用 `resizeBlocklyWorkspace`
-      resizeBlocklyWorkspace();
-  
-      // 註冊變化監聽器，確保 workspace 已初始化
-      if (primaryWorkspace.current) {
-        primaryWorkspace.current.addChangeListener(handleWorkspaceChange);
-      }
-    });
-  
-    // 清理函數
-    return () => {
-      window.removeEventListener('resize', resizeBlocklyWorkspace);
-      if (primaryWorkspace.current) {
-        primaryWorkspace.current.dispose();
-      }
-    };
-  }, [primaryWorkspace, toolbox, blocklyDiv, props]);
-  
+
+      // 清理函數
+      return () => {
+        window.removeEventListener('resize', resizeBlocklyWorkspace);
+        if (primaryWorkspace.current) {
+          window.removeEventListener('codeUpdated', handleCodeUpdate);
+          primaryWorkspace.current.dispose();
+        }
+      };
+    }
+  , [primaryWorkspace, toolbox, blocklyDiv, props]);
+
   // 在工作區變化時自動保存
-  const handleWorkspaceChange = useCallback(() => {
-    const json = JSON.stringify(Blockly.serialization.workspaces.save(primaryWorkspace.current), null, 2);
-    saveWorkspaceToIndexedDB(json);
-  }, []);
-  
+  // const handleWorkspaceChange = useCallback(() => {
+  //   const json = JSON.stringify(Blockly.serialization.workspaces.save(primaryWorkspace.current), null, 2);
+  //   saveWorkspaceToIndexedDB(json);
+  // }, []);
+
   // 確保監聽器附加到工作區並在重渲染時移除
   useEffect(() => {
     if (primaryWorkspace.current) {
       // 註冊變化監聽器
       primaryWorkspace.current.addChangeListener(handleWorkspaceChange);
     }
-  
+
     // 清理函數：移除變化監聽器
     return () => {
       if (primaryWorkspace.current) {
@@ -213,23 +287,23 @@ const BlocklyComponent = forwardRef((props, ref) => {
       }
     };
   }, [primaryWorkspace, handleWorkspaceChange]);
-  
+
   useEffect(() => {
     if (primaryWorkspace.current) {
       if (!props.viewState) {
         // 當顯示狀態恢復時，重新加載狀態並調整大小
         setTimeout(() => {
           resizeBlocklyWorkspace();
-          loadWorkspaceFromIndexedDB((workspaceJSON) => {
-            if (workspaceJSON) {
-              restoreWorkspaceState(workspaceJSON);
+          loadWorkspaceFromIndexedDB((workspaceXML) => {
+            if (workspaceXML) {
+              restoreWorkspaceState(workspaceXML);
             }
           });
         }, 0);
       }
     }
   }, [props.viewState, restoreWorkspaceState]);
-  
+
 
   // 渲染React組件的部分，返回Blockly工作區和工具箱
   return (
