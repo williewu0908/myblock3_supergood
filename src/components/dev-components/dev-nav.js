@@ -70,6 +70,7 @@ export default function DevNavBar({ toggleViewState }) {
         Blockly: true,
         FlowChart: true,
         Code: true,
+        ChatWithAI: true,
     });
 
     // React.useEffect(() => {
