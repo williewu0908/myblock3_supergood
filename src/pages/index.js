@@ -10,7 +10,7 @@ export default function Index() {
     Blockly: true,
     FlowChart: true,
     Code: true,
-    ChatToggle: true,
+    ChatWithAI: true,
   });
   const router = useRouter();
 
@@ -53,12 +53,14 @@ export default function Index() {
   };
 
   return (
-    <div className="container">
-      <JSONProvider>
-        <ChatWithAI viewState={viewState} />
-        <DevNavBar toggleViewState={toggleViewState} />
-        <CodeEditor viewState={viewState} />
-      </JSONProvider>
-    </div>
+    <>
+      <div className="container">
+        <JSONProvider>
+          {/* <ChatWithAI viewState={viewState} /> */}
+          <DevNavBar toggleViewState={toggleViewState} />
+          <CodeEditor viewState={viewState} />
+        </JSONProvider>
+      </div>
+    </>
   );
 }

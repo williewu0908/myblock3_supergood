@@ -5,6 +5,7 @@ import PythonEditor from '../pythonEditor/pythonEditor';
 import PythonFlowchart from '../flowchart/pythonFlowchart';
 import { CodeProvider } from './CodeContext';
 import styles from './CodeEditor.module.css';
+import ChatInterface from '../chatAI/ChatInterface/ChatInterface';
 
 const toolbox = {
   kind: 'categoryToolbox',
@@ -692,6 +693,12 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
           </div>
           <div className={styles.boxcontainer}>
             <PythonEditor code={code} onUpdate={handleCodeUpdate} />
+          </div>
+        </Box>
+        
+        <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.ChatWithAI ? 'block' : 'none' }}>
+          <div className={styles.boxcontainer}>
+              <ChatInterface viewState={viewState}/>
           </div>
         </Box>
       </CodeProvider>

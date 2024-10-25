@@ -38,18 +38,6 @@ function SwitchesGroup({ state, handleChange }) {
                         <Switch checked={state.Code} onChange={handleChange} name="Code" />
                     }
                     label="程式碼"
-                    sx={{ 
-                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                    }}
-                />
-                <FormControlLabel
-                    control={
-                        <Switch checked={state.ChatToggle} onChange={handleChange} name="ChatToggle" />
-                    }
-                    label="AI聊天室"
-                    sx={{ 
-                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                    }}
                 />
             </FormGroup>
         </FormControl>
@@ -70,7 +58,6 @@ export default function DevNavBar({ toggleViewState }) {
         Blockly: true,
         FlowChart: true,
         Code: true,
-        ChatToggle: true,
     });
 
     // React.useEffect(() => {

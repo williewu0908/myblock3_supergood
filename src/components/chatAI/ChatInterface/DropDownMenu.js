@@ -1,14 +1,18 @@
 import styles from './DropDownMenu.module.css';
+import Image from 'next/image';
 
-export default function DropDownMenu({ onGetModel, onGetCharacter, onGetShowModal}) {
+export default function DropDownMenu({ character, model, countTrueValues, onGetModel, onGetCharacter, onGetShowModal}) {
     return (
         <nav className="navBox">
+            <Image src="/AIchat/media/robot.jpg" width={40} height={40} className={styles.characterTitleImg} alt="robot" />
+            <h1 className={styles.title}>Chat with AI</h1>
+            <div className={styles.subtitle}><span id={styles.showCharacter}>{character}</span>（<span id={styles.showModel}>{model}</span>）</div>
             <input type="checkbox" id={styles.menuButton} />
             <label htmlFor={styles.menuButton} className={styles.line}>
                 <div className={styles.menuButton}></div>
             </label>
 
-            <div className={styles.menuList}>
+            <div className={styles.menuList} style={{ width: `${(1 / countTrueValues) * 100}%` }}>
                 <ul>
                     <li>
                         <a>更換模型</a>
