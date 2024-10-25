@@ -38,6 +38,18 @@ function SwitchesGroup({ state, handleChange }) {
                         <Switch checked={state.Code} onChange={handleChange} name="Code" />
                     }
                     label="程式碼"
+                    sx={{ 
+                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                    }}
+                />
+                <FormControlLabel
+                    control={
+                        <Switch checked={state.ChatWithAI} onChange={handleChange} name="ChatWithAI" />
+                    }
+                    label="AI聊天室"
+                    sx={{ 
+                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
+                    }}
                 />
             </FormGroup>
         </FormControl>
