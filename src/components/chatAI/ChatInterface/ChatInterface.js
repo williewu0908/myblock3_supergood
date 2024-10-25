@@ -154,7 +154,7 @@ function ChatInterface({ viewState }) {
       <div className={styles.titleContainer}>
         <DropDownMenu character={character} model={model} countTrueValues={countTrueValues} onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} />
       </div>
-      <div id={styles.chatlog} ref={chatLogRef}>
+      <div id={styles.chatlog} ref={chatLogRef} style={{ width: '100%' }}>
         {chatLog.map((content, index) => (
           <div key={index} className={`${styles[`${content.role}ReplyContainer`]}`}>
             {content.role === 'assistant' && (
@@ -169,7 +169,7 @@ function ChatInterface({ viewState }) {
                   <FontAwesomeIcon icon={faSpinner} spin />
                 </div>
               ) : (
-                <pre className={styles.message} id={`message-${index}`} dangerouslySetInnerHTML={{ __html: content.content }}></pre>
+                <pre className={styles.message} id={`message-${index}`} dangerouslySetInnerHTML={{ __html: content.content }} style={{ width: '100%', whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}></pre>
               )}
             </div>
             {content.time && <div className={styles.time}>{content.time}</div>}

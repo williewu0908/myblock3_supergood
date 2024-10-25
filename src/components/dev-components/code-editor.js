@@ -613,6 +613,7 @@ import '../blockly/generator/generator';
 // };
 
 export default function CodeEditor({ viewState }) {
+  const countTrueValues = Object.values(viewState).filter(value => value === true).length;
   const BlocklyRef = useRef();
   const [code, setCode] = useState(`def add_numbers(num1, num2):
     result = num1 + num2
@@ -639,11 +640,6 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Blockly ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
             <h2>積木</h2>
-            <button onClick={() => {
-              handleBlocklyCode();
-            }}>
-              Update Code
-            </button>
           </div>
           <div className={styles.boxcontainer} id='blockly_container'>
             <BlocklyComponent
@@ -772,7 +768,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
           </div>
         </Box>
         
-        <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.ChatWithAI ? 'block' : 'none' }}>
+        <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.ChatWithAI ? 'block' : 'none', maxWidth : `${(1 / countTrueValues) * 100}%` }}>
           <div className={styles.boxcontainer}>
               <ChatInterface viewState={viewState}/>
           </div>

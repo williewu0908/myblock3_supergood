@@ -104,16 +104,17 @@
 
 .userReplyContainer {
   margin-top: 10px;
-  width: 80%;
+  width: 100%;
   float: right;
 }
 
 .userReply {
   float: right;
-  right: 20px;
+  right: 5px;
   background-color: white;
   border: 2px solid rgb(234, 234, 234);
   border-top-right-radius: 0px;
+  max-width: 95%;
 }
 
 .userReplyContainer .time {
