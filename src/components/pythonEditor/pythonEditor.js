@@ -79,7 +79,6 @@ function PythonEditor() {
     // 接收到 blockUpdated 事件後，從 indexedDB 取得 python 程式碼
     useEffect(() => {
         const handleBlockUpdate = async (event) => {
-            console.log('get blockUpdated');
             if (event.detail.source === 'BlocklyComponent' && !isEditorFocused) {
                 // 只有当编辑器没有被聚焦时，才从 IndexedDB 获取代码
                 const updatedCode = await getPythonCodeFromIndexedDB();

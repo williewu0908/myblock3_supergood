@@ -62,7 +62,7 @@ function saveWorkspaceToIndexedDB(workspaceXML) {
   var request = objectStore.put({ id: 'workspace_xml', code: xmlString });
 
   request.onsuccess = function () {
-    console.log('Workspace XML saved to IndexedDB successfully');
+    console.log('XML from Workspace saved to IndexedDB :' + xmlString);
   };
 
   request.onerror = function (event) {
@@ -110,12 +110,13 @@ const BlocklyComponent = forwardRef((props, ref) => {
 
   function saveCodeToIndexedDB(code) {
     return new Promise((resolve, reject) => {
+      console.log('WorkSpace Python:' + code);
       var transaction = db.transaction(['codeStore'], 'readwrite');
       var objectStore = transaction.objectStore('codeStore');
       var request = objectStore.put({ id: 'python_code', code: code });
 
       request.onsuccess = function (event) {
-        console.log('Code saved to IndexedDB');
+        // console.log('Code saved to IndexedDB');
         resolve();
       };
 
@@ -178,7 +179,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
       return xml;
     },
     loadCode: (xml) => {
-      const xmlText = Blockly.utils.xml.textToDom(blocks.xml);
+      const xmlText = Blockly.utils.xml.textToDom(xml);
       Blockly.Xml.domToWorkspace(xmlText, primaryWorkspace.current);
     }
   }));

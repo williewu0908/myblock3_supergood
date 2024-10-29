@@ -197,24 +197,26 @@ pythonGenerator.forBlock['ast_Break'] = function (block) {
 };
 
 pythonGenerator.forBlock['ast_Call'] = function (block, generator) {
-  // TODO: Handle import
+  // Handle import if there is a module
   if (block.module_) {
     generator.definitions_["import_" + block.module_] = BlockMirrorTextToBlocks.prototype.MODULE_FUNCTION_IMPORTS[block.module_];
   }
-  // Blockly.Python.definitions_['import_matplotlib'] = 'import matplotlib.pyplot as plt';
-  // Get the caller
+
+  // 获取调用者名称
   let funcName = "";
   if (block.isMethod_) {
-    funcName = generator.valueToCode(block, 'FUNC', Order.FUNCTION_CALL) ||
-      '__';
+     funcName = generator.valueToCode(block, 'FUNCTION_NAME', Order.FUNCTION_CALL) || '__';
   }
-  funcName += this.name_;
-  // Build the arguments
-  var args = [];
-  for (var i = 0; i < block.arguments_.length; i++) {
-    let value = generator.valueToCode(block, 'ARG' + i,
-      Order.NONE) || '__';
+
+  // 获取用户自定义的函数名称
+  funcName += block.getFieldValue('FUNCTION_NAME') || "__";  // 修改这里使用 getFieldValue
+  
+  // 构建参数列表
+  let args = [];
+  for (let i = 0; i < block.arguments_.length; i++) {
+    let value = generator.valueToCode(block, 'ARG' + i, Order.NONE) || '__';
     let argument = block.arguments_[i];
+
     if (argument.startsWith('KWARGS:')) {
       args[i] = "**" + value;
     } else if (argument.startsWith('KEYWORD:')) {
@@ -223,7 +225,8 @@ pythonGenerator.forBlock['ast_Call'] = function (block, generator) {
       args[i] = value;
     }
   }
-  // Return the result
+
+  // 生成最终的代码
   let code = funcName + '(' + args.join(', ') + ')';
   if (block.returns_) {
     return [code, Order.FUNCTION_CALL];
@@ -231,6 +234,7 @@ pythonGenerator.forBlock['ast_Call'] = function (block, generator) {
     return code + "\n";
   }
 };
+
 
 
 pythonGenerator.forBlock['ast_ClassDef'] = function (block, generator) {

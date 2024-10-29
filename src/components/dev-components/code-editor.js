@@ -723,7 +723,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
                 <Block type="ast_input" />
               </Category>
               <Category name='List' colour={COLOR.LIST}>
-                {/* <Block type="ast_ListComp" /> */}
+                {/* <Block type="ast_List_create_with_item" /> */}
                 <Block type="ast_List" />
               </Category>
               <Category name='Dictionary' colour={COLOR.DICTIONARY}>

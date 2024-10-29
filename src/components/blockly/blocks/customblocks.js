@@ -264,27 +264,30 @@ Blockly.Blocks['ast_Call'] = {
    * @this Blockly.Block
    */
   init: function () {
-      this.givenColour_ = BlockMirrorTextToBlocks.COLOR.FUNCTIONS
-      this.setInputsInline(true);
-      // Regular ('NAME') or Keyword (either '**' or '*NAME')
-      this.arguments_ = [];
-      this.argumentVarModels_ = [];
-      // acbart: Added count to keep track of unused parameters
-      this.argumentCount_ = 0;
-      this.quarkConnections_ = {};
-      this.quarkIds_ = null;
-      // acbart: Show parameter names, if they exist
-      this.showParameterNames_ = false;
-      // acbart: Whether this block returns
-      this.returns_ = true;
-      // acbart: added simpleName to handle complex function calls (e.g., chained)
-      this.isMethod_ = false;
-      this.name_ = null;
-      this.message_ = "function";
-      this.premessage_ = "";
-      this.module_ = "";
-      this.updateShape_();
-  },
+    this.givenColour_ = BlockMirrorTextToBlocks.COLOR.FUNCTIONS;
+    this.setInputsInline(true);
+    this.arguments_ = [];
+    this.argumentVarModels_ = [];
+    this.argumentCount_ = 0;
+    this.quarkConnections_ = {};
+    this.quarkIds_ = null;
+    this.showParameterNames_ = false;
+    this.returns_ = true;
+    this.isMethod_ = false;
+    this.name_ = "function_name";  // 初始函式名稱
+    this.message_ = "";
+    this.premessage_ = "";
+    this.module_ = "";
+
+    // 使用 Blockly.FieldTextInput 來讓使用者輸入函式名稱
+    this.appendDummyInput("NAME_FIELD")
+        .appendField(new Blockly.FieldTextInput(this.name_), "FUNCTION_NAME");
+
+    this.updateShape_();
+    // 添加 Mutator 功能
+    this.setMutator(new Blockly.icons.MutatorIcon(['ast_Call_argument'], this));
+},
+
 
   /**
    * Returns the name of the procedure this block calls.
@@ -292,7 +295,7 @@ Blockly.Blocks['ast_Call'] = {
    * @this Blockly.Block
    */
   getProcedureCall: function () {
-      return this.name_;
+    return this.getFieldValue("FUNCTION_NAME");
   },
   /**
    * Notification that a procedure is renaming.
@@ -303,11 +306,10 @@ Blockly.Blocks['ast_Call'] = {
    * @this Blockly.Block
    */
   renameProcedure: function (oldName, newName) {
-      if (this.name_ === null ||
-          Blockly.Names.equals(oldName, this.name_)) {
-          this.name_ = newName;
-          this.updateShape_();
-      }
+    if (this.getProcedureCall() === oldName) {
+      this.setFieldValue(newName, "FUNCTION_NAME");
+      this.updateShape_();
+  }
   },
   /**
    * Notification that the procedure's parameters have changed.
@@ -411,6 +413,38 @@ Blockly.Blocks['ast_Call'] = {
       }
       return true;
   },
+
+  decompose: function (workspace) {
+    const containerBlock = workspace.newBlock('ast_Call_container');
+    containerBlock.initSvg();
+
+    let connection = containerBlock.getInput('STACK').connection;
+    for (let i = 0; i < this.argumentCount_; i++) {
+      const argumentBlock = workspace.newBlock('ast_Call_argument');
+      argumentBlock.initSvg();
+      connection.connect(argumentBlock.previousConnection);
+      connection = argumentBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+
+  compose: function (containerBlock) {
+    let argumentCount = 0;
+    let itemBlock = containerBlock.getInputTargetBlock('STACK');
+    const argument = [];
+
+    while (itemBlock) {
+      argument.push(`arg${argumentCount}`);
+      argumentCount++;
+      itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+    }
+
+    this.argumentCount_ = argumentCount;
+    this.arguments_ = argument;
+
+    this.updateShape_();
+  },
+
   /**
    * Modify this block to have the correct number of arguments.
    * @private
@@ -668,6 +702,29 @@ Blockly.Blocks['ast_Call'] = {
       return Math.min(this.argumentCount_, this.arguments_.length);
   }
 };
+
+Blockly.Blocks['ast_Call_container'] = {
+  init: function () {
+    this.appendDummyInput().appendField("Add parameter");
+    this.appendStatementInput("STACK");
+    this.setColour(BlockMirrorTextToBlocks.COLOR.FUNCTIONS);
+    this.contextMenu = false;
+  }
+};
+
+// 参数块，用于添加参数
+Blockly.Blocks['ast_Call_argument'] = {
+  init: function () {
+    this.appendDummyInput().appendField("Parameter");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(BlockMirrorTextToBlocks.COLOR.FUNCTIONS);
+    this.contextMenu = false;
+  }
+};
+
+
+
 Blockly.Blocks['ast_ClassDef'] = {
   init: function () {
     this.decorators_ = 0;
@@ -1570,6 +1627,7 @@ Blockly.Blocks['ast_Global'] = {
 };
 
 // ast_If
+// 修改後的 ast_If block 定義
 Blockly.Blocks['ast_If'] = {
   init: function () {
     this.orelse_ = 0;
@@ -1583,67 +1641,188 @@ Blockly.Blocks['ast_If'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(BlockMirrorTextToBlocks.COLOR.LOGIC);
+    this.setMutator(new Blockly.icons.MutatorIcon(['ast_If_elif', 'ast_If_else'], this));
+    // 增加狀態追蹤
+    this.lastState_ = {
+      elifs: 0,
+      orelse: false
+    };
     this.updateShape_();
   },
-  // TODO: Not mutable currently
+
+  // 改進的 decompose 函數，確保狀態同步
+  decompose: function (workspace) {
+    const containerBlock = workspace.newBlock('ast_If_mutator');
+    containerBlock.initSvg();
+    
+    // 使用當前保存的狀態
+    let currentElifs = this.elifs_;
+    let currentOrelse = this.orelse_;
+    
+    let previousBlock = containerBlock;
+    // 為每個 elif 添加對應的方塊
+    for (let i = 0; i < currentElifs; i++) {
+      const elifBlock = workspace.newBlock('ast_If_elif');
+      elifBlock.initSvg();
+      previousBlock.nextConnection.connect(elifBlock.previousConnection);
+      previousBlock = elifBlock;
+    }
+
+    // 添加 else 區塊
+    if (currentOrelse) {
+      const elseBlock = workspace.newBlock('ast_If_else');
+      elseBlock.initSvg();
+      previousBlock.nextConnection.connect(elseBlock.previousConnection);
+    }
+
+    return containerBlock;
+  },
+
+  // 改進的 compose 函數，增加狀態檢查
+  compose: function (containerBlock) {
+    let oldElifs = this.elifs_;
+    let oldOrelse = this.orelse_;
+    
+    this.elifs_ = 0;
+    let elifCount = 0;
+    let elsePresent = false;
+
+    // 循環檢查 Mutator 的鏈接
+    let clauseBlock = containerBlock.nextConnection.targetBlock();
+    while (clauseBlock && clauseBlock.type) {
+      if (clauseBlock.type === 'ast_If_elif') {
+        elifCount++;
+      } else if (clauseBlock.type === 'ast_If_else') {
+        elsePresent = true;
+        // 確保 else 只能出現一次
+        break;
+      }
+      clauseBlock = clauseBlock.nextConnection &&
+                    clauseBlock.nextConnection.targetBlock();
+    }
+
+    // 檢查狀態變化
+    if (elifCount !== oldElifs || elsePresent !== oldOrelse) {
+      this.elifs_ = elifCount;
+      this.orelse_ = elsePresent;
+      this.updateShape_();
+      
+      // 更新狀態追蹤
+      this.lastState_ = {
+        elifs: elifCount,
+        orelse: elsePresent
+      };
+    }
+  },
+
+  // 改進的 updateShape_ 函數，增加輸入檢查
   updateShape_: function () {
-    let latestInput = "BODY";
-    for (var i = 0; i < this.elifs_; i++) {
-      if (!this.getInput('ELIF' + i)) {
+    // 移除多餘的 elif 輸入
+    for (let i = this.elifs_; i < this.getElifCount_(); i++) {
+      this.removeInput('ELIFTEST' + i);
+      this.removeInput('ELIFBODY' + i);
+    }
+    
+    // 添加需要的 elif 輸入
+    for (let i = 0; i < this.elifs_; i++) {
+      if (!this.getInput('ELIFTEST' + i)) {
         this.appendValueInput('ELIFTEST' + i)
-          .appendField('elif');
-        this.appendStatementInput("ELIFBODY" + i)
+          .appendField('else if');
+        this.appendStatementInput('ELIFBODY' + i)
           .setCheck(null);
       }
     }
-    // Remove deleted inputs.
-    while (this.getInput('ELIFTEST' + i)) {
-      this.removeInput('ELIFTEST' + i);
-      this.removeInput('ELIFBODY' + i);
-      i++;
-    }
 
-    if (this.orelse_ && !this.getInput('ELSE')) {
+    // 處理 else 部分
+    if (this.orelse_ && !this.getInput('ORELSETEST')) {
       this.appendDummyInput('ORELSETEST')
         .appendField("else:");
       this.appendStatementInput("ORELSEBODY")
         .setCheck(null);
-    } else if (!this.orelse_ && this.getInput('ELSE')) {
+    } else if (!this.orelse_ && this.getInput('ORELSETEST')) {
       this.removeInput('ORELSETEST');
       this.removeInput('ORELSEBODY');
     }
 
-    for (i = 0; i < this.elifs_; i++) {
-      if (this.orelse_) {
+    // 確保正確的輸入順序
+    this.reorderInputs_();
+  },
+
+  // 新增：獲取當前 elif 數量的輔助函數
+  getElifCount_: function() {
+    let count = 0;
+    while (this.getInput('ELIFTEST' + count)) {
+      count++;
+    }
+    return count;
+  },
+
+  // 新增：重新排序輸入的輔助函數
+  reorderInputs_: function() {
+    // 確保基本順序：if -> elif... -> else
+    let lastInput = 'BODY';
+    
+    for (let i = 0; i < this.elifs_; i++) {
+      if (this.getInput('ELIFTEST' + i)) {
         this.moveInputBefore('ELIFTEST' + i, 'ORELSETEST');
         this.moveInputBefore('ELIFBODY' + i, 'ORELSETEST');
-      } else if (i + 1 < this.elifs_) {
-        this.moveInputBefore('ELIFTEST' + i, 'ELIFTEST' + (i + 1));
-        this.moveInputBefore('ELIFBODY' + i, 'ELIFBODY' + (i + 1));
+        lastInput = 'ELIFBODY' + i;
       }
     }
   },
-  /**
-   * Create XML to represent the (non-editable) name and arguments.
-   * @return {!Element} XML storage element.
-   * @this Blockly.Block
-   */
+
+  // 改進的 mutationToDom 函數
   mutationToDom: function () {
-    let container = document.createElement('mutation');
+    const container = document.createElement('mutation');
     container.setAttribute('orelse', this.orelse_);
     container.setAttribute('elifs', this.elifs_);
     return container;
   },
-  /**
-   * Parse XML to restore the (non-editable) name and parameters.
-   * @param {!Element} xmlElement XML storage element.
-   * @this Blockly.Block
-   */
+
+  // 改進的 domToMutation 函數
   domToMutation: function (xmlElement) {
-    this.orelse_ = "true" === xmlElement.getAttribute('orelse');
-    this.elifs_ = parseInt(xmlElement.getAttribute('elifs'), 10) || 0;
-    this.updateShape_();
-  },
+    const newOrelse = xmlElement.getAttribute('orelse') === 'true';
+    const newElifs = parseInt(xmlElement.getAttribute('elifs'), 10) || 0;
+    
+    if (this.orelse_ !== newOrelse || this.elifs_ !== newElifs) {
+      this.orelse_ = newOrelse;
+      this.elifs_ = newElifs;
+      this.updateShape_();
+    }
+  }
+};
+
+// 定義 Mutator 內的 'elif' 和 'else' 子方塊
+Blockly.Blocks['ast_If_elif'] = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField("else if");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setColour(BlockMirrorTextToBlocks.COLOR.LOGIC);
+    this.contextMenu = false;
+  }
+};
+
+Blockly.Blocks['ast_If_else'] = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField("else");
+    this.setPreviousStatement(true);
+    this.setColour(BlockMirrorTextToBlocks.COLOR.LOGIC);
+    this.contextMenu = false;
+  }
+};
+
+// Mutator 容器方塊
+Blockly.Blocks['ast_If_mutator'] = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField("if statement");
+    this.setNextStatement(true);
+    this.setColour(BlockMirrorTextToBlocks.COLOR.LOGIC);
+    this.contextMenu = false;
+  }
 };
 
 
@@ -3072,14 +3251,14 @@ Blockly.Blocks['ast_Expr'] = {
   init: function () {
     this.jsonInit({
       "type": "ast_Expr",
-      "message0": "do nothing with %1",  // 显示内容
+      "message0": "%1",  // 显示内容
       "args0": [
         { "type": "input_value", "name": "VALUE" }  // 输入值
       ],
       "inputsInline": false,  // 不支持内联
       "previousStatement": null,  // 之前可以接其他语句
       "nextStatement": null,  // 可以接其他语句
-      "colour": BlockMirrorTextToBlocks.COLOR.PYTHON  // 设置颜色
+      "colour": BlockMirrorTextToBlocks.COLOR.FUNCTIONS  // 设置颜色
     });
   }
 };
@@ -3399,7 +3578,7 @@ Blockly.VariableModel.compareByName = function (var1, var2) {
 
 Blockly.Names.prototype.getName = function (name, type) {
   if (type == Blockly.VARIABLE_CATEGORY_NAME) {
-    var varName = this.getNameForUserVariable_(name);
+    var varName = this.getNameForUserVariable(name);  //這裡可能會出問題
 
     if (varName) {
       name = varName;
@@ -3410,12 +3589,12 @@ Blockly.Names.prototype.getName = function (name, type) {
   var isVarType = type == Blockly.VARIABLE_CATEGORY_NAME || type == Blockly.Names.DEVELOPER_VARIABLE_TYPE;
   var prefix = isVarType ? this.variablePrefix_ : '';
 
-  if (normalized in this.db_) {
-    return prefix + this.db_[normalized];
+  if (normalized in this.db) {
+    return prefix + this.db[normalized];
   }
 
   var safeName = this.getDistinctName(name, type);
-  this.db_[normalized] = safeName.substr(prefix.length);
+  this.db[normalized] = safeName.substr(prefix.length);
   return safeName;
 };
 

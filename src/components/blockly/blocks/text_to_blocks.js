@@ -1059,7 +1059,7 @@ BlockMirrorTextToBlocks.prototype['ast_Call'] = function (node, parent) {
         }
     }
 
-    returns = returns || (parent._astname !== 'Expr');
+    returns = returns && (parent._astname !== 'Expr');  // 只有當父節點是 Expr 節點,且先前的 returns 為 false 時,才會回傳statement
 
     let argumentsNormal = {};
     // TODO: do I need to be limiting only the *args* length, not keywords?
@@ -1070,7 +1070,7 @@ BlockMirrorTextToBlocks.prototype['ast_Call'] = function (node, parent) {
         "@parameters": true,
         "@method": isMethod,
         "@name": name,
-        "@message": message,
+        "@message": '',
         "@premessage": premessage,
         "@colour": colour,
         "@module": module || ""
@@ -1401,17 +1401,17 @@ BlockMirrorTextToBlocks.prototype['ast_Dict'] = function (node, parent) {
 
 
 // ast_Expr
-BlockMirrorTextToBlocks.BLOCKS.push({
-    "type": "ast_Expr",
-    "message0": "do nothing with %1",
-    "args0": [
-        { "type": "input_value", "name": "VALUE" }
-    ],
-    "inputsInline": false,
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": BlockMirrorTextToBlocks.COLOR.PYTHON,
-});
+// BlockMirrorTextToBlocks.BLOCKS.push({
+//     "type": "ast_Expr",
+//     "message0": "%1",
+//     "args0": [
+//         { "type": "input_value", "name": "VALUE" }
+//     ],
+//     "inputsInline": false,
+//     "previousStatement": null,
+//     "nextStatement": null,
+//     "colour": BlockMirrorTextToBlocks.COLOR.PYTHON,
+// });
 
 BlockMirrorTextToBlocks.prototype['ast_Expr'] = function (node, parent) {
     var value = node.value;
