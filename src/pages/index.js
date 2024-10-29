@@ -1,7 +1,7 @@
 import { useState} from 'react';
 import DevNavBar from "../components/dev-components/dev-nav";
 import CodeEditor from '../components/dev-components/code-editor';
-import { JSONProvider } from "../components/blockly/JSONContext";
+import { XMLProvider } from "../components/blockly/XMLContext";
 
 export default function Index() {
   const [viewState, setViewState] = useState({
@@ -18,11 +18,11 @@ export default function Index() {
   return (
     <>
       <div className="container">
-        <JSONProvider>
+        <XMLProvider>
           {/* <ChatWithAI viewState={viewState} /> */}
           <DevNavBar toggleViewState={toggleViewState} />
           <CodeEditor viewState={viewState} />
-        </JSONProvider>
+        </XMLProvider>
       </div>
     </>
   );

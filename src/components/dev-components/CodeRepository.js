@@ -24,17 +24,17 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Skeleton from '@mui/material/Skeleton';
-import { useJSON } from '../blockly/JSONContext';
+import { useXML } from '../blockly/XMLContext';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
 // 新增專案
-function NewCodeDialog({ open, handleClose, fetchProject, existingProjects, setOriginJSON }) {
+function NewCodeDialog({ open, handleClose, fetchProject, existingProjects, setOriginXML }) {
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
-    const { getJSON } = useJSON(); // 獲取getJSON方法
+    const { getXML } = useXML(); // 獲取getXML方法
 
     // 儲存到資料庫
     const handleSubmit = async (event) => {
@@ -53,7 +53,7 @@ function NewCodeDialog({ open, handleClose, fetchProject, existingProjects, setO
         try {
             const requestBody = {
                 projectname: trimmedUserInput,
-                JSONcode: getJSON() // 獲取當前工作區的JSON
+                XMLcode: getXML() // 獲取當前工作區的JSON
             };
 
             const response = await fetch("http://127.0.0.1:5000/addToDB", {
@@ -69,7 +69,7 @@ function NewCodeDialog({ open, handleClose, fetchProject, existingProjects, setO
             if (response.ok) {
                 console.log("Project added:", data);
                 // 設置新增專案的初始 JSON
-                setOriginJSON(getJSON());
+                setOriginXML(getXML());
                 // 更新專案列表
                 fetchProject();
             } else {
@@ -172,13 +172,13 @@ function RenameDialog({ open, handleClose, selectedProject, renameProject }) {
     );
 }
 
-export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData, fetchData, loading, setCurrentProject, setOriginJSON }) {
+export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData, fetchData, loading, setCurrentProject, setOriginXML }) {
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [selectedProject, setSelectedProject] = React.useState(null);
     const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
-    const { getJSON } = useJSON(); // 獲取getJSON方法
-    const { setJSON } = useJSON(); // 獲取getJSON方法
+    const { getXML } = useXML(); // 獲取getXML方法
+    const { setXML } = useXML(); // 獲取setXML方法
     const open = Boolean(anchorEl);
     const [searchQuery, setSearchQuery] = React.useState(''); // 搜尋狀態
     const searchInputRef = React.useRef(null);
@@ -278,9 +278,9 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
             const data = await response.json();
             if (response.ok) {
                 console.log("Project loaded:", data);
-                setJSON(data);
+                setXML(data);
                 // 設置載入專案後的初始 JSON
-                // setOriginJSON(getJSON());
+                // setOriginXML(getXML());
                 setCurrentProject(projectName);
             } else {
                 console.error("Failed to load project:", data);
@@ -432,7 +432,7 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                 }}
             >
                 {list()}
-                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProject={fetchData} existingProjects={repositoryData} setOriginJSON={setOriginJSON}/>
+                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProject={fetchData} existingProjects={repositoryData} setOriginXML={setOriginXML}/>
                 <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} renameProject={renameProject} selectedProject={selectedProject} />
             </Drawer>
         </>

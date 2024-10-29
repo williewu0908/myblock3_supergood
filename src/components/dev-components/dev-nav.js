@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, CssBaseline } from '@mui/material';
 import CodeRepository from './CodeRepository';
-import { useJSON } from '../blockly/JSONContext';
+import { useXML } from '../blockly/XMLContext';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Switch from '@mui/material/Switch';
@@ -64,8 +64,8 @@ export default function DevNavBar({ toggleViewState }) {
     const [canSave, setCanSave] = React.useState(false);
     const [showSuccess, setShowSuccess] = React.useState(false);
     const [currentProject, setCurrentProject] = React.useState('新專案');
-    const [originJSON, setOriginJSON] = React.useState('');
-    const { getJSON } = useJSON(); // 獲取getJSON方法
+    const [originXML, setOriginXML] = React.useState('');
+    const { getXML } = useXML(); // 獲取getXML方法
     const [state, setState] = React.useState({
         Blockly: true,
         FlowChart: true,
@@ -74,10 +74,10 @@ export default function DevNavBar({ toggleViewState }) {
     });
 
     // React.useEffect(() => {
-    //     const currentJSON = getJSON();  // 獲取當前的 JSON
+    //     const currentJSON = getXML();  // 獲取當前的 JSON
 
     //     // 如果專案是 'MyBlock3' 或當前 JSON 與原始 JSON 一樣
-    //     if (currentProject === 'MyBlock3' || currentJSON === originJSON) {
+    //     if (currentProject === 'MyBlock3' || currentJSON === originXML) {
     //         setCanSave(true); // 按鈕無法保存
     //         console.log('save button disabled');
     //     } else {
@@ -85,7 +85,7 @@ export default function DevNavBar({ toggleViewState }) {
     //         console.log('save button enabled');
     //     }
 
-    // }, [getJSON()]); // 依賴 currentProject 和 getJSON 返回的 JSON 值
+    // }, [getXML()]); // 依賴 currentProject 和 getXML 返回的 JSON 值
 
     React.useEffect(() => {
         if (currentProject === '新專案') {
@@ -96,7 +96,7 @@ export default function DevNavBar({ toggleViewState }) {
             console.log('save button enabled');
         }
 
-    }); // 依賴 currentProject 和 getJSON 返回的 JSON 值
+    }); // 依賴 currentProject 和 getXML 返回的 JSON 值
 
     const handleChange = (event) => {
         setState({
@@ -141,10 +141,10 @@ export default function DevNavBar({ toggleViewState }) {
     const saveProject = async (project) => {
         try {
             setIsSaving(true);
-            const JSONcode = getJSON(); // 獲取當前工作區的JSON
+            const XMLcode = getXML(); // 獲取當前工作區的JSON
             const requestBody = {
                 projectname: project,
-                JSONcode: JSONcode
+                XMLcode: XMLcode
             };
 
             const response = await fetch("http://127.0.0.1:5000/saveProject", {
@@ -160,7 +160,7 @@ export default function DevNavBar({ toggleViewState }) {
             if (response.ok) {
                 console.log("Project update:", data);
                 fetchData();
-                setOriginJSON(JSONcode);
+                setOriginXML(XMLcode);
                 setShowSuccess(true); // 儲存成功，顯示成功圖案
                 // 1秒後隱藏成功圖案
                 setTimeout(() => {
@@ -249,7 +249,7 @@ export default function DevNavBar({ toggleViewState }) {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchData={fetchData} loading={isLoading} setCurrentProject={handleProjectName} setOriginJSON={setOriginJSON} />
+            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchData={fetchData} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} />
         </>
     );
 }

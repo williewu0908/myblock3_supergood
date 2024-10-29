@@ -32,23 +32,6 @@ function initIndexedDB(callback) {
   };
 }
 
-// // 儲存python到IndexedDB
-// function saveCodeToIndexedDB(code) {
-//   var transaction = db.transaction(['codeStore'], 'readwrite');
-//   var objectStore = transaction.objectStore('codeStore');
-//   var request = objectStore.put({ id: 'python_code', code: code });
-
-//   request.onsuccess = function (event) {
-//     console.log('Code saved to IndexedDB');
-//     // Emit an event to notify that the code has been updated
-//     window.dispatchEvent(new CustomEvent('codeUpdated'));
-//   };
-
-//   request.onerror = function (event) {
-//     console.error('Error saving code to IndexedDB:', event.target.errorCode);
-//   };
-// }
-
 // 儲存Blockly產生的xml到IndexedDB
 function saveWorkspaceToIndexedDB(workspaceXML) {
   if (!db) {
@@ -62,7 +45,7 @@ function saveWorkspaceToIndexedDB(workspaceXML) {
   var request = objectStore.put({ id: 'workspace_xml', code: xmlString });
 
   request.onsuccess = function () {
-    console.log('XML from Workspace saved to IndexedDB :' + xmlString);
+    // console.log('XML from Workspace saved to IndexedDB :' + xmlString);
   };
 
   request.onerror = function (event) {
@@ -85,7 +68,7 @@ function loadWorkspaceFromIndexedDB(callback) {
   request.onsuccess = function (event) {
     const result = event.target.result;
     if (result && result.code) {
-      console.log('Workspace XML loaded from IndexedDB:', result.code);
+      // console.log('Workspace XML loaded from IndexedDB:', result.code);
       // 使用 DOMParser 將字符串轉換回 XML
       // const parser = new DOMParser();
       // const workspaceXML = parser.parseFromString(result.code, 'text/xml');
@@ -110,7 +93,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
 
   function saveCodeToIndexedDB(code) {
     return new Promise((resolve, reject) => {
-      console.log('WorkSpace Python:' + code);
+      // console.log('WorkSpace Python:' + code);
       var transaction = db.transaction(['codeStore'], 'readwrite');
       var objectStore = transaction.objectStore('codeStore');
       var request = objectStore.put({ id: 'python_code', code: code });
@@ -159,7 +142,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
         const blocks = converter.convertSource('', newCode);
 
         // 將轉換後的積木加載到工作區
-        console.log(blocks.xml);
+        // console.log(blocks.xml);
         const xml = Blockly.utils.xml.textToDom(blocks.xml);
         Blockly.Xml.domToWorkspace(xml, primaryWorkspace.current);
       } catch (error) {
@@ -175,7 +158,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
     },
     saveCode: () => {
       const xml = Blockly.Xml.workspaceToDom(primaryWorkspace.current);
-      console.log(xml);
+      // console.log(xml);
       return xml;
     },
     loadCode: (xml) => {
@@ -188,7 +171,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
   const generateCode = () => {
     var code = pythonGenerator.workspaceToCode(primaryWorkspace.current);
     saveCodeToIndexedDB(code);
-    console.log(code);
+    // console.log(code);
   };
 
   const restoreWorkspaceState = useCallback((xml) => {
