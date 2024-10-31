@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     let { chatLog, selectedCharacter, model } = req.body;
 
     let url;
-    let apiKey = "sk-proj-8Dgv78LfKmanRLsGDtozT3BlbkFJxKYlo5HiyExq6j1pQcMe";
+    let apiKey = "your api";
 
     if (model === 'Llama3-8B') {
       url = 'http://192.168.194.39:8000/v1/';
