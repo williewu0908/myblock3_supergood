@@ -110,9 +110,18 @@ const BlocklyComponent = forwardRef((props, ref) => {
     });
   }
 
-  function cleanGeneratedPythonCode(code) {
-    // 移除將變數初始化為 `None` 的語句，並去除僅跟在「變數名稱 = None」後的空白行
-    code = code.replace(/^\s*\w+\s*=\s*None\s*\n(\s*\n)*/gm, '');
+  // function cleanGeneratedPythonCode(code) {
+  //   // 移除將變數初始化為 `None` 的語句，並去除僅跟在「變數名稱 = None」後的空白行
+  //   code = code.replace(/^\s*\w+\s*=\s*None\s*\n(\s*\n)*/gm, '');
+  //   return code;
+  // }
+  function cleanGeneratedPythonCode(code) {   
+    // 清除所有空行
+    code = code.replace(/^\s*$(?:\r\n?|\n)/gm, '');
+    
+    // 去掉 `__name__` 後的數字
+    code = code.replace(/__name__\d+/g, '__name__');
+    
     return code;
   }
 
