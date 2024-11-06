@@ -247,3 +247,31 @@
   margin: 0 auto;
   width: 95%;
 }
+
+.bubbleContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: fixed; /* 固定在底部 */
+  bottom: 55px; /* 放在 formGroup 上方 */
+  right: 0;
+  padding: 8px;
+  width: 25%; /* 與 formGroup 寬度一致 */
+  z-index: 998; /* 確保在 formGroup 之下 */
+  box-sizing: border-box;
+}
+
+.bubbleButton {
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 12px; /* 調整泡泡的字體大小 */
+  cursor: pointer;
+  transition: background-color 0.3s;
+  white-space: nowrap; /* 確保泡泡文字不換行 */
+}
+
+.bubbleButton:hover {
+  background-color: #d0d0d0;
+}
