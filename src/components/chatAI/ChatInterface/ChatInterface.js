@@ -206,19 +206,6 @@ function ChatInterface({ viewState }) {
         <DropDownMenu character={character} model={model} countTrueValues={countTrueValues} onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} />
       </div>
       
-      {/* 預設問題泡泡 */}
-      <div className={styles.bubbleContainer}>
-        {defaultQuestions.map((question, index) => (
-          <button 
-            key={index} 
-            className={styles.bubbleButton} 
-            onClick={() => handleBubbleClick(question)}
-          >
-            {question.label}
-          </button>
-        ))}
-      </div>
-      
       <div id={styles.chatlog} ref={chatLogRef} style={{ width: '100%' }}>
         {chatLog.map((content, index) => (
           <div key={index} className={`${styles[`${content.role}ReplyContainer`]}`}>
@@ -239,6 +226,19 @@ function ChatInterface({ viewState }) {
             </div>
             {content.time && <div className={styles.time}>{content.time}</div>}
           </div>
+        ))}
+      </div>
+
+      {/* 預設問題泡泡 */}
+      <div className={styles.bubbleContainer}>
+        {defaultQuestions.map((question, index) => (
+          <button 
+            key={index} 
+            className={styles.bubbleButton} 
+            onClick={() => handleBubbleClick(question)}
+          >
+            {question.label}
+          </button>
         ))}
       </div>
       
