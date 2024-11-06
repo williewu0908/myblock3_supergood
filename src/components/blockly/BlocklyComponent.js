@@ -204,7 +204,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
     blocklyDivElement.style.width = element.offsetWidth + 'px';
     
     if (element.offsetHeight > 0){
-      blocklyDivElement.style.height = element.offsetHeight - 160 + 'px';
+      blocklyDivElement.style.height = element.offsetHeight + 'px';
     } else {
       blocklyDivElement.style.height = element.offsetHeight + 'px';
     }

@@ -195,8 +195,8 @@ export default function DevNavBar({ toggleViewState }) {
             <CssBaseline />
             <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)' }}>
                 <Toolbar sx={{ p: 0, m: 0 ,flexDirection: 'column', backgroundColor: '#333E51', width: '100%', paddingLeft: '0px !important', paddingRight: '0px !important' }}>
-                    <Box sx={{ flexGrow: 1, display: 'flex', height: 60, float: 'left', justifyContent: 'center', alignItems: 'flex-end', width: '100%', background: 'linear-gradient(90deg, #f3f4f6 0%, #eae9e3 100%)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '.0rem .0rem .3rem .3rem' }}>
-                        <Typography variant="h1" component="div" sx={{ fontSize: 45, paddingLeft: 3, paddingBottom: 1.75, fontWeight: 'bold', color: '#333',fontFamily: '"Aref Ruqaa Ink", system-ui'}}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', height: 65, float: 'left', justifyContent: 'center', alignItems: 'flex-end', width: '100%', background: 'linear-gradient(90deg, #f3f4f6 0%, #eae9e3 100%)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '.0rem .0rem .3rem .3rem' }}>
+                        <Typography variant="h1" component="div" sx={{ fontSize: 40, paddingLeft: 3, paddingBottom: 1.75, fontWeight: 'bold', color: '#333',fontFamily: '"Aref Ruqaa Ink", system-ui'}}>
                             myBlock3
                         </Typography>
                         <Typography variant="h3" component="div" sx={{ color: '#5a5a5a', fontSize: 16, paddingLeft: 2, paddingBottom: 1.5}}>
@@ -206,12 +206,12 @@ export default function DevNavBar({ toggleViewState }) {
                             v3.00 - 20241010
                         </Typography>
                     </Box>
-                    <Box sx={{ flexGrow: 1, display: 'flex', height: 80, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', height: 60, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
                         <Button 
                             color="inherit" 
                             sx={{
                                 backgroundColor: '#F2F3F4', 
-                                width: 0.08, maxHeight: 0.5, 
+                                width: 0.08, maxHeight: 0.6, 
                                 marginX: 3, 
                                 fontWeight: 'bold', 
                                 '&:hover': {
@@ -226,7 +226,7 @@ export default function DevNavBar({ toggleViewState }) {
                             onClick={toggleDrawer(true)} 
                             sx={{
                                 backgroundColor: '#F2F3F4', 
-                                width: 0.08, maxHeight: 0.5, 
+                                width: 0.08, maxHeight: 0.6, 
                                 marginX: 3, 
                                 fontWeight: 'bold',
                                 '&:hover': {
@@ -236,15 +236,15 @@ export default function DevNavBar({ toggleViewState }) {
                         >
                             專案
                         </Button>
-                        <Button disabled={canSave} loading={isSaving} onClick={() => saveProject(currentProject)} sx={{ transition: '0.3s ease', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3 }}>
+                        <Button disabled={canSave} loading={isSaving} onClick={() => saveProject(currentProject)} sx={{ transition: '0.3s ease', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.6, marginX: 3 }}>
                             {showSuccess ? <CheckCircleIcon color="success" /> : <SaveIcon />}
                         </Button>
                         <Divider orientation="vertical" variant="middle" flexItem />
-                        <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.5, marginX: 3 }}>
+                        <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.6, marginX: 3 }}>
                             {currentProject}
                         </Box>
                     </Box>
-                    <Box sx={{ flexGrow: 1, display: 'flex', height: 50, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', height: 50, marginTop:'-15px', float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
                         <SwitchesGroup state={state} handleChange={handleChange} />
                     </Box>
                 </Toolbar>

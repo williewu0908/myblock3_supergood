@@ -12,7 +12,7 @@ export default function DropDownMenu({ character, model, countTrueValues, onGetM
                 <div className={styles.menuButton}></div>
             </label>
 
-            <div className={styles.menuList} style={{ width: `${(1 / countTrueValues) * 100}%` }}>
+            <div className={styles.menuList}>
                 <ul>
                     <li>
                         <a>更換模型</a>

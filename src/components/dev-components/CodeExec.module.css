@@ -1,0 +1,19 @@
+#CodeExecContainer{
+    width: 100%;
+    height: 100%;
+    background: 'linear-gradient(90deg, #f3f4f6 0%, #eae9e3 100%)'
+}
+
+#DisplayResult{
+    
+}
+
+.boxtitle {
+    display: flex;
+    padding-left: 0.5em;
+    /* justify-content: center; */
+    align-items: center;
+    height: 7%;
+    font-size: 16px;
+    color: rgb(99, 99, 99);
+}

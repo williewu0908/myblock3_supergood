@@ -177,7 +177,7 @@ function ChatInterface({ viewState }) {
         ))}
       </div>
       <form id={styles.chatform} onSubmit={handleSubmit}>
-      <div className={styles.formGroup} style={{ width: `${(1 / countTrueValues) * 100}%` }}> {/* 動態調整.formGroup的寬度*/}
+      <div className={styles.formGroup}>
           <div className={styles.inputContainer}>
             <textarea
               type="text"

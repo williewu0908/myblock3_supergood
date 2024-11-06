@@ -1,4 +1,5 @@
 .container {
+  position: relative;
   background-color: rgb(248, 248, 248);
   width: 100%;
   overflow: hidden;
@@ -7,7 +8,7 @@
 .titleContainer {
   background-color: rgb(228, 225, 225);
   border-bottom: 1px solid rgb(233, 233, 233);
-  height: 70px;
+  height: 10%;
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   margin-bottom: 0px;
 }
@@ -16,8 +17,8 @@
   box-sizing: border-box;
   margin: 10px;
   float: left;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   border: 1px solid rgb(233, 233, 233);
   border-radius: 50%;
 }
@@ -130,14 +131,12 @@
 .formGroup {
   display: flex;
   align-items: center;
-  position: fixed; /* 改為固定在視窗底部 */
-  bottom: 0; /* 固定在視窗底部 */
-  right: 0; /* 從左邊開始 */
+  position: absolute;
+  bottom: 0px;
   background-color: rgb(228, 225, 225);
+  width: 100%;
   height: 55px;
   border-top: 1px solid rgb(233, 233, 233);
-  z-index: 999; /* 確保在其他內容之上 */
-  width: 25%;
 }
 
 .inputContainer {
