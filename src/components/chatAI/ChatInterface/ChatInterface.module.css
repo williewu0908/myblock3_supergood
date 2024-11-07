@@ -258,6 +258,8 @@
   width: 100%; /* 與 formGroup 寬度一致 */
   z-index: 998; /* 確保在 formGroup 之下 */
   box-sizing: border-box;
+  display: flex;
+  justify-content: flex-end; /* 将子元素对齐到右边 */
 }
 
 .bubbleButton {
