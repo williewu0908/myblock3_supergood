@@ -11,7 +11,6 @@ import '../blockly/blocks/customblocks';
 import '../blockly/generator/generator';
 
 export default function CodeEditor({ viewState }) {
-  const countTrueValues = Object.values(viewState).filter(value => value === true).length;
   const BlocklyRef = useRef();
   const [code, setCode] = useState(`def add_numbers(num1, num2):
     result = num1 + num2

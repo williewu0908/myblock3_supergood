@@ -73,7 +73,7 @@ const savePythonCodeToIndexedDB = async (newCode) => {
 
 function PythonEditor() {
     const [code, setCode] = useState("# Write your Python code here\n");
-    const [isEditorFocused, setIsEditorFocused] = useState(false); 
+    const [isEditorFocused, setIsEditorFocused] = useState(false);
     const [lineCount, setLineCount] = useState(1); // 用於追蹤行數
     const { setContextCode } = useContext(CodeContext);
     const editorRef = useRef(null);
@@ -118,6 +118,8 @@ function PythonEditor() {
         setCode(newCode);
         setContextCode(newCode);
         savePythonCodeToIndexedDB(newCode);
+        // 觸發CodeExec對indexedDB是否為空的檢查
+        window.dispatchEvent(new CustomEvent('checkCodeAvailabilityTrigger'));
         console.log('codeUpdated:' + newCode);
         window.dispatchEvent(new CustomEvent('codeUpdated', {
             detail: {

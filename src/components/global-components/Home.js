@@ -1,6 +1,6 @@
 // components/Home.js
 import { useState } from 'react';
-// import ChatWithAI from "../chatAI/ChatWithAI";
+import ChatWithAI from "../chatAI/ChatWithAI";
 import DevNavBar from "../dev-components/dev-nav";
 import CodeEditor from '../dev-components/code-editor';
 import { JSONProvider } from "../blockly/XMLContext";
@@ -20,11 +20,10 @@ export default function Home() {
     return (
         <div className="container">
             <JSONProvider>
-                {/* <ChatWithAI viewState={viewState} /> */}
+                <ChatWithAI viewState={viewState} />
                 <DevNavBar toggleViewState={toggleViewState} />
                 <CodeEditor viewState={viewState} />
             </JSONProvider>
-            <CodeExec />
         </div>
     );
 }

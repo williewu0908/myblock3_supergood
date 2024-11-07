@@ -85,7 +85,7 @@
     overflow: hidden;
     background-color: rgb(228, 225, 225);
     float: right;
-    top: 10%;
+    top: 60px;
     right: 0px;
     z-index: 1000;
     transition: max-height ease-out 0.5s;

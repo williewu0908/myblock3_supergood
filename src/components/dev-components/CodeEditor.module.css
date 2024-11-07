@@ -36,7 +36,7 @@
 .boxcontainer {
     display: flex;
     justify-content: center;
-    height: calc(100% - 10%); /* 將 10% 用於 .boxtitle */
+    height: calc(100% - 60px); /* 將 10% 用於 .boxtitle */
 }
 
 .chatInterfaceContainer {

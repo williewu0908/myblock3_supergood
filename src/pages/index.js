@@ -2,6 +2,7 @@ import { useState} from 'react';
 import DevNavBar from "../components/dev-components/dev-nav";
 import CodeEditor from '../components/dev-components/code-editor';
 import { XMLProvider } from "../components/blockly/XMLContext";
+import CodeExec from '@/components/dev-components/CodeExec';
 
 export default function Index() {
   const [viewState, setViewState] = useState({
@@ -23,6 +24,7 @@ export default function Index() {
           <DevNavBar toggleViewState={toggleViewState} />
           <CodeEditor viewState={viewState} />
         </XMLProvider>
+        <CodeExec />
       </div>
     </>
   );
