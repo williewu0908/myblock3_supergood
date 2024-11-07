@@ -261,7 +261,7 @@
 }
 
 .bubbleButton {
-  float: right;
+  /* float: right; */
   background-color: #e0e0e0;
   border: none;
   border-radius: 20px;
