@@ -15,10 +15,12 @@ function ChatInterface({ viewState }) {
     ];
 
     const defaultQuestions = [
-      { label: "優化", fullText: "幫我優化我的第7~9行程式碼" },
-      { label: "除錯", fullText: "我在第15行出現錯誤，可以幫我看看嗎？" },
-      { label: "語法說明", fullText: "可以解釋一下Python中的迴圈語法嗎？" },
-      { label: "執行時間", fullText: "如何縮短我的程式碼執行時間？" }
+      { label: "優化", fullText: "幫我優化我的第{int}~{int}行程式碼" },
+      { label: "除錯", fullText: "我在第{int}行出現錯誤，可以幫我看看嗎？" },
+      { label: "迴圈", fullText: "可以解釋一下Python中的迴圈語法嗎？" },
+      { label: "執行時間", fullText: "如何縮短我的程式碼執行時間？" },
+      { label: "解釋", fullText: "可以幫我看看這段程式碼是什麼邏輯嗎" },
+      { label: "範例", fullText: "可以給我一個{String}的邏輯範例嗎" }
     ];
 
     const [chatLog, setChatLog] = useState([]);

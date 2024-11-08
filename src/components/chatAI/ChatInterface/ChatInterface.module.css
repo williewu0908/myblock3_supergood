@@ -251,6 +251,9 @@
 }
 
 .bubbleContainer {
+  display: flex; /* 使用 flex 佈局 */
+  flex-wrap: wrap; /* 允許按鈕自動換行 */
+  justify-content: flex-end; /* 讓按鈕靠右 */
   position: absolute; /* 固定在formGroup上方 */
   bottom: 55px;
   right: 0px;
@@ -258,8 +261,6 @@
   width: 100%; /* 與 formGroup 寬度一致 */
   z-index: 998; /* 確保在 formGroup 之下 */
   box-sizing: border-box;
-  display: flex;
-  justify-content: flex-end; /* 将子元素对齐到右边 */
 }
 
 .bubbleButton {
