@@ -205,7 +205,7 @@ pythonGenerator.forBlock['ast_Call'] = function (block, generator) {
   // 获取调用者名称
   let funcName = "";
   if (block.isMethod_) {
-     funcName = generator.valueToCode(block, 'FUNCTION_NAME', Order.FUNCTION_CALL) || '__';
+     funcName = generator.valueToCode(block, 'FUNC', Order.FUNCTION_CALL) || generator.valueToCode(block, 'FUNCTION_NAME', Order.FUNCTION_CALL) || '__';
   }
 
   // 获取用户自定义的函数名称
