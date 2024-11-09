@@ -77,6 +77,7 @@ function PythonEditor() {
     const [lineCount, setLineCount] = useState(1); // 用於追蹤行數
     const { setContextCode } = useContext(CodeContext);
     const editorRef = useRef(null);
+    const [isRequestPending, setIsRequestPending] = useState(false); // 用來追蹤請求是否處理中
 
     // 接收到 blockUpdated 事件後，從 IndexedDB 取得 python 程式碼
     useEffect(() => {
@@ -98,22 +99,29 @@ function PythonEditor() {
     // 在程式碼編輯區編輯 python 後，觸發 codeUpdated，把 python 程式碼儲存到 IndexedDB
     const handleChange = (newCode) => {
         const newLineCount = newCode.split('\n').length;
-
+    
         // 延遲執行，以確保 Enter 動作完成後再取得游標位置和行數
         setTimeout(() => {
             const cursorPosition = editorRef.current.getCursorPosition();
-
+    
             // 如果行數增加，且游標在新行開頭，確認是 Enter 鍵新增一行
             if (newLineCount > lineCount && cursorPosition.column === 0) {
                 const previousLineCode = newCode.split('\n')[cursorPosition.row - 1];
                 console.log(`第 ${cursorPosition.row} 行的程式碼:`, previousLineCode);
-                // 在此執行後續分析，如呼叫 analyzeLineCode(previousLineCode);
+    
+                // 加上提示詞
+                const message = `這是我剛剛寫的程式碼：${previousLineCode}。請幫我看看有沒有語法錯誤。`;
+    
+                // 檢查請求是否在進行中，若沒有才發送新的請求
+                if (!isRequestPending) {
+                    sendToAI(message);
+                }
             }
-
+    
             // 更新行數
             setLineCount(newLineCount);
         }, 0); // 使用 setTimeout 延遲執行
-
+    
         // 更新程式碼
         setCode(newCode);
         setContextCode(newCode);
@@ -132,6 +140,51 @@ function PythonEditor() {
     // 設定 onLoad 事件來初始化 editor 的游標變更事件監聽
     const handleEditorLoad = (editor) => {
         editorRef.current = editor;
+    };
+
+    // 定義 sendToAI 函數，將訊息傳送給後端 API
+    const sendToAI = async (message) => {
+        setIsRequestPending(true);
+    
+        // 構建請求體，包括完整的 chatLog、selectedCharacter 和 model
+        const currentTime = new Date().toLocaleTimeString('it-IT');
+        const newChatLog = [
+            { role: 'user', content: '你可以作為一個很厲害的程式工程師，幫我看看我的這一行程式有沒有語法錯誤嗎？', time: currentTime },
+            { role: 'assistant', content: '當然，請提供你的程式碼給我。' },
+            { role: 'user', content: message, time: currentTime },
+        ];
+    
+        const requestBody = {
+            chatLog: newChatLog,
+            selectedCharacter: "CodingExpert",
+            model: "Llama3-8B"
+        };
+    
+        try {
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestBody)
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                console.log("AI Response:", data.airesponse);
+                setAiResponse(data.airesponse); // 將回應保存並顯示
+                setChatLog([
+                    ...newChatLog.slice(0, -1), // 移除 "loading"
+                    { role: 'assistant', content: data.airesponse }
+                ]); // 更新 chatLog 並顯示回應
+            } else {
+                console.error("Failed to fetch AI response.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            setIsRequestPending(false);
+        }
     };
 
     return (

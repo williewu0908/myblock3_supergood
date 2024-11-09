@@ -251,6 +251,9 @@
 }
 
 .bubbleContainer {
+  display: flex; /* 使用 flex 佈局 */
+  flex-wrap: wrap; /* 允許按鈕自動換行 */
+  justify-content: flex-end; /* 讓按鈕靠右 */
   position: absolute; /* 固定在formGroup上方 */
   bottom: 55px;
   right: 0px;
@@ -258,8 +261,6 @@
   width: 100%; /* 與 formGroup 寬度一致 */
   z-index: 998; /* 確保在 formGroup 之下 */
   box-sizing: border-box;
-  display: flex;
-  justify-content: flex-end; /* 将子元素对齐到右边 */
 }
 
 .bubbleButton {
@@ -278,4 +279,49 @@
 
 .bubbleButton:hover {
   background-color: #d0d0d0;
+}
+
+.lineInputContainer {
+  position: absolute;
+  bottom: 135px;
+  display: flex;
+  align-items: center;
+  background-color: #e0e0e0;
+  border-radius: 20px;
+  padding: 8px 12px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  right: 5px;
+  cursor: pointer; /* 設置為點擊容器 */
+}
+
+.lineInput {
+  border: none;
+  background-color: transparent;
+  outline: none;
+  font-size: 14px;
+  padding: 4px;
+  margin: 0 8px; /* 增加左右間距，讓輸入框之間有空隙 */
+  width: 60px; /* 控制寬度 */
+  color: #333;
+  text-align: center; /* 文字置中 */
+}
+
+.lineInput::placeholder {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.cancelButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px; /* 調整大小適合泡泡 */
+  color: #888; /* 使用灰色讓叉叉更柔和 */
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.cancelButton:hover {
+  color: #555; /* 滑鼠懸停變色 */
 }
