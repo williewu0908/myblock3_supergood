@@ -1,48 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import styles from './CodeExec.module.css';
 
-// 獲取 IndexedDB 中的 Python 代碼
-const getPythonCodeFromIndexedDB = async () => {
-    return new Promise((resolve, reject) => {
-        const openRequest = indexedDB.open('codeDatabase', 1);
-
-        openRequest.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('codeStore')) {
-                db.createObjectStore('codeStore', { keyPath: 'id' });
-            }
-        };
-
-        openRequest.onerror = (event) => {
-            console.error('開啟資料庫錯誤:', event.target.errorCode);
-            reject(event.target.errorCode);
-        };
-
-        openRequest.onsuccess = (event) => {
-            const db = event.target.result;
-            const transaction = db.transaction(['codeStore'], 'readonly');
-            const store = transaction.objectStore('codeStore');
-            const getRequest = store.get('python_code');
-
-            getRequest.onsuccess = () => {
-                if (getRequest.result) {
-                    resolve(getRequest.result.code);
-                } else {
-                    resolve("");
-                }
-            };
-
-            getRequest.onerror = () => {
-                console.error('獲取代碼錯誤:', getRequest.error);
-                reject(getRequest.error);
-            };
-        };
-    });
-};
-
-export default function CodeExec() {
+const CodeExec = forwardRef((props, ref) => {
     const [isCodeAvailable, setIsCodeAvailable] = useState(false);
     const [output, setOutput] = useState("");
 
@@ -64,6 +25,50 @@ export default function CodeExec() {
         ]);
     };
 
+    // 獲取 IndexedDB 中的 Python 代碼
+    const getPythonCodeFromIndexedDB = async () => {
+        return new Promise((resolve, reject) => {
+            const openRequest = indexedDB.open('codeDatabase', 1);
+
+            openRequest.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('codeStore')) {
+                    db.createObjectStore('codeStore', { keyPath: 'id' });
+                }
+            };
+
+            openRequest.onerror = (event) => {
+                console.error('開啟資料庫錯誤:', event.target.errorCode);
+                reject(event.target.errorCode);
+            };
+
+            openRequest.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction(['codeStore'], 'readonly');
+                const store = transaction.objectStore('codeStore');
+                const getRequest = store.get('python_code');
+
+                getRequest.onsuccess = () => {
+                    if (getRequest.result) {
+                        resolve(getRequest.result.code);
+                    } else {
+                        resolve("");
+                    }
+                };
+
+                getRequest.onerror = () => {
+                    console.error('獲取代碼錯誤:', getRequest.error);
+                    reject(getRequest.error);
+                };
+            };
+        });
+    };
+
+    // async function checkCodeAvailability() {
+    //     const code = await getPythonCodeFromIndexedDB();
+    //     setIsCodeAvailable(code.trim() !== ""); // 檢查是否有代碼
+    // }
+
     useEffect(() => {
         // 載入 Skulpt
         loadSkulpt().then(() => {
@@ -72,28 +77,23 @@ export default function CodeExec() {
             console.error('載入 Skulpt 失敗:', error);
         });
 
-        async function checkCodeAvailability() {
-            const code = await getPythonCodeFromIndexedDB();
-            setIsCodeAvailable(code.trim() !== ""); // 檢查是否有代碼
-        }
+        // const handleCheckCodeAvailabilityTrigger = () => {
+        //     checkCodeAvailability();
+        // };
 
-        const handleCheckCodeAvailabilityTrigger = () => {
-            checkCodeAvailability();
-        };
+        // // 監聽 pythonEditor 的改變
+        // window.addEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
 
-        // 監聽 pythonEditor 的改變
-        window.addEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
+        // checkCodeAvailability();
 
-        checkCodeAvailability();
-
-        return () => {
-            window.removeEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
-        };
+        // return () => {
+        //     window.removeEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
+        // };
     }, []);
 
     const runPythonCode = async () => {
         const code = await getPythonCodeFromIndexedDB();
-        console.log('Code to Execute: '+ code);
+        console.log('Code to Execute: ' + code);
         setOutput(""); // 清空輸出
 
         // 配置 Skulpt 的輸出函數
@@ -130,11 +130,18 @@ export default function CodeExec() {
         }
     };
 
+    // 使用 useImperativeHandle 暴露方法
+    useImperativeHandle(ref, () => ({
+        getPythonCodeFromIndexedDB,
+        // checkCodeAvailability,
+        runPythonCode,
+    }));
+
     return (
         <div id={styles.CodeExecContainer}>
             <div className={styles.boxtitle}>
-                <h2>執行程式碼</h2>
-                <IconButton
+                <h2>執行結果</h2>
+                {/* <IconButton
                     aria-label="play"
                     size="large"
                     sx={{ color: '#a55b6d' }}
@@ -142,7 +149,7 @@ export default function CodeExec() {
                     disabled={!isCodeAvailable}
                 >
                     <PlayArrowIcon fontSize="inherit" />
-                </IconButton>
+                </IconButton> */}
             </div>
             <pre
                 id={styles.DisplayResult}
@@ -153,4 +160,7 @@ export default function CodeExec() {
             <div id="mycanvas"></div>
         </div>
     );
-}
+});
+
+
+export default CodeExec;

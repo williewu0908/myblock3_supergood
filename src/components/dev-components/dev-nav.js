@@ -4,6 +4,7 @@ import CodeRepository from './CodeRepository';
 import { useXML } from '../blockly/XMLContext';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import Menu from '@mui/material/Menu';
 import Switch from '@mui/material/Switch';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -14,42 +15,30 @@ import Blockly from 'blockly/core'; // 確保導入 Blockly
 function SwitchesGroup({ state, handleChange }) {
     return (
         <FormControl component="fieldset" variant="standard">
-            <FormGroup row sx={{ paddingLeft: 2 }}>
+            <FormGroup sx={{ paddingLeft: 2 }}>
                 <FormControlLabel
                     control={
                         <Switch checked={state.Blockly} onChange={handleChange} name="Blockly" />
                     }
                     label="積木"
-                    sx={{ 
-                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                    }}
                 />
                 <FormControlLabel
                     control={
                         <Switch checked={state.FlowChart} onChange={handleChange} name="FlowChart" />
                     }
                     label="活動圖"
-                    sx={{ 
-                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                    }}
                 />
                 <FormControlLabel
                     control={
                         <Switch checked={state.Code} onChange={handleChange} name="Code" />
                     }
                     label="程式碼"
-                    sx={{ 
-                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                    }}
                 />
                 <FormControlLabel
                     control={
                         <Switch checked={state.ChatWithAI} onChange={handleChange} name="ChatWithAI" />
                     }
                     label="AI聊天室"
-                    sx={{ 
-                        '.MuiFormControlLabel-label': { color: '#FFFFFF' }  // 修改字體顏色
-                    }}
                 />
             </FormGroup>
         </FormControl>
@@ -193,7 +182,8 @@ export default function DevNavBar({ toggleViewState }) {
     return (
         <>
             <CssBaseline />
-            <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)' }}>
+            {/* myBlock2式樣 */
+            /* <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)' }}>
                 <Toolbar sx={{ p: 0, m: 0 ,flexDirection: 'column', backgroundColor: '#333E51', width: '100%', paddingLeft: '0px !important', paddingRight: '0px !important' }}>
                     <Box sx={{ flexGrow: 1, display: 'flex', height: 65, float: 'left', justifyContent: 'center', alignItems: 'flex-end', width: '100%', background: 'linear-gradient(90deg, #f3f4f6 0%, #eae9e3 100%)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '.0rem .0rem .3rem .3rem' }}>
                         <Typography variant="h1" component="div" sx={{ fontSize: 40, paddingLeft: 3, paddingBottom: 1.75, fontWeight: 'bold', color: '#333',fontFamily: '"Aref Ruqaa Ink", system-ui'}}>
@@ -246,6 +236,46 @@ export default function DevNavBar({ toggleViewState }) {
                     </Box>
                     <Box sx={{ flexGrow: 1, display: 'flex', height: 50, marginTop:'-15px', float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
                         <SwitchesGroup state={state} handleChange={handleChange} />
+                    </Box>
+                </Toolbar>
+            </AppBar> */}
+            <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)' }}>
+                <Toolbar sx={{ p: 0, m: 0 }}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', height: 52, float: 'left', flexDirection: 'column', justifyContent: 'center' }}>
+                        <Typography variant="h1" component="div" sx={{ fontSize: 26 }}>
+                            myBlock 3
+                        </Typography>
+                        <Typography variant="h6" component="div" sx={{ color: 'rgb(90, 90, 90)', fontSize: 10, paddingTop: 0.5 }}>
+                            利用 AI 來幫您編寫程式碼 v3.10-202401109
+                        </Typography>
+                    </Box>
+                    <Button color="inherit">首頁</Button>
+                    <Button color="inherit" onClick={toggleDrawer(true)}>專案</Button>
+                    <Button
+                        aria-haspopup="true"
+                        color="inherit"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={handleSwitchOpen}
+                    >
+                        畫面選項
+                    </Button>
+                    <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        MenuListProps={{
+                            'aria-labelledby': 'basic-button',
+                        }}
+                    >
+                        <SwitchesGroup state={state} handleChange={handleChange} />
+                    </Menu>
+                    <Button disabled={canSave} loading={isSaving} onClick={() => saveProject(currentProject)} sx={{ transition: '0.3s ease' }}>
+                        {showSuccess ? <CheckCircleIcon color="success" /> : <SaveIcon />}
+                    </Button>
+                    <Divider orientation="vertical" variant="middle" flexItem />
+                    <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)' }}>
+                        {currentProject}
                     </Box>
                 </Toolbar>
             </AppBar>

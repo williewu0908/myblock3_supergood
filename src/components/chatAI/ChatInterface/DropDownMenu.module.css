@@ -85,7 +85,7 @@
     overflow: hidden;
     background-color: rgb(228, 225, 225);
     float: right;
-    top: 60px;
+    top: 50px;
     right: 0px;
     z-index: 1000;
     transition: max-height ease-out 0.5s;
@@ -177,25 +177,25 @@
 
 .characterTitleImg {
     box-sizing: border-box;
-    margin: 10px;
+    margin: 8px;
     float: left;
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     border: 1px solid rgb(233, 233, 233);
     border-radius: 50%;
 }
 
 .title {
     color: rgb(99, 99, 99);
-    font-size: 1.7em;
-    line-height: 1.4em;
+    font-size: 1.6em;
+    line-height: 1.2em;
     font-weight: 600;
     margin: 0;
 }
 
 .subtitle {
     color: rgb(137, 137, 137);
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .navBox {

@@ -1,4 +1,4 @@
-import { useState} from 'react';
+import { useState, useRef } from 'react';
 import DevNavBar from "../components/dev-components/dev-nav";
 import CodeEditor from '../components/dev-components/code-editor';
 import { XMLProvider } from "../components/blockly/XMLContext";
@@ -16,15 +16,17 @@ export default function Index() {
     setViewState(newState);
   };
 
+  const codeExecRef = useRef(); // 在 CodeExec 中的handleCheckCodeAvailabilityTrigger 和 runPythonCode引用
+
   return (
     <>
       <div className="container">
         <XMLProvider>
           {/* <ChatWithAI viewState={viewState} /> */}
           <DevNavBar toggleViewState={toggleViewState} />
-          <CodeEditor viewState={viewState} />
+          <CodeEditor viewState={viewState} codeExecRef={codeExecRef} />
         </XMLProvider>
-        <CodeExec />
+        <CodeExec ref={codeExecRef}/>
       </div>
     </>
   );

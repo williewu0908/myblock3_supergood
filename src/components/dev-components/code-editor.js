@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box } from '@mui/material';
 import BlocklyComponent, { Block, Button, Category, Value, Field, Shadow, COLOR } from '../blockly';
 import PythonEditor from '../pythonEditor/pythonEditor';
@@ -6,12 +6,15 @@ import PythonFlowchart from '../flowchart/pythonFlowchart';
 import { CodeProvider } from './CodeContext';
 import styles from './CodeEditor.module.css';
 import ChatInterface from '../chatAI/ChatInterface/ChatInterface';
+import { IconButton } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import '../blockly/blocks/customblocks';
 import '../blockly/generator/generator';
 
-export default function CodeEditor({ viewState }) {
+export default function CodeEditor({ viewState, codeExecRef }) {
   const BlocklyRef = useRef();
+  const [isCodeAvailable, setIsCodeAvailable] = useState(false);
   const [code, setCode] = useState(`def add_numbers(num1, num2):
     result = num1 + num2
     return result
@@ -31,8 +34,34 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
     }
   }
 
+  const executeCode = () => {
+    if (codeExecRef.current) {
+      codeExecRef.current.runPythonCode();
+    }
+  };
+
+  async function checkCodeAvailability() {
+    const code = await codeExecRef.current.getPythonCodeFromIndexedDB();
+    setIsCodeAvailable(code.trim() !== ""); // 檢查是否有代碼
+  }
+
+  useEffect(() => {
+    const handleCheckCodeAvailabilityTrigger = () => {
+      checkCodeAvailability();
+    };
+
+    // 監聽 pythonEditor 的改變
+    window.addEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
+
+    checkCodeAvailability();
+
+    return () => {
+      window.removeEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
+    };
+  }, []);
+
   return (
-    <Box sx={{ width: '100%', height: '60%', display: 'flex' }}>
+    <Box sx={{ width: '100%', height: '55%', display: 'flex' }}>
       <CodeProvider>
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Blockly ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
@@ -145,10 +174,10 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.FlowChart ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
             <h2>活動圖</h2>
-            <button onClick={() => {
+            <button id={styles.export} onClick={() => {
               window.dispatchEvent(new CustomEvent('exportFlowchart'));
             }}>
-              Export Flowchart
+              Export
             </button>
           </div>
           <div className={styles.boxcontainer}>
@@ -156,9 +185,20 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
           </div>
         </Box>
 
-        <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Code ? 'block' : 'none', position:'relative' }}>
+        <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Code ? 'block' : 'none', position: 'relative' }}>
           <div className={styles.boxtitle}>
             <h2>程式碼</h2>
+            <IconButton
+              aria-label="play"
+              size="large"
+              sx={{ color: '#a55b6d',
+                    marginLeft: 'auto',
+                    marginRight: '2px' }}
+              onClick={executeCode}
+              disabled={!isCodeAvailable}
+            >
+              <PlayArrowIcon fontSize="inherit" />
+            </IconButton>
           </div>
           <div className={styles.boxcontainer}>
             <PythonEditor code={code} onUpdate={handleCodeUpdate} />
@@ -166,7 +206,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
         </Box>
 
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.ChatWithAI ? 'block' : 'none' }}>
-          <div className={styles.boxcontainer} style={{height: '100%'}}>
+          <div className={styles.boxcontainer} style={{ height: '100%' }}>
             <div className={styles.chatInterfaceContainer}>
               <ChatInterface viewState={viewState} />
             </div>

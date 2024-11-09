@@ -3,12 +3,12 @@
     padding-left: 0.5em;
     /* justify-content: center; */
     align-items: center;
-    height: 60px;
+    height: 50px;
     font-size: 16px;
     color: rgb(99, 99, 99);
 }
 
-.boxtitle button {
+.boxtitle #export {
     margin-left: auto; /* 保持按鈕在右側 */
     margin-right: 10px; /* 控制按鈕與右邊的距離 */
     padding: 10px 20px; /* 增加內部空間，讓按鈕看起來更大氣 */
@@ -23,12 +23,12 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease; /* 增加動畫效果 */
 }
 
-.boxtitle button:hover {
+.boxtitle #export:hover {
     transform: translateY(-3px); /* 滑鼠懸停時讓按鈕稍微上移 */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* 增強陰影效果 */
 }
 
-.boxtitle button:active {
+.boxtitle #export:active {
     transform: translateY(0); /* 點擊時讓按鈕回到原位 */
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* 點擊時陰影變弱 */
 }
@@ -36,7 +36,7 @@
 .boxcontainer {
     display: flex;
     justify-content: center;
-    height: calc(100% - 60px); /* 將 10% 用於 .boxtitle */
+    height: calc(100% - 50px); /* 將 10% 用於 .boxtitle */
 }
 
 .chatInterfaceContainer {
