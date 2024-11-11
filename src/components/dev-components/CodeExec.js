@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import styles from './CodeExec.module.css';
+import styles from '@/components/dev-components/CodeExec.module.css';
 
 const CodeExec = forwardRef((props, ref) => {
     const [isCodeAvailable, setIsCodeAvailable] = useState(false);

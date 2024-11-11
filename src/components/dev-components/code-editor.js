@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box } from '@mui/material';
-import BlocklyComponent, { Block, Button, Category, Value, Field, Shadow, COLOR } from '../blockly';
-import PythonEditor from '../pythonEditor/pythonEditor';
-import PythonFlowchart from '../flowchart/pythonFlowchart';
-import { CodeProvider } from './CodeContext';
-import styles from './CodeEditor.module.css';
-import ChatInterface from '../chatAI/ChatInterface/ChatInterface';
+import BlocklyComponent, { Block, Button, Category, Value, Field, Shadow, COLOR } from '@/components/blockly'
+import PythonEditor from '@/components/pythonEditor/pythonEditor';
+import PythonFlowchart from '@/components/flowchart/pythonFlowchart';
+import { CodeProvider } from '@/components/dev-components/CodeContext';
+import styles from '@/components/dev-components/CodeEditor.module.css';
+import ChatInterface from '@/components/chatAI/ChatInterface/ChatInterface';
 import { IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
-import '../blockly/blocks/customblocks';
-import '../blockly/generator/generator';
+import '@/components/blockly/blocks/customblocks';
+import '@/components/blockly/generator/generator';
 
 export default function CodeEditor({ viewState, codeExecRef }) {
   const BlocklyRef = useRef();

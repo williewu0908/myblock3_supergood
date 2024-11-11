@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, CssBaseline } from '@mui/material';
-import CodeRepository from './CodeRepository';
-import { useXML } from '../blockly/XMLContext';
+import CodeRepository from '@/components/dev-components/CodeRepository';
+import { useXML } from '@/components/blockly/XMLContext';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Menu from '@mui/material/Menu';

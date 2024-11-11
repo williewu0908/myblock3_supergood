@@ -1,9 +1,10 @@
 // components/Home.js
 import { useState } from 'react';
-import ChatWithAI from "../chatAI/ChatWithAI";
-import DevNavBar from "../dev-components/dev-nav";
-import CodeEditor from '../dev-components/code-editor';
-import { JSONProvider } from "../blockly/XMLContext";
+import ChatWithAI from "@/components/chatAI/ChatWithAI";
+import DevNavBar from "@/components/dev-components/dev-nav";
+import CodeEditor from '@/components/dev-components/code-editor';
+import { JSONProvider } from "@/components/blockly/XMLContext";
+
 
 export default function Home() {
     const [viewState, setViewState] = useState({
