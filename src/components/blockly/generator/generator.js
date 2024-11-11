@@ -460,7 +460,7 @@ pythonGenerator.forBlock['ast_FunctionDef'] = function (block, generator) {
 
   // 檢查參數數量，防止未拼接到的情況
   if (parameters.length === 0) {
-    parameters.push('__');  // 如果無參數，提供一個默認值
+    parameters.push('');  // 如果無參數，提供一個默認值
   }
 
   // 處理返回值註解
