@@ -1,4 +1,4 @@
-import styles from './DropDownMenu.module.css';
+import styles from '@/components/chatAI/ChatInterface/DropDownMenu.module.css';
 import Image from 'next/image';
 
 export default function DropDownMenu({ character, model, countTrueValues, onGetModel, onGetCharacter, onGetShowModal}) {

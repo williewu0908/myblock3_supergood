@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import DropDownMenu from './DropDownMenu';
-import styles from './ChatInterface.module.css';
-import Modal from './Modal';
+import DropDownMenu from '@/components/chatAI/ChatInterface/DropDownMenu';
+import styles from '@/components/chatAI/ChatInterface/ChatInterface.module.css';
+import Modal from '@/components/chatAI/ChatInterface/Modal';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css';
 import { faTimes } from '@fortawesome/free-solid-svg-icons'; // 新增 faTimes

@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly/core';
 import { pythonGenerator, Order } from 'blockly/python';
-import { BlockMirrorTextToBlocks } from '../blocks/text_to_blocks'
+import { BlockMirrorTextToBlocks } from '@/components/blockly/blocks/text_to_blocks';
 
 
 

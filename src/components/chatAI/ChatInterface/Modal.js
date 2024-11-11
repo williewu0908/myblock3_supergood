@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import styles from './Modal.module.css';
+import styles from '@/components/chatAI/ChatInterface/Modal.module.css';
 
 function Modal({ showModal, onConfirm, onCancel }) {
     const modalContentRef = useRef(null);

@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import styles from './BlocklyComponent.module.css';
+import styles from '@/components/blockly/BlocklyComponent.module.css';
 import * as Blockly from 'blockly/core';
 import { pythonGenerator } from 'blockly/python';
 import * as locale from 'blockly/msg/zh-hant';
 
 import 'blockly/blocks';
-import { BlockMirrorTextToBlocks } from './blocks/text_to_blocks'
+import { BlockMirrorTextToBlocks } from '@/components/blockly/blocks/text_to_blocks';
 
 
 // 設定Blockly的語言

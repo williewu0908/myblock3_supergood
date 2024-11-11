@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useRef } from 'react';
-import BlocklyComponent from './BlocklyComponent'; // 引入 BlocklyComponent
+import BlocklyComponent from '@/components/blockly/BlocklyComponent';
 
 
 const XMLContext = createContext();
