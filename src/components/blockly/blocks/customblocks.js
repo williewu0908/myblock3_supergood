@@ -1,8 +1,8 @@
 import * as Blockly from 'blockly/core';
 
 // Since we're using json to initialize the field, we'll need to import it.
-import '../fields/BlocklyReactField';
-import { BlockMirrorTextToBlocks } from './text_to_blocks'
+import '@/components/blockly/fields/BlocklyReactField';
+import { BlockMirrorTextToBlocks } from '@/components/blockly/blocks/text_to_blocks';
 
 // this.workspace.registerButtonCallback('createVariable', Blockly.Variables.createVariableButtonHandler(this.getTargetWorkspace(), null, 'panda'));
 

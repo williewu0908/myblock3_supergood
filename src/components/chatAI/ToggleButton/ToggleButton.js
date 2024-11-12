@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWandMagicSparkles, faXmark } from '@fortawesome/free-solid-svg-icons';
-import styles from './ToggleButton.module.css';
+import styles from '@/components/chatAI/ToggleButton/ToggleButton.module.css';
 
 function ToggleButton({ showChat, toggleChat, viewChatToggle}) {
   return (

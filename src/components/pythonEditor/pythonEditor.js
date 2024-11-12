@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import AceEditor from 'react-ace';
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-github";
-import { CodeContext } from '../dev-components/CodeContext';
+import { CodeContext } from '@/components/dev-components/CodeContext';
 
 // 獲取 Python 程式碼從 IndexedDB
 const getPythonCodeFromIndexedDB = async () => {

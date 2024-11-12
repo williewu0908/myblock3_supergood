@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import ChatInterface from './ChatInterface/ChatInterface';
-import ToggleButton from './ToggleButton/ToggleButton';
-import styles from './ChatWithAI.module.css';
+import ChatInterface from '@/components/chatAI/ChatInterface/ChatInterface';
+import ToggleButton from '@/components/chatAI/ToggleButton/ToggleButton';
+import styles from '@/components/chatAI/ChatWithAI.module.css';
 
 function ChatWithAI({ viewState }) {
   const [showChat, setShowChat] = useState(false);

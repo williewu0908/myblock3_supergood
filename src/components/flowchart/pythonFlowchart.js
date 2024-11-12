@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext } from 'react';
-import { CodeContext } from '../dev-components/CodeContext';
+import { CodeContext } from '@/components/dev-components/CodeContext';
 
 const PythonFlowchart = () => {
     const { contextCode } = useContext(CodeContext);

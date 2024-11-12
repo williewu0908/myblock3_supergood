@@ -2,7 +2,7 @@
 import * as Blockly from 'blockly/core';
 // Import the generator.
 import { Order } from 'blockly/python';
-import Sk from './skulpt_parser';
+import Sk from '@/components/blockly/blocks/skulpt_parser';
 
 var CONSTRUCTOR_IMAGE_URL = /(?:^|\W)(Image\((["'])(.+?)\2\))/g;
 
