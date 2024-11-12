@@ -260,13 +260,14 @@ export default function DevNavBar({ toggleViewState }) {
                         畫面選項
                     </Button>
                     <Menu
-                        id="basic-menu"
+                        id="changeUI"
                         anchorEl={anchorEl}
                         open={open}
                         onClose={handleClose}
                         MenuListProps={{
-                            'aria-labelledby': 'basic-button',
+                            'aria-labelledby': 'changeUIButton',
                         }}
+                        disableScrollLock={ true }
                     >
                         <SwitchesGroup state={state} handleChange={handleChange} />
                     </Menu>

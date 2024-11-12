@@ -205,7 +205,7 @@ print("The sum of", number1, "and", number2, "is", sum_result)`);
           </div>
         </Box>
 
-        <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.ChatWithAI ? 'block' : 'none' }}>
+        <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.ChatWithAI ? 'block' : 'none', overflow: 'auto' }}>
           <div className={styles.boxcontainer} style={{ height: '100%' }}>
             <div className={styles.chatInterfaceContainer}>
               <ChatInterface viewState={viewState} />

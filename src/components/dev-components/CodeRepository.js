@@ -430,6 +430,7 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                         }
                     }
                 }}
+                disableScrollLock={ true }
             >
                 {list()}
                 <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProject={fetchData} existingProjects={repositoryData} setOriginXML={setOriginXML}/>
