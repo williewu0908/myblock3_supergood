@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    assetPrefix: process.env.NODE_ENV === 'production' ? 'https://sw-hie-ie.nknu.edu.tw' : '',
-    basePath: process.env.NODE_ENV === 'production' ? '/myblock3c' : '',
-};
+    output: 'export',
+    basePath: '/myblock3c', 
+    assetPrefix: '/myblock3c/',
+    trailingSlash: true,
+    images: {
+    unoptimized: true
+}
+}
 
-export default nextConfig;
+export default nextConfig
