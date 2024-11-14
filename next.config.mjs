@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'export',
-    basePath: '/myblock3c', 
-    assetPrefix: '/myblock3c/',
+    basePath: process.env.NODE_ENV === 'development' ? '' : '/myblock3c',
+    assetPrefix: process.env.NODE_ENV === 'development' ? '' : '/myblock3c/',
     trailingSlash: true,
     images: {
-    unoptimized: true
-}
+        unoptimized: true
+    }
 }
 
 export default nextConfig
