@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -138,15 +139,16 @@
         }
     </style>
 </head>
+
 <body>
     <div id="particles-js"></div>
-    
+
     <div class="card">
         <div class="card-header">
             <h1 class="title">myBlock3</h1>
             <p id="welcome-message" class="subtitle">載入中...</p>
         </div>
-        
+
         <h2 class="projects-title">你的專案</h2>
         <div id="project-list" class="project-list">
             <div class="loading">載入中...</div>
@@ -219,14 +221,13 @@
                 const response = await fetch('/myblock3/whois', {
                     credentials: 'include'
                 });
-                
-                if (response.status === 401) {
-                    const data = await response.json();
-                    window.location.href = data.redirect;
-                    return;
-                }
 
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        // 如果是401錯誤(未授權),直接重定向
+                        window.location.href = 'https://sw-hie-ie.nknu.edu.tw';
+                        return;
+                    }
                     throw new Error('獲取用戶資訊失敗');
                 }
 
@@ -234,9 +235,11 @@
                 document.getElementById('welcome-message').textContent = `歡迎回來，${data.username}`;
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('welcome-message').textContent = '歡迎回來';
+                // 如果發生任何錯誤,也重定向到指定URL
+                window.location.href = 'https://sw-hie-ie.nknu.edu.tw';
             }
         }
+
 
         // 獲取專案列表
         async function fetchProjects() {
@@ -244,7 +247,7 @@
                 const response = await fetch('/myblock3/api/projects', {
                     credentials: 'include'
                 });
-                
+
                 if (response.status === 401) {
                     const data = await response.json();
                     window.location.href = data.redirect;
@@ -257,7 +260,7 @@
 
                 const data = await response.json();
                 const projectList = document.getElementById('project-list');
-                
+
                 if (!data.projects || data.projects.length === 0) {
                     // 顯示加號按鈕
                     projectList.innerHTML = `
@@ -293,4 +296,5 @@
         });
     </script>
 </body>
+
 </html>
