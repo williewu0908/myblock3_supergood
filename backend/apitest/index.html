@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <style>
+        body { padding: 20px; font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .response { margin-top: 10px; padding: 10px; background: #f5f5f5; white-space: pre-wrap; }
+        button { margin: 5px; padding: 5px 10px; }
+        input { margin: 5px; padding: 5px; width: 200px; }
+        textarea { margin: 5px; padding: 5px; width: 100%; height: 100px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Test Interface</h1>
+        
+        <div class="section">
+            <h2>Current User Info</h2>
+            <button onclick="getCurrentUser()">Get Current User</button>
+            <div id="userResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h2>List Projects</h2>
+            <button onclick="listProjects()">Get All Projects</button>
+            <div id="listResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h2>Create Project</h2>
+            <input type="text" id="newProjectName" placeholder="Project Name">
+            <textarea id="newProjectCode" placeholder="Code (optional)"></textarea>
+            <textarea id="newProjectBlocklyCode" placeholder="Blockly Code (optional)"></textarea>
+            <button onclick="createProject()">Create Project</button>
+            <div id="createResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h2>Update Project</h2>
+            <input type="number" id="updateProjectId" placeholder="Project ID">
+            <input type="text" id="updateProjectName" placeholder="New Project Name">
+            <button onclick="updateProjectName()">Update Name</button>
+            <textarea id="updateProjectCode" placeholder="New Code"></textarea>
+            <textarea id="updateProjectBlocklyCode" placeholder="New Blockly Code"></textarea>
+            <button onclick="updateProjectContent()">Update Content</button>
+            <div id="updateResponse" class="response"></div>
+        </div>
+
+        <div class="section">
+            <h2>Delete Project</h2>
+            <input type="number" id="deleteProjectId" placeholder="Project ID">
+            <button onclick="deleteProject()">Delete Project</button>
+            <div id="deleteResponse" class="response"></div>
+        </div>
+    </div>
+
+    <script>
+        const showResponse = (elementId, data) => {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        };
+
+        const handleError = (elementId, error) => {
+            let message = error.message;
+            if (error.response) {
+                message = `Status: ${error.response.status}\nData: ${JSON.stringify(error.response.data, null, 2)}`;
+            }
+            document.getElementById(elementId).textContent = `Error: ${message}`;
+        };
+
+        async function getCurrentUser() {
+            try {
+                const response = await axios.get('/myblock3/whois');
+                showResponse('userResponse', response.data);
+            } catch (error) {
+                handleError('userResponse', error);
+            }
+        }
+
+        async function listProjects() {
+            try {
+                const response = await axios.get('/myblock3/api/projects');
+                showResponse('listResponse', response.data);
+            } catch (error) {
+                handleError('listResponse', error);
+            }
+        }
+
+        async function createProject() {
+            try {
+                const response = await axios.post('/myblock3/api/projects', {
+                    project_name: document.getElementById('newProjectName').value,
+                    code: document.getElementById('newProjectCode').value,
+                    blockly_code: document.getElementById('newProjectBlocklyCode').value
+                });
+                showResponse('createResponse', response.data);
+            } catch (error) {
+                handleError('createResponse', error);
+            }
+        }
+
+        async function updateProjectName() {
+            const projectId = document.getElementById('updateProjectId').value;
+            try {
+                const response = await axios.put(`/myblock3/api/projects/${projectId}/name`, {
+                    project_name: document.getElementById('updateProjectName').value
+                });
+                showResponse('updateResponse', response.data);
+            } catch (error) {
+                handleError('updateResponse', error);
+            }
+        }
+
+        async function updateProjectContent() {
+            const projectId = document.getElementById('updateProjectId').value;
+            try {
+                const response = await axios.put(`/myblock3/api/projects/${projectId}/content`, {
+                    code: document.getElementById('updateProjectCode').value,
+                    blockly_code: document.getElementById('updateProjectBlocklyCode').value
+                });
+                showResponse('updateResponse', response.data);
+            } catch (error) {
+                handleError('updateResponse', error);
+            }
+        }
+
+        async function deleteProject() {
+            const projectId = document.getElementById('deleteProjectId').value;
+            try {
+                const response = await axios.delete(`/myblock3/api/projects/${projectId}`);
+                showResponse('deleteResponse', response.data);
+            } catch (error) {
+                handleError('deleteResponse', error);
+            }
+        }
+    </script>
+</body>
+</html>
