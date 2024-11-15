@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify, redirect
 import redis
 import mysql.connector
 from datetime import datetime
+from pyflowchart import Flowchart
 
 app = Flask(__name__)
 
@@ -208,6 +209,27 @@ def update_project_content(project_id):
     finally:
         cursor.close()
         conn.close()
+
+@app.route('/api/flowchart', methods=['POST'])
+def generate_flowchart():
+    """處理前端的流程圖生成請求"""
+    try:
+        data = request.get_json()
+        python_code = data.get('code', '')
+        
+        flowchart = Flowchart.from_code(python_code)
+        diagram_code = flowchart.flowchart()
+        
+        return jsonify({
+            'success': True,
+            'diagramCode': diagram_code
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/whois')
 def index():

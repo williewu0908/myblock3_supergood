@@ -35,7 +35,7 @@ const PythonFlowchart = () => {
         const fetchFlowchart = async () => {
             if (contextCode) {
                 try {
-                    const response = await fetch('http://127.0.0.1:5000/flowchart', {
+                    const response = await fetch('/myblock3//api/flowchart', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
