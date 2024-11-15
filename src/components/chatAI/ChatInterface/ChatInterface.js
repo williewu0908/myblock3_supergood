@@ -121,6 +121,36 @@ function ChatInterface({ viewState }) {
               );
             };
 
+            // 創建「加進程式碼」按鈕
+            const AddCodeButton = () => {
+              const handleAddCode = async () => {
+                const codeToAdd = block.innerText;
+                try {
+                  await addCodeToIndexedDB(codeToAdd); // 新增程式碼到 IndexedDB
+                } catch (error) {
+                  console.error('無法加入程式碼：', error);
+                }
+              };
+
+              return (
+                <button
+                  style={{
+                    marginTop: '8px',
+                    display: 'block',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    padding: '5px 10px',
+                    cursor: 'pointer',
+                    borderRadius: '4px',
+                  }}
+                  onClick={handleAddCode}
+                >
+                  加進程式碼
+                </button>
+              );
+            };
+
             // 創建容器並設置定位
             const preBlock = block.closest('pre');
             if (preBlock) {
@@ -135,6 +165,20 @@ function ChatInterface({ viewState }) {
               ReactDOM.render(
                 <CopyButton />,
                 copyButtonContainer
+              );
+
+              // 創建按鈕容器
+              const buttonContainer = document.createElement('div');
+              buttonContainer.style.marginTop = '8px';
+              buttonContainer.id = `add-button-${index}-${blockIndex}`;
+
+              // 添加到 preBlock
+              preBlock.appendChild(buttonContainer);
+
+               // 渲染按鈕
+              ReactDOM.render(
+                <AddCodeButton />,
+                buttonContainer
               );
             }
           });
@@ -153,14 +197,158 @@ function ChatInterface({ viewState }) {
         if (element) {
           element.querySelectorAll('pre').forEach((pre, blockIndex) => {
             const container = document.getElementById(`copy-button-${index}-${blockIndex}`);
+            const container2 = document.getElementById(`add-button-${index}-${blockIndex}`);
             if (container) {
               ReactDOM.unmountComponentAtNode(container);
+            }
+            if (container2) {
+              ReactDOM.unmountComponentAtNode(container2);
             }
           });
         }
       });
     };
   }, [chatLog]);
+
+  useEffect(() => {
+    const handlePythonEditorResponse = (event) => {
+        const { userMessage, aiResponse, time } = event.detail;
+
+        // 新增對話記錄
+        const updatedChatLog = [
+            ...chatLog,
+            { role: 'user', content: userMessage, time },
+            { role: 'assistant', content: aiResponse, time },
+        ];
+        setChatLog(updatedChatLog);
+        saveChatLog(updatedChatLog);
+    };
+
+    window.addEventListener('pythonEditorResponse', handlePythonEditorResponse);
+
+    return () => {
+        window.removeEventListener('pythonEditorResponse', handlePythonEditorResponse);
+    };
+}, [chatLog]);
+
+  const getCodeFromIndexedDB = async (startLine, endLine) => {
+    return new Promise((resolve, reject) => {
+      const openRequest = indexedDB.open('codeDatabase', 1);
+
+      openRequest.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['codeStore'], 'readonly');
+        const store = transaction.objectStore('codeStore');
+        const getRequest = store.get('python_code');
+
+        getRequest.onsuccess = function () {
+          if (getRequest.result) {
+            const codeLines = getRequest.result.code.split('\n');
+            const selectedCode = codeLines.slice(startLine - 1, endLine).join('\n');
+            resolve(selectedCode);
+          } else {
+            resolve('');
+          }
+        };
+
+        getRequest.onerror = function () {
+          console.error('Error fetching code from IndexedDB:', getRequest.error);
+          reject(getRequest.error);
+        };
+      };
+
+      openRequest.onerror = function (event) {
+        console.error('Error opening IndexedDB:', event.target.errorCode);
+        reject(event.target.errorCode);
+      };
+    });
+  };
+
+  const getAllCodeFromIndexedDB = async () => {
+    return new Promise((resolve, reject) => {
+      const openRequest = indexedDB.open('codeDatabase', 1);
+  
+      openRequest.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['codeStore'], 'readonly');
+        const store = transaction.objectStore('codeStore');
+        const getRequest = store.get('python_code');
+  
+        getRequest.onsuccess = function () {
+          if (getRequest.result) {
+            resolve(getRequest.result.code); // 提取所有程式碼
+          } else {
+            resolve(''); // 若無程式碼，回傳空字串
+          }
+        };
+  
+        getRequest.onerror = function () {
+          console.error('Error fetching code from IndexedDB:', getRequest.error);
+          reject(getRequest.error);
+        };
+      };
+  
+      openRequest.onerror = function (event) {
+        console.error('Error opening IndexedDB:', event.target.errorCode);
+        reject(event.target.errorCode);
+      };
+    });
+  };
+  
+  const addCodeToIndexedDB = async (code) => {
+    return new Promise((resolve, reject) => {
+      const openRequest = indexedDB.open('codeDatabase', 1);
+  
+      openRequest.onupgradeneeded = function (event) {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('codeStore')) {
+          db.createObjectStore('codeStore', { keyPath: 'id' });
+        }
+      };
+  
+      openRequest.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['codeStore'], 'readwrite');
+        const store = transaction.objectStore('codeStore');
+  
+        // 獲取現有程式碼並更新
+        const getRequest = store.get('python_code');
+        getRequest.onsuccess = function () {
+          const existingCode = getRequest.result ? getRequest.result.code : '';
+          const updatedCode = existingCode + '\n' + code;
+  
+          // 儲存更新後的程式碼
+          const putRequest = store.put({ id: 'python_code', code: updatedCode });
+          putRequest.onsuccess = function () {
+            // 觸發事件通知更新
+            window.dispatchEvent(new CustomEvent('newCodeAdd', {
+              detail: {
+                code: updatedCode,
+                source: 'addCodeToIndexedDB'
+              }
+            }));
+  
+            // console.log('程式碼已成功加入 IndexedDB');
+            resolve();
+          };
+          putRequest.onerror = function (error) {
+            console.error('儲存程式碼時發生錯誤:', error);
+            reject(error);
+          };
+        };
+  
+        getRequest.onerror = function (error) {
+          console.error('獲取現有程式碼時發生錯誤:', error);
+          reject(error);
+        };
+      };
+  
+      openRequest.onerror = function (error) {
+        console.error('無法打開 IndexedDB:', error);
+        reject(error);
+      };
+    });
+  };
 
   const saveChatLog = (chatLog) => {
     const expirationTime = new Date();
@@ -236,26 +424,26 @@ function ChatInterface({ viewState }) {
       setShowInputFields({ type: "range", fullText: question.fullText });
     } else if (question.fullText.includes("{int}")) {
       setShowInputFields({ type: "singleInt", fullText: question.fullText });
-    } else if (question.fullText.includes("{String}")) {
-      setShowInputFields({ type: "string", fullText: question.fullText });
+    } else if (question.label === "解釋") {
+      sendQuestionToAI(question.fullText, true); // 包含所有程式碼的請求
     } else {
       sendQuestionToAI(question.fullText);
     }
   };
 
   // 修改確認輸入的函數，不再使用按鈕，而是在點擊容器時發送
-  const confirmInputOnContainerClick = () => {
-    if (showInputFields?.type === "range" && startLine && endLine) {
-      const filledText = showInputFields.fullText.replace("{int}~{int}", `${startLine}~${endLine}`);
-      sendQuestionToAI(filledText);
+  const confirmInputOnContainerClick = async () => {
+    if (showInputFields?.type === 'range' && startLine && endLine) {
+      const filledText = showInputFields.fullText.replace('{int}~{int}', `${startLine}~${endLine}`);
+      await sendQuestionToAI(filledText); // 傳送包含行數範圍的問題
       resetInputs();
-    } else if (showInputFields?.type === "singleInt" && singleLineInput) {
-      const filledText = showInputFields.fullText.replace("{int}", singleLineInput);
-      sendQuestionToAI(filledText);
+    } else if (showInputFields?.type === 'singleInt' && singleLineInput) {
+      const filledText = showInputFields.fullText.replace('{int}', singleLineInput);
+      await sendQuestionToAI(filledText, true); // 傳送包含單行的問題
       resetInputs();
-    } else if (showInputFields?.type === "string" && textInput) {
-      const filledText = showInputFields.fullText.replace("{String}", textInput);
-      sendQuestionToAI(filledText);
+    } else if (showInputFields?.type === 'string' && textInput) {
+      const filledText = showInputFields.fullText.replace('{String}', textInput);
+      await sendQuestionToAI(filledText);
       resetInputs();
     }
   };
@@ -269,52 +457,99 @@ function ChatInterface({ viewState }) {
   };
 
   // 發送請求的函數
-  const sendQuestionToAI = async (content) => {
+  const sendQuestionToAI = async (content, includeAllCode = false) => {
     const currentTime = new Date().toLocaleTimeString('it-IT');
+  
+    let extractedCode = '';
+  
+    if (includeAllCode) {
+      if (showInputFields?.type === 'singleInt') {
+        // 提取指定行的程式碼
+        const lineNum = parseInt(singleLineInput, 10);
+        if (!isNaN(lineNum)) {
+          extractedCode = await getCodeFromIndexedDB(lineNum, lineNum); // 單行程式碼
+          extractedCode += '\n以下是全部程式碼：\n' + await getAllCodeFromIndexedDB();
+        }
+      }
+      else{
+        // 提取所有程式碼
+        extractedCode = await getAllCodeFromIndexedDB();
+      }
+    } else if (showInputFields?.type === 'range') {
+      // 提取範圍內的程式碼
+      const startLineNum = parseInt(startLine, 10);
+      const endLineNum = parseInt(endLine, 10);
+      if (!isNaN(startLineNum) && !isNaN(endLineNum)) {
+        extractedCode = await getCodeFromIndexedDB(startLineNum, endLineNum);
+      }
+    } 
+    // else if (showInputFields?.type === 'singleInt') {
+    //   // 提取指定行的程式碼
+    //   const lineNum = parseInt(singleLineInput, 10);
+    //   if (!isNaN(lineNum)) {
+    //     extractedCode = await getCodeFromIndexedDB(lineNum, lineNum); // 單行程式碼
+    //   }
+    // }
+  
+    // 用於顯示的內容
+    const displayContent = content;
+  
+    // 實際發送的完整內容
+    const fullContent = extractedCode
+      ? `${content}\n以下是提取的程式碼：\n${extractedCode}`
+      : content;
+  
+    // 更新聊天室（僅顯示用戶的指令）
     const newChatLog = [
       ...chatLog,
-      { role: 'user', content: content, time: currentTime },
-      { role: 'assistant', content: 'loading' }
+      { role: 'user', content: displayContent, time: currentTime }, // 顯示簡單指令
+      { role: 'assistant', content: 'loading' } // 加載狀態
     ];
-
+  
     setChatLog(newChatLog);
     saveChatLog(newChatLog);
-
+  
+    // 發送包含完整內容的請求
     const requestBody = {
-      chatLog: newChatLog.filter(message => message.role !== 'assistant' || message.content !== 'loading'),
+      chatLog: [
+        ...chatLog,
+        { role: 'user', content: fullContent, time: currentTime } // 發送完整內容
+      ],
       selectedCharacter: character,
       model: model
     };
-
+  
     try {
       const response = await fetch("http://127.0.0.1:5000/generate-answer", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
       });
       const data = await response.json();
       const airesponse = data.airesponse;
-
+  
+      // 更新聊天室，顯示 AI 回應
       const updatedChatLog = [
         ...chatLog,
-        { role: 'user', content: content, time: currentTime },
+        { role: 'user', content: displayContent, time: currentTime }, // 保持用戶顯示內容
         { role: 'assistant', content: airesponse }
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       const updatedChatLog = [
         ...chatLog,
-        { role: 'user', content: content, time: currentTime },
+        { role: 'user', content: displayContent, time: currentTime },
         { role: 'assistant', content: 'Error: Unable to fetch response.' }
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
     }
   };
+  
 
   return (
     <div className={styles.container}>
