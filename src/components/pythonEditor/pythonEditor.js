@@ -78,6 +78,7 @@ function PythonEditor() {
     const { setContextCode } = useContext(CodeContext);
     const editorRef = useRef(null);
     const [isRequestPending, setIsRequestPending] = useState(false); // 用來追蹤請求是否處理中
+    const requestQueue = []; // 用於保存未發送的請求
 
     // 接收到 blockUpdated 事件後，從 IndexedDB 取得 python 程式碼
     useEffect(() => {
@@ -96,6 +97,23 @@ function PythonEditor() {
         return () => window.removeEventListener('blockUpdated', handleBlockUpdate);
     }, [isEditorFocused]);
 
+    // 接收到 newCodeAdd 事件後，從 IndexedDB 取得 python 程式碼
+    useEffect(() => {
+        const handleBlockUpdate = async (event) => {
+            console.log('get newCodeAdd');
+            if (event.detail.source === 'addCodeToIndexedDB' && !isEditorFocused) {
+                // 只有當編輯器沒有被聚焦時，才從 IndexedDB 取得程式碼
+                const updatedCode = await getPythonCodeFromIndexedDB();
+                setCode(updatedCode);
+                setContextCode(updatedCode);
+                setLineCount(updatedCode.split('\n').length);  // 更新行數
+            }
+        };
+
+        window.addEventListener('newCodeAdd', handleBlockUpdate);
+        return () => window.removeEventListener('newCodeAdd', handleBlockUpdate);
+    }, [isEditorFocused]);
+
     // 在程式碼編輯區編輯 python 後，觸發 codeUpdated，把 python 程式碼儲存到 IndexedDB
     const handleChange = (newCode) => {
         const newLineCount = newCode.split('\n').length;
@@ -110,7 +128,7 @@ function PythonEditor() {
                 console.log(`第 ${cursorPosition.row} 行的程式碼:`, previousLineCode);
     
                 // 加上提示詞
-                const message = `這是我剛剛寫的程式碼：${previousLineCode}。請幫我看看有沒有語法錯誤。`;
+                const message = `${previousLineCode}\n請幫我看看有沒有語法錯誤，並以一句話簡單回應。`;
     
                 // 檢查請求是否在進行中，若沒有才發送新的請求
                 if (!isRequestPending) {
@@ -144,47 +162,58 @@ function PythonEditor() {
 
     // 定義 sendToAI 函數，將訊息傳送給後端 API
     const sendToAI = async (message) => {
+        // 將當前請求加入隊列
+        requestQueue.push(message);
+    
+        // 如果已經有請求處理中，直接返回，等待排隊處理
+        if (isRequestPending) return;
+    
+        // 開始處理請求
         setIsRequestPending(true);
+        while (requestQueue.length > 0) {
+            const currentMessage = requestQueue.shift(); // 取出隊列中的第一個請求
+            try {
+                const currentTime = new Date().toLocaleTimeString('it-IT');
+                const newChatLog = [
+                    // { role: 'system', content: '請扮演一個很厲害的程式工程師，幫忙處理語法錯誤。'},
+                    { role: 'user', content: currentMessage},
+                ];
     
-        // 構建請求體，包括完整的 chatLog、selectedCharacter 和 model
-        const currentTime = new Date().toLocaleTimeString('it-IT');
-        const newChatLog = [
-            { role: 'user', content: '你可以作為一個很厲害的程式工程師，幫我看看我的這一行程式有沒有語法錯誤嗎？', time: currentTime },
-            { role: 'assistant', content: '當然，請提供你的程式碼給我。' },
-            { role: 'user', content: message, time: currentTime },
-        ];
+                const requestBody = {
+                    chatLog: newChatLog,
+                    selectedCharacter: "CodingExpert",
+                    model: "Llama3-8B"
+                };
     
-        const requestBody = {
-            chatLog: newChatLog,
-            selectedCharacter: "CodingExpert",
-            model: "Llama3-8B"
-        };
+                const response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(requestBody)
+                });
     
-        try {
-            const response = await fetch("/api/chat", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-            });
-    
-            if (response.ok) {
-                const data = await response.json();
-                console.log("AI Response:", data.airesponse);
-                setAiResponse(data.airesponse); // 將回應保存並顯示
-                setChatLog([
-                    ...newChatLog.slice(0, -1), // 移除 "loading"
-                    { role: 'assistant', content: data.airesponse }
-                ]); // 更新 chatLog 並顯示回應
-            } else {
-                console.error("Failed to fetch AI response.");
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("AI Response:", data.airesponse);
+
+                    // 發送 CustomEvent 給 ChatInterface
+                    window.dispatchEvent(new CustomEvent('pythonEditorResponse', {
+                        detail: {
+                            userMessage: currentMessage,
+                            aiResponse: data.airesponse,
+                            time: currentTime,
+                        }
+                    }));
+                } else {
+                    console.error("Failed to fetch AI response.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
             }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setIsRequestPending(false);
         }
+        // 所有請求處理完成後，將 pending 狀態設為 false
+        setIsRequestPending(false);
     };
 
     return (

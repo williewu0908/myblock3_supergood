@@ -41,7 +41,7 @@
   top: -4%;
   border-bottom: transparent solid 135px;
   box-sizing: border-box;
-  height: 102%;
+  height: 96%;
   overflow-y: scroll;
 }
 
@@ -251,13 +251,14 @@
 }
 
 .bubbleContainer {
+  background-color:rgb(240, 235, 235);
   display: flex; /* 使用 flex 佈局 */
   flex-wrap: wrap; /* 允許按鈕自動換行 */
   justify-content: flex-end; /* 讓按鈕靠右 */
   position: absolute; /* 固定在formGroup上方 */
   bottom: 55px;
   right: 0px;
-  padding: 8px;
+  padding: 2px;
   width: 100%; /* 與 formGroup 寬度一致 */
   z-index: 998; /* 確保在 formGroup 之下 */
   box-sizing: border-box;
