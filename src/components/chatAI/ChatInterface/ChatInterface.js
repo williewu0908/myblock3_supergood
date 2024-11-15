@@ -200,7 +200,7 @@ function ChatInterface({ viewState }) {
     };
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch("http://127.0.0.1:5000/generate-answer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -287,7 +287,7 @@ function ChatInterface({ viewState }) {
     };
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch("http://127.0.0.1:5000/generate-answer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
