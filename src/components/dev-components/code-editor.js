@@ -15,14 +15,7 @@ import '@/components/blockly/generator/generator';
 export default function CodeEditor({ viewState, codeExecRef }) {
   const BlocklyRef = useRef();
   const [isCodeAvailable, setIsCodeAvailable] = useState(false);
-  const [code, setCode] = useState(`def add_numbers(num1, num2):
-    result = num1 + num2
-    return result
-
-number1 = 5
-number2 = 3
-sum_result = add_numbers(number1, number2)
-print("The sum of", number1, "and", number2, "is", sum_result)`);
+  const [code, setCode] = useState(``);
 
   const handleCodeUpdate = (newCode) => {
     setCode(newCode);

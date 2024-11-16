@@ -1,73 +1,104 @@
-import React, { useEffect, useRef, useContext } from 'react';
+import React, { useEffect, useRef, useContext, useState } from 'react';
 import { CodeContext } from '@/components/dev-components/CodeContext';
 
 const PythonFlowchart = () => {
     const { contextCode } = useContext(CodeContext);
     const ref = useRef(null);
+    const containerRef = useRef(null);
+    const [lastValidDiagram, setLastValidDiagram] = useState('');
 
     useEffect(() => {
         const initFlowchart = async (diagramCode) => {
             if (typeof window !== 'undefined' && ref.current) {
-                // 清除舊的流程圖
                 ref.current.innerHTML = '';
                 try {
                     const flowchart = await import('flowchart.js');
                     const diagram = flowchart.parse(diagramCode);
-                    diagram.drawSVG(ref.current);
+                    
+                    // 設置 SVG 的適應性渲染
+                    diagram.drawSVG(ref.current, {
+                        'line-width': 2,
+                        'scale': 0.8,
+                        'flowstate': {
+                            'past': { 'fill': '#CCCCCC', 'font-size': 12 },
+                            'current': { 'fill': '#ffffff', 'font-size': 12 },
+                            'future': { 'fill': '#FFFFFF', 'font-size': 12 },
+                            'invalid': { 'fill': '#FFFFFF', 'font-size': 12 },
+                            'request': { 'fill': '#FFFFFF', 'font-size': 12 }
+                        }
+                    });
+
+                    // 調整 SVG 大小以適應容器
+                    const svg = ref.current.querySelector('svg');
+                    if (svg) {
+                        svg.style.maxWidth = '100%';
+                        svg.style.height = 'auto';
+                    }
+
+                    setLastValidDiagram(diagramCode);
                 } catch (error) {
-                    console.error('Failed to load the flowchart.js library', error);
+                    console.error('Flowchart rendering error:', error);
+                    if (lastValidDiagram) {
+                        const flowchart = await import('flowchart.js');
+                        const diagram = flowchart.parse(lastValidDiagram);
+                        diagram.drawSVG(ref.current);
+                    }
                 }
             }
         };
 
-        const defaultDiagramCode = `st=>start: Start|past:>http://www.google.com[blank]
-                        e=>end: End|future:>http://www.google.com
-                        op1=>operation: Execute Python Code|current
-                        cond=>condition: Code Correct?|invalid
-                        io=>inputoutput: Catch result|request
-
-                        st->op1->cond
-                        cond(yes)->io->e
-                        cond(no)->op1;`;
-
-        initFlowchart(defaultDiagramCode);
-
         const fetchFlowchart = async () => {
-            if (contextCode) {
-                try {
-                    const response = await fetch('/myblock3//api/flowchart', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ code: contextCode })
-                    });
+            if (!contextCode || contextCode.trim() === '') {
+                return;
+            }
 
-                    if (response.ok) {
-                        const { diagramCode } = await response.json();
-                        initFlowchart(diagramCode);
-                        console.log('diagramcode', diagramCode);
-                    } else {
-                        console.error('Failed to fetch diagram code:', response.statusText);
+            try {
+                const response = await fetch('http://127.0.0.1:5000/flowchart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code: contextCode })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success && data.diagramCode) {
+                    try {
+                        await initFlowchart(data.diagramCode);
+                        console.log('Flowchart updated successfully');
+                    } catch (renderError) {
+                        console.error('Failed to render new flowchart:', renderError);
+                        if (lastValidDiagram) {
+                            await initFlowchart(lastValidDiagram);
+                        }
                     }
-                } catch (error) {
-                    console.error('Error fetching diagram code:', error);
+                } else {
+                    const errorMessage = data.error || 'Unknown error';
+                    console.log('Server response error:', errorMessage);
+                    
+                    if (lastValidDiagram) {
+                        await initFlowchart(lastValidDiagram);
+                    }
+                }
+            } catch (error) {
+                console.error('Network or parsing error:', error);
+                if (lastValidDiagram) {
+                    await initFlowchart(lastValidDiagram);
                 }
             }
         };
 
         fetchFlowchart();
 
-        // 匯出流程圖為 PNG 圖片
         const handleExportFlowchart = () => {
             if (ref.current) {
-                const svg = ref.current.querySelector('svg'); // 取得流程圖的 SVG
+                const svg = ref.current.querySelector('svg');
                 if (!svg) {
                     console.error("No SVG found for export");
                     return;
                 }
 
-                // 創建一個畫布，將 SVG 轉換為 PNG
                 const canvas = document.createElement('canvas');
                 const svgData = new XMLSerializer().serializeToString(svg);
                 const img = new Image();
@@ -80,23 +111,19 @@ const PythonFlowchart = () => {
                     const context = canvas.getContext('2d');
                     context.drawImage(img, 0, 0);
 
-                    // 將畫布轉換為 PNG
                     const pngUrl = canvas.toDataURL('image/png');
-
-                    // 創建下載連結
                     const downloadLink = document.createElement('a');
                     downloadLink.href = pngUrl;
                     downloadLink.download = 'flowchart.png';
                     downloadLink.click();
 
-                    URL.revokeObjectURL(url); // 釋放 URL
+                    URL.revokeObjectURL(url);
                 };
 
                 img.src = url;
             }
         };
 
-        // 監聽自定義的 'exportFlowchart' 事件
         const handleExportEvent = () => {
             handleExportFlowchart();
         };
@@ -107,11 +134,49 @@ const PythonFlowchart = () => {
             window.removeEventListener('exportFlowchart', handleExportEvent);
         };
 
-    }, [contextCode]);
+    }, [contextCode, lastValidDiagram]);
 
     return (
-        <div style={{ width: '100%', border: '1px solid #ccc', display: 'flex', justifyContent: 'center' }}>
-            <div ref={ref} />
+        <div 
+            ref={containerRef}
+            style={{ 
+                width: '100%',
+                height: '100%',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden' // 防止外層溢出
+            }}
+        >
+            <div style={{ 
+                flex: '1 1 auto',
+                overflow: 'auto',
+                width: '100%',
+                height: '100%',
+                position: 'relative',
+                padding: '16px',
+                boxSizing: 'border-box',
+                backgroundColor: '#fff'
+            }}>
+                <div 
+                    style={{
+                        position: 'relative',
+                        width: 'fit-content',
+                        minWidth: '100%',
+                        margin: '0 auto'
+                    }}
+                >
+                    <div 
+                        ref={ref}
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            minHeight: '100%'
+                        }}
+                    />
+                </div>
+            </div>
         </div>
     );
 };
