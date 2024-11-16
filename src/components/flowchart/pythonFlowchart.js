@@ -48,7 +48,12 @@ const PythonFlowchart = () => {
         };
 
         const fetchFlowchart = async () => {
+            // 新增：如果 contextCode 為空，清空流程圖並直接返回
             if (!contextCode || contextCode.trim() === '') {
+                if (ref.current) {
+                    ref.current.innerHTML = '';
+                }
+                setLastValidDiagram('');
                 return;
             }
 
