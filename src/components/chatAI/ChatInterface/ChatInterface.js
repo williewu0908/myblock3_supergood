@@ -81,7 +81,7 @@ function ChatInterface({ viewState }) {
 
   useEffect(() => {
     chatLog.forEach((message, index) => {
-      if (message.role === 'assistant') {
+      if (message.role === 'assistant' && message.hasAddCodeButton) {
         const element = document.getElementById(`message-${index}`);
         if (element) {
           // 對每個 <pre><code> 元素進行高亮顯示並添加複製按鈕
@@ -121,40 +121,39 @@ function ChatInterface({ viewState }) {
               );
             };
 
-            // 創建「加進程式碼」按鈕
-            const AddCodeButton = () => {
-              const handleAddCode = async () => {
-                const codeToAdd = block.innerText;
-                try {
-                  await addCodeToIndexedDB(codeToAdd); // 新增程式碼到 IndexedDB
-                } catch (error) {
-                  console.error('無法加入程式碼：', error);
-                }
-              };
-
-              return (
-                <button
-                  style={{
-                    marginTop: '8px',
-                    display: 'block',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    border: 'none',
-                    padding: '5px 10px',
-                    cursor: 'pointer',
-                    borderRadius: '4px',
-                  }}
-                  onClick={handleAddCode}
-                >
-                  加進程式碼
-                </button>
-              );
-            };
-
             // 創建容器並設置定位
             const preBlock = block.closest('pre');
             if (preBlock) {
               preBlock.style.position = 'relative';
+
+              // 創建「加進程式碼」按鈕
+              const AddCodeButton = () => {
+                  const handleAddCode = async () => {
+                      try {
+                          await addCodeToIndexedDB(block.innerText, message.positionRow); // 替換指定行
+                      } catch (error) {
+                          console.error('無法替代程式碼：', error);
+                      }
+                  };
+
+                  return (
+                      <button
+                          style={{
+                              marginTop: '8px',
+                              display: 'block',
+                              backgroundColor: '#4CAF50',
+                              color: 'white',
+                              border: 'none',
+                              padding: '5px 10px',
+                              cursor: 'pointer',
+                              borderRadius: '4px',
+                          }}
+                          onClick={handleAddCode}
+                      >
+                          加進程式碼
+                      </button>
+                  );
+              };
 
               // 創建新的容器元素
               const copyButtonContainer = document.createElement('div');
@@ -175,11 +174,8 @@ function ChatInterface({ viewState }) {
               // 添加到 preBlock
               preBlock.appendChild(buttonContainer);
 
-               // 渲染按鈕
-              ReactDOM.render(
-                <AddCodeButton />,
-                buttonContainer
-              );
+              // 渲染按鈕
+              ReactDOM.render(<AddCodeButton />, buttonContainer);
             }
           });
         }
@@ -211,25 +207,32 @@ function ChatInterface({ viewState }) {
   }, [chatLog]);
 
   useEffect(() => {
-    const handlePythonEditorResponse = (event) => {
-        const { userMessage, aiResponse, time } = event.detail;
+      const handlePythonEditorResponse = (event) => {
+          const { userMessage, aiResponse, time, positionRow } = event.detail;
 
-        // 新增對話記錄
-        const updatedChatLog = [
-            ...chatLog,
-            { role: 'user', content: userMessage, time },
-            { role: 'assistant', content: aiResponse, time },
-        ];
-        setChatLog(updatedChatLog);
-        saveChatLog(updatedChatLog);
-    };
+          // 新增對話記錄，包含行數
+          const updatedChatLog = [
+              ...chatLog,
+              { role: 'user', content: userMessage, time },
+              { 
+                  role: 'assistant', 
+                  content: aiResponse, 
+                  time, 
+                  positionRow, // 傳遞行數
+                  hasAddCodeButton: true, // 標記需要[加進程式碼]按鈕
+                  hasCommentButton: true // 標記需要[註解此行]按鈕
+              },
+          ];
+          setChatLog(updatedChatLog);
+          saveChatLog(updatedChatLog);
+      };
 
-    window.addEventListener('pythonEditorResponse', handlePythonEditorResponse);
+      window.addEventListener('pythonEditorResponse', handlePythonEditorResponse);
 
-    return () => {
-        window.removeEventListener('pythonEditorResponse', handlePythonEditorResponse);
-    };
-}, [chatLog]);
+      return () => {
+          window.removeEventListener('pythonEditorResponse', handlePythonEditorResponse);
+      };
+  }, [chatLog]);
 
   const getCodeFromIndexedDB = async (startLine, endLine) => {
     return new Promise((resolve, reject) => {
@@ -295,60 +298,70 @@ function ChatInterface({ viewState }) {
     });
   };
   
-  const addCodeToIndexedDB = async (code) => {
-    return new Promise((resolve, reject) => {
-      const openRequest = indexedDB.open('codeDatabase', 1);
-  
-      openRequest.onupgradeneeded = function (event) {
-        const db = event.target.result;
-        if (!db.objectStoreNames.contains('codeStore')) {
-          db.createObjectStore('codeStore', { keyPath: 'id' });
-        }
-      };
-  
-      openRequest.onsuccess = function (event) {
-        const db = event.target.result;
-        const transaction = db.transaction(['codeStore'], 'readwrite');
-        const store = transaction.objectStore('codeStore');
-  
-        // 獲取現有程式碼並更新
-        const getRequest = store.get('python_code');
-        getRequest.onsuccess = function () {
-          const existingCode = getRequest.result ? getRequest.result.code : '';
-          const updatedCode = existingCode + '\n' + code;
-  
-          // 儲存更新後的程式碼
-          const putRequest = store.put({ id: 'python_code', code: updatedCode });
-          putRequest.onsuccess = function () {
-            // 觸發事件通知更新
-            window.dispatchEvent(new CustomEvent('newCodeAdd', {
-              detail: {
-                code: updatedCode,
-                source: 'addCodeToIndexedDB'
+  const addCodeToIndexedDB = async (code, replaceLine = null) => {
+      return new Promise((resolve, reject) => {
+          const openRequest = indexedDB.open('codeDatabase', 1);
+
+          openRequest.onupgradeneeded = function (event) {
+              const db = event.target.result;
+              if (!db.objectStoreNames.contains('codeStore')) {
+                  db.createObjectStore('codeStore', { keyPath: 'id' });
               }
-            }));
-  
-            // console.log('程式碼已成功加入 IndexedDB');
-            resolve();
           };
-          putRequest.onerror = function (error) {
-            console.error('儲存程式碼時發生錯誤:', error);
-            reject(error);
+
+          openRequest.onsuccess = function (event) {
+              const db = event.target.result;
+              const transaction = db.transaction(['codeStore'], 'readwrite');
+              const store = transaction.objectStore('codeStore');
+
+              const getRequest = store.get('python_code');
+              getRequest.onsuccess = function () {
+                  const existingCode = getRequest.result ? getRequest.result.code : '';
+                  let updatedCode = existingCode;
+
+                  if (replaceLine !== null) {
+                      // 確保程式碼有足夠的行數
+                      const lines = existingCode.split('\n');
+                      while (lines.length < replaceLine) {
+                          lines.push(''); // 填充空行
+                      }
+                      lines[replaceLine - 1] = code; // 替換指定行
+                      updatedCode = lines.join('\n');
+                  } else {
+                      updatedCode = existingCode + '\n' + code; // 附加程式碼
+                  }
+
+                  // 更新到 IndexedDB
+                  const putRequest = store.put({ id: 'python_code', code: updatedCode });
+                  putRequest.onsuccess = function () {
+                      // 觸發事件通知更新
+                      window.dispatchEvent(new CustomEvent('newCodeAdd', {
+                          detail: {
+                              code: updatedCode,
+                              source: 'addCodeToIndexedDB'
+                          }
+                      }));
+                      resolve();
+                  };
+                  putRequest.onerror = function (error) {
+                      console.error('儲存程式碼時發生錯誤:', error);
+                      reject(error);
+                  };
+              };
+
+              getRequest.onerror = function (error) {
+                  console.error('獲取現有程式碼時發生錯誤:', error);
+                  reject(error);
+              };
           };
-        };
-  
-        getRequest.onerror = function (error) {
-          console.error('獲取現有程式碼時發生錯誤:', error);
-          reject(error);
-        };
-      };
-  
-      openRequest.onerror = function (error) {
-        console.error('無法打開 IndexedDB:', error);
-        reject(error);
-      };
-    });
+
+          openRequest.onerror = function (error) {
+              console.error('無法打開 IndexedDB:', error);
+              reject(error);
+          };
+      });
   };
+
 
   const saveChatLog = (chatLog) => {
     const expirationTime = new Date();
@@ -388,7 +401,7 @@ function ChatInterface({ viewState }) {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/generate-answer", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -446,6 +459,12 @@ function ChatInterface({ viewState }) {
       await sendQuestionToAI(filledText);
       resetInputs();
     }
+  };
+
+  const handleCommentLine = (lineNumber) => {
+      window.dispatchEvent(new CustomEvent('addCommentToLine', {
+          detail: { lineNumber }
+      }));
   };
 
   const resetInputs = () => {
@@ -520,7 +539,7 @@ function ChatInterface({ viewState }) {
     };
   
     try {
-      const response = await fetch("http://127.0.0.1:5000/generate-answer", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -567,13 +586,32 @@ function ChatInterface({ viewState }) {
               </div>
             )}
             <div className={`${styles[`${content.role}Reply`]} ${styles.chatCard}`}>
-              {content.content === 'loading' ? (
-                <div className={styles.loadingIcon}>
-                  <FontAwesomeIcon icon={faSpinner} spin />
-                </div>
-              ) : (
-                <pre className={styles.message} id={`message-${index}`} dangerouslySetInnerHTML={{ __html: content.content }} style={{ width: '100%', whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}></pre>
-              )}
+                {content.content === 'loading' ? (
+                    <div className={styles.loadingIcon}>
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                    </div>
+                ) : (
+                    <>
+                        <pre className={styles.message} id={`message-${index}`} dangerouslySetInnerHTML={{ __html: content.content }} style={{ width: '100%', whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}></pre>
+                        {content.hasCommentButton && (
+                            <button
+                                onClick={() => handleCommentLine(content.positionRow)} // 點擊後呼叫函數
+                                style={{
+                                    marginTop: '8px',
+                                    display: 'block',
+                                    backgroundColor: '#4CAF50',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '5px 10px',
+                                    cursor: 'pointer',
+                                    borderRadius: '4px',
+                                }}
+                            >
+                                註解此行
+                            </button>
+                        )}
+                    </>
+                )}
             </div>
             {content.time && <div className={styles.time}>{content.time}</div>}
           </div>

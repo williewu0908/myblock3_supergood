@@ -100,7 +100,7 @@ function PythonEditor() {
     // 接收到 newCodeAdd 事件後，從 IndexedDB 取得 python 程式碼
     useEffect(() => {
         const handleBlockUpdate = async (event) => {
-            console.log('get newCodeAdd');
+            // console.log('get newCodeAdd');
             if (event.detail.source === 'addCodeToIndexedDB' && !isEditorFocused) {
                 // 只有當編輯器沒有被聚焦時，才從 IndexedDB 取得程式碼
                 const updatedCode = await getPythonCodeFromIndexedDB();
@@ -114,6 +114,28 @@ function PythonEditor() {
         return () => window.removeEventListener('newCodeAdd', handleBlockUpdate);
     }, [isEditorFocused]);
 
+    useEffect(() => {
+        const handleAddCommentToLine = (event) => {
+            const { lineNumber } = event.detail;
+            setCode((prevCode) => {
+                const lines = prevCode.split('\n');
+                lines[lineNumber - 1] = `# 停用: ${lines[lineNumber - 1]}`; // 添加註解
+                const updatedCode = lines.join('\n');
+    
+                // 更新到 IndexedDB
+                savePythonCodeToIndexedDB(updatedCode);
+    
+                return updatedCode;
+            });
+        };
+    
+        window.addEventListener('addCommentToLine', handleAddCommentToLine);
+    
+        return () => {
+            window.removeEventListener('addCommentToLine', handleAddCommentToLine);
+        };
+    }, []);
+
     // 在程式碼編輯區編輯 python 後，觸發 codeUpdated，把 python 程式碼儲存到 IndexedDB
     const handleChange = (newCode) => {
         const newLineCount = newCode.split('\n').length;
@@ -125,14 +147,14 @@ function PythonEditor() {
             // 如果行數增加，且游標在新行開頭，確認是 Enter 鍵新增一行
             if (newLineCount > lineCount && cursorPosition.column === 0) {
                 const previousLineCode = newCode.split('\n')[cursorPosition.row - 1];
-                console.log(`第 ${cursorPosition.row} 行的程式碼:`, previousLineCode);
+                // console.log(`第 ${cursorPosition.row} 行的程式碼:`, previousLineCode);
     
                 // 加上提示詞
-                const message = `${previousLineCode}\n請幫我看看有沒有語法錯誤，並以一句話簡單回應。`;
+                const message = `${previousLineCode}\n請幫我看看這一行的意義與有沒有語法錯誤，並以一句話簡單回應。`;
     
                 // 檢查請求是否在進行中，若沒有才發送新的請求
                 if (!isRequestPending) {
-                    sendToAI(message);
+                    sendToAI(message, cursorPosition.row);
                 }
             }
     
@@ -161,7 +183,7 @@ function PythonEditor() {
     };
 
     // 定義 sendToAI 函數，將訊息傳送給後端 API
-    const sendToAI = async (message) => {
+    const sendToAI = async (message, cursorPositionRow) => {
         // 將當前請求加入隊列
         requestQueue.push(message);
     
@@ -185,7 +207,7 @@ function PythonEditor() {
                     model: "Llama3-8B"
                 };
     
-                const response = await fetch("http://127.0.0.1:5000/generate-answer", {
+                const response = await fetch("/api/chat", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -195,7 +217,7 @@ function PythonEditor() {
     
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("AI Response:", data.airesponse);
+                    // console.log("AI Response:", data.airesponse);
 
                     // 發送 CustomEvent 給 ChatInterface
                     window.dispatchEvent(new CustomEvent('pythonEditorResponse', {
@@ -203,6 +225,7 @@ function PythonEditor() {
                             userMessage: currentMessage,
                             aiResponse: data.airesponse,
                             time: currentTime,
+                            positionRow: cursorPositionRow
                         }
                     }));
                 } else {
