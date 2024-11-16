@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import openai
 from dotenv import dotenv_values
+from pyflowchart import Flowchart
 
 app = Flask(__name__)
 
@@ -213,6 +214,27 @@ def update_project_content(project_id):
         conn.close()
         
 config = dotenv_values(".env")
+
+@app.route('/api/flowchart', methods=['POST'])
+def generate_flowchart():
+    """處理前端的流程圖生成請求"""
+    try:
+        data = request.get_json()
+        python_code = data.get('code', '')
+        
+        flowchart = Flowchart.from_code(python_code)
+        diagram_code = flowchart.flowchart()
+        
+        return jsonify({
+            'success': True,
+            'diagramCode': diagram_code
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 def generate_ans(url, api_key, model, chat_log, selected_character):
     openai.base_url = url
