@@ -111,6 +111,37 @@ def create_project():
         cursor.close()
         conn.close()
 
+@app.route('/api/projects/<int:project_id>/code', methods=['GET'])
+@login_required
+def get_project_code(project_id):
+    """獲取專案程式碼"""
+    user, _ = get_user_from_session()
+    
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # 檢查專案是否存在且屬於該用戶
+        cursor.execute(
+            "SELECT code, blockly_code FROM blockly_projects WHERE id = %s AND user_id = %s",
+            (project_id, user['Id'])
+        )
+        project = cursor.fetchone()
+        
+        if not project:
+            return jsonify({'error': 'Project not found or unauthorized'}), 404
+        
+        return jsonify({
+            'code': project['code'],
+            'blockly_code': project['blockly_code']
+        })
+        
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/api/projects/<int:project_id>', methods=['DELETE'])
 @login_required
 def delete_project(project_id):
