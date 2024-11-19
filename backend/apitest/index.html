@@ -13,6 +13,7 @@
         button { margin: 5px; padding: 5px 10px; }
         input { margin: 5px; padding: 5px; width: 200px; }
         textarea { margin: 5px; padding: 5px; width: 100%; height: 100px; }
+        .error { color: red; }
     </style>
 </head>
 <body>
@@ -33,7 +34,7 @@
 
         <div class="section">
             <h2>Get Project Code</h2>
-            <input type="number" id="getProjectId" placeholder="Project ID">
+            <input type="text" id="getProjectName" placeholder="Project Name">
             <button onclick="getProjectCode()">Get Project Code</button>
             <div id="getCodeResponse" class="response"></div>
         </div>
@@ -49,8 +50,8 @@
 
         <div class="section">
             <h2>Update Project</h2>
-            <input type="number" id="updateProjectId" placeholder="Project ID">
-            <input type="text" id="updateProjectName" placeholder="New Project Name">
+            <input type="text" id="updateProjectName" placeholder="Current Project Name">
+            <input type="text" id="newProjectName" placeholder="New Project Name">
             <button onclick="updateProjectName()">Update Name</button>
             <textarea id="updateProjectCode" placeholder="New Code"></textarea>
             <textarea id="updateProjectBlocklyCode" placeholder="New Blockly Code"></textarea>
@@ -60,7 +61,7 @@
 
         <div class="section">
             <h2>Delete Project</h2>
-            <input type="number" id="deleteProjectId" placeholder="Project ID">
+            <input type="text" id="deleteProjectName" placeholder="Project Name">
             <button onclick="deleteProject()">Delete Project</button>
             <div id="deleteResponse" class="response"></div>
         </div>
@@ -78,6 +79,9 @@
             }
             document.getElementById(elementId).textContent = `Error: ${message}`;
         };
+
+        // URL encode project name to handle special characters
+        const encodeProjectName = (name) => encodeURIComponent(name);
 
         async function getCurrentUser() {
             try {
@@ -98,9 +102,13 @@
         }
 
         async function getProjectCode() {
-            const projectId = document.getElementById('getProjectId').value;
+            const projectName = document.getElementById('getProjectName').value;
+            if (!projectName) {
+                handleError('getCodeResponse', new Error('Project name is required'));
+                return;
+            }
             try {
-                const response = await axios.get(`/myblock3/api/projects/${projectId}/code`);
+                const response = await axios.get(`/myblock3/api/projects/${encodeProjectName(projectName)}/code`);
                 showResponse('getCodeResponse', response.data);
             } catch (error) {
                 handleError('getCodeResponse', error);
@@ -108,9 +116,14 @@
         }
 
         async function createProject() {
+            const projectName = document.getElementById('newProjectName').value;
+            if (!projectName) {
+                handleError('createResponse', new Error('Project name is required'));
+                return;
+            }
             try {
                 const response = await axios.post('/myblock3/api/projects', {
-                    project_name: document.getElementById('newProjectName').value,
+                    project_name: projectName,
                     code: document.getElementById('newProjectCode').value,
                     blockly_code: document.getElementById('newProjectBlocklyCode').value
                 });
@@ -121,10 +134,15 @@
         }
 
         async function updateProjectName() {
-            const projectId = document.getElementById('updateProjectId').value;
+            const currentProjectName = document.getElementById('updateProjectName').value;
+            const newName = document.getElementById('newProjectName').value;
+            if (!currentProjectName || !newName) {
+                handleError('updateResponse', new Error('Both current and new project names are required'));
+                return;
+            }
             try {
-                const response = await axios.put(`/myblock3/api/projects/${projectId}/name`, {
-                    project_name: document.getElementById('updateProjectName').value
+                const response = await axios.put(`/myblock3/api/projects/${encodeProjectName(currentProjectName)}/name`, {
+                    project_name: newName
                 });
                 showResponse('updateResponse', response.data);
             } catch (error) {
@@ -133,9 +151,13 @@
         }
 
         async function updateProjectContent() {
-            const projectId = document.getElementById('updateProjectId').value;
+            const projectName = document.getElementById('updateProjectName').value;
+            if (!projectName) {
+                handleError('updateResponse', new Error('Project name is required'));
+                return;
+            }
             try {
-                const response = await axios.put(`/myblock3/api/projects/${projectId}/content`, {
+                const response = await axios.put(`/myblock3/api/projects/${encodeProjectName(projectName)}/content`, {
                     code: document.getElementById('updateProjectCode').value,
                     blockly_code: document.getElementById('updateProjectBlocklyCode').value
                 });
@@ -146,9 +168,13 @@
         }
 
         async function deleteProject() {
-            const projectId = document.getElementById('deleteProjectId').value;
+            const projectName = document.getElementById('deleteProjectName').value;
+            if (!projectName) {
+                handleError('deleteResponse', new Error('Project name is required'));
+                return;
+            }
             try {
-                const response = await axios.delete(`/myblock3/api/projects/${projectId}`);
+                const response = await axios.delete(`/myblock3/api/projects/${encodeProjectName(projectName)}`);
                 showResponse('deleteResponse', response.data);
             } catch (error) {
                 handleError('deleteResponse', error);
