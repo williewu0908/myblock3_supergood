@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import DevNavBar from "@/components/dev-components/dev-nav";
 import CodeEditor from '@/components/dev-components/code-editor';
 import { XMLProvider } from "@/components/blockly/XMLContext";
+import { CodeProvider } from '@/components/dev-components/CodeContext'
+
 import CodeExec from '@/components/dev-components/CodeExec';
 
 export default function Index() {
@@ -22,11 +24,13 @@ export default function Index() {
     <>
       <div className="container">
         <XMLProvider>
-          {/* <ChatWithAI viewState={viewState} /> */}
-          <DevNavBar toggleViewState={toggleViewState} />
-          <CodeEditor viewState={viewState} codeExecRef={codeExecRef} />
+          <CodeProvider>
+            {/* <ChatWithAI viewState={viewState} /> */}
+            <DevNavBar toggleViewState={toggleViewState} />
+            <CodeEditor viewState={viewState} codeExecRef={codeExecRef} />
+          </CodeProvider>
         </XMLProvider>
-        <CodeExec ref={codeExecRef}/>
+        <CodeExec ref={codeExecRef} />
       </div>
     </>
   );

@@ -3,7 +3,6 @@ import { Box } from '@mui/material';
 import BlocklyComponent, { Block, Button, Category, Value, Field, Shadow, COLOR } from '@/components/blockly'
 import PythonEditor from '@/components/pythonEditor/pythonEditor';
 import PythonFlowchart from '@/components/flowchart/pythonFlowchart';
-import { CodeProvider } from '@/components/dev-components/CodeContext';
 import styles from '@/components/dev-components/CodeEditor.module.css';
 import ChatInterface from '@/components/chatAI/ChatInterface/ChatInterface';
 import { IconButton } from '@mui/material';
@@ -55,7 +54,6 @@ export default function CodeEditor({ viewState, codeExecRef }) {
 
   return (
     <Box sx={{ width: '100%', height: '55%', display: 'flex' }}>
-      <CodeProvider>
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Blockly ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
             <h2>積木</h2>
@@ -205,7 +203,6 @@ export default function CodeEditor({ viewState, codeExecRef }) {
             </div>
           </div>
         </Box>
-      </CodeProvider>
     </Box>
   );
 }
