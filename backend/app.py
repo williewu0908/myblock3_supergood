@@ -94,6 +94,16 @@ def create_project():
     cursor = conn.cursor()
     
     try:
+        # 檢查是否已存在同名專案
+        cursor.execute(
+            "SELECT id FROM blockly_projects WHERE user_id = %s AND project_name = %s",
+            (user['Id'], data['project_name'])
+        )
+        existing_project = cursor.fetchone()
+        
+        if existing_project:
+            return jsonify({'error': 'A project with this name already exists'}), 400
+        
         cursor.execute(
             "INSERT INTO blockly_projects (user_id, project_name, code, blockly_code) VALUES (%s, %s, %s, %s)",
             (user['Id'], data['project_name'], data.get('code', ''), data.get('blockly_code', ''))
@@ -111,9 +121,9 @@ def create_project():
         cursor.close()
         conn.close()
 
-@app.route('/api/projects/<int:project_id>/code', methods=['GET'])
+@app.route('/api/projects/<string:project_name>/code', methods=['GET'])
 @login_required
-def get_project_code(project_id):
+def get_project_code(project_name):
     """獲取專案程式碼"""
     user, _ = get_user_from_session()
     
@@ -123,8 +133,8 @@ def get_project_code(project_id):
     try:
         # 檢查專案是否存在且屬於該用戶
         cursor.execute(
-            "SELECT code, blockly_code FROM blockly_projects WHERE id = %s AND user_id = %s",
-            (project_id, user['Id'])
+            "SELECT code, blockly_code FROM blockly_projects WHERE project_name = %s AND user_id = %s",
+            (project_name, user['Id'])
         )
         project = cursor.fetchone()
         
@@ -142,9 +152,9 @@ def get_project_code(project_id):
         cursor.close()
         conn.close()
 
-@app.route('/api/projects/<int:project_id>', methods=['DELETE'])
+@app.route('/api/projects/<string:project_name>', methods=['DELETE'])
 @login_required
-def delete_project(project_id):
+def delete_project(project_name):
     """刪除專案"""
     user, _ = get_user_from_session()
     
@@ -152,13 +162,20 @@ def delete_project(project_id):
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT user_id FROM blockly_projects WHERE id = %s", (project_id,))
+        # 檢查專案是否存在且屬於該用戶
+        cursor.execute(
+            "SELECT id FROM blockly_projects WHERE project_name = %s AND user_id = %s",
+            (project_name, user['Id'])
+        )
         project = cursor.fetchone()
         
-        if not project or project[0] != user['Id']:
+        if not project:
             return jsonify({'error': 'Project not found or unauthorized'}), 404
         
-        cursor.execute("DELETE FROM blockly_projects WHERE id = %s", (project_id,))
+        cursor.execute(
+            "DELETE FROM blockly_projects WHERE project_name = %s AND user_id = %s",
+            (project_name, user['Id'])
+        )
         conn.commit()
         
         return jsonify({'message': 'Project deleted successfully'})
@@ -168,9 +185,9 @@ def delete_project(project_id):
         cursor.close()
         conn.close()
 
-@app.route('/api/projects/<int:project_id>/name', methods=['PUT'])
+@app.route('/api/projects/<string:old_project_name>/name', methods=['PUT'])
 @login_required
-def update_project_name(project_id):
+def update_project_name(old_project_name):
     """修改專案名稱"""
     user, _ = get_user_from_session()
     
@@ -178,19 +195,35 @@ def update_project_name(project_id):
     if not data or 'project_name' not in data:
         return jsonify({'error': 'New project name is required'}), 400
     
+    new_project_name = data['project_name']
+    
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT user_id FROM blockly_projects WHERE id = %s", (project_id,))
+        # 檢查專案是否存在且屬於該用戶
+        cursor.execute(
+            "SELECT id FROM blockly_projects WHERE project_name = %s AND user_id = %s",
+            (old_project_name, user['Id'])
+        )
         project = cursor.fetchone()
         
-        if not project or project[0] != user['Id']:
+        if not project:
             return jsonify({'error': 'Project not found or unauthorized'}), 404
+            
+        # 檢查新名稱是否已被使用
+        cursor.execute(
+            "SELECT id FROM blockly_projects WHERE project_name = %s AND user_id = %s AND project_name != %s",
+            (new_project_name, user['Id'], old_project_name)
+        )
+        existing_project = cursor.fetchone()
+        
+        if existing_project:
+            return jsonify({'error': 'A project with this name already exists'}), 400
         
         cursor.execute(
-            "UPDATE blockly_projects SET project_name = %s WHERE id = %s",
-            (data['project_name'], project_id)
+            "UPDATE blockly_projects SET project_name = %s WHERE project_name = %s AND user_id = %s",
+            (new_project_name, old_project_name, user['Id'])
         )
         conn.commit()
         
@@ -201,9 +234,9 @@ def update_project_name(project_id):
         cursor.close()
         conn.close()
 
-@app.route('/api/projects/<int:project_id>/content', methods=['PUT'])
+@app.route('/api/projects/<string:project_name>/content', methods=['PUT'])
 @login_required
-def update_project_content(project_id):
+def update_project_content(project_name):
     """更新專案內容"""
     user, _ = get_user_from_session()
     
@@ -215,10 +248,14 @@ def update_project_content(project_id):
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT user_id FROM blockly_projects WHERE id = %s", (project_id,))
+        # 檢查專案是否存在且屬於該用戶
+        cursor.execute(
+            "SELECT id FROM blockly_projects WHERE project_name = %s AND user_id = %s",
+            (project_name, user['Id'])
+        )
         project = cursor.fetchone()
         
-        if not project or project[0] != user['Id']:
+        if not project:
             return jsonify({'error': 'Project not found or unauthorized'}), 404
         
         update_fields = []
@@ -230,9 +267,9 @@ def update_project_content(project_id):
             update_fields.append("blockly_code = %s")
             values.append(data['blockly_code'])
         
-        values.append(project_id)
+        values.extend([project_name, user['Id']])
         cursor.execute(
-            f"UPDATE blockly_projects SET {', '.join(update_fields)} WHERE id = %s",
+            f"UPDATE blockly_projects SET {', '.join(update_fields)} WHERE project_name = %s AND user_id = %s",
             tuple(values)
         )
         conn.commit()
