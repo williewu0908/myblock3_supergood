@@ -31,7 +31,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 // 新增專案
-function NewCodeDialog({ open, handleClose, fetchProject, existingProjects, setOriginXML }) {
+function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML }) {
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
     const { getXML } = useXML(); // 獲取getXML方法
@@ -71,7 +71,7 @@ function NewCodeDialog({ open, handleClose, fetchProject, existingProjects, setO
                 // 設置新增專案的初始 JSON
                 setOriginXML(getXML());
                 // 更新專案列表
-                fetchProject();
+                fetchProjects();
             } else {
                 console.error("Failed to add project:", data);
             }
@@ -172,7 +172,7 @@ function RenameDialog({ open, handleClose, selectedProject, renameProject }) {
     );
 }
 
-export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData, fetchData, loading, setCurrentProject, setOriginXML }) {
+export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData, fetchProjects, loading, setCurrentProject, setOriginXML }) {
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [selectedProject, setSelectedProject] = React.useState(null);
@@ -230,7 +230,7 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
             const data = await response.json();
             if (response.ok) {
                 console.log("Project deleted:", data);
-                fetchData(); // Refresh data
+                fetchProjects(); // Refresh data
             } else {
                 console.error("Failed to delete project:", data);
             }
@@ -253,7 +253,7 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
             const data = await response.json();
             if (response.ok) {
                 console.log("Project renamed:", data);
-                fetchData(); // Refresh data
+                fetchProjects(); // Refresh data
             } else {
                 console.error("Failed to rename project:", data);
             }
@@ -265,23 +265,20 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
     };
 
     // 載入先前的專案
-    const loadProject = async (projectName) => {
+    const loadProject = async (projectId) => {
         try {
-            const response = await fetch("http://127.0.0.1:5000/loadProject", {
-                method: "POST",
+            const response = await fetch(`http://127.0.0.1:5500/api/projects/${projectId}/code`, {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ projectname: projectName })
+                }
             });
 
             const data = await response.json();
             if (response.ok) {
                 console.log("Project loaded:", data);
-                setXML(data);
-                // 設置載入專案後的初始 JSON
-                // setOriginXML(getXML());
-                setCurrentProject(projectName);
+                setXML(data.XMLcode); // 假設後端返回的 JSON 中包含 XMLcode
+                setCurrentProject(projectId); // 更新當前項目 ID 或名稱
             } else {
                 console.error("Failed to load project:", data);
             }
@@ -291,9 +288,10 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
         handleMenuClose();
     };
 
+
     // 搜尋過濾專案
-    const filteredProjects = repositoryData.filter((project) =>
-        project.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredProjects = repositoryData.projects.filter((project) =>
+        project.project_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // 更新輸入框時自動獲取焦點
@@ -430,10 +428,10 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                         }
                     }
                 }}
-                disableScrollLock={ true }
+                disableScrollLock={true}
             >
                 {list()}
-                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProject={fetchData} existingProjects={repositoryData} setOriginXML={setOriginXML}/>
+                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProjects={fetchProjects} existingProjects={repositoryData} setOriginXML={setOriginXML} />
                 <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} renameProject={renameProject} selectedProject={selectedProject} />
             </Drawer>
         </>

@@ -106,14 +106,14 @@ export default function DevNavBar({ toggleViewState }) {
 
         if (open) {
             setIsLoading(true);
-            fetchData();
+            fetchProjects();
         }
     };
 
     // 取得現在所有專案的名字
-    const fetchData = async () => {
+    const fetchProjects = async () => {
         try {
-            const response = await fetch('http://localhost:5000/searchDB?username=${username}');
+            const response = await fetch('http://localhost:5500/myblock3/api/projects', {method:'GET'});
             if (response.ok) {
                 const data = await response.json();
                 setRepositoryData(data); // 更新狀態
@@ -136,7 +136,7 @@ export default function DevNavBar({ toggleViewState }) {
                 XMLcode: XMLcode
             };
 
-            const response = await fetch("http://127.0.0.1:5000/saveProject", {
+            const response = await fetch("http://127.0.0.1:5500/myblock3/api/projects", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -148,7 +148,7 @@ export default function DevNavBar({ toggleViewState }) {
             const data = await response.json();
             if (response.ok) {
                 console.log("Project update:", data);
-                fetchData();
+                fetchProjects();
                 setOriginXML(XMLcode);
                 setShowSuccess(true); // 儲存成功，顯示成功圖案
                 // 1秒後隱藏成功圖案
@@ -182,63 +182,6 @@ export default function DevNavBar({ toggleViewState }) {
     return (
         <>
             <CssBaseline />
-            {/* myBlock2式樣 */
-            /* <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)' }}>
-                <Toolbar sx={{ p: 0, m: 0 ,flexDirection: 'column', backgroundColor: '#333E51', width: '100%', paddingLeft: '0px !important', paddingRight: '0px !important' }}>
-                    <Box sx={{ flexGrow: 1, display: 'flex', height: 65, float: 'left', justifyContent: 'center', alignItems: 'flex-end', width: '100%', background: 'linear-gradient(90deg, #f3f4f6 0%, #eae9e3 100%)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '.0rem .0rem .3rem .3rem' }}>
-                        <Typography variant="h1" component="div" sx={{ fontSize: 40, paddingLeft: 3, paddingBottom: 1.75, fontWeight: 'bold', color: '#333',fontFamily: '"Aref Ruqaa Ink", system-ui'}}>
-                            myBlock3
-                        </Typography>
-                        <Typography variant="h3" component="div" sx={{ color: '#5a5a5a', fontSize: 16, paddingLeft: 2, paddingBottom: 1.5}}>
-                            利用 AI 來幫您編寫程式碼
-                        </Typography>
-                        <Typography variant="h5" component="div" sx={{ color: '#5a5a5a', fontSize: 10, paddingLeft: 1, paddingBottom: 1.5 }}>
-                            v3.00 - 20241010
-                        </Typography>
-                    </Box>
-                    <Box sx={{ flexGrow: 1, display: 'flex', height: 60, float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
-                        <Button 
-                            color="inherit" 
-                            sx={{
-                                backgroundColor: '#F2F3F4', 
-                                width: 0.08, maxHeight: 0.6, 
-                                marginX: 3, 
-                                fontWeight: 'bold', 
-                                '&:hover': {
-                                    backgroundColor: '#e0e0e0', // 設定 hover 狀態的背景顏色
-                                }
-                            }}
-                        >
-                            首頁
-                        </Button>
-                        <Button 
-                            color="inherit" 
-                            onClick={toggleDrawer(true)} 
-                            sx={{
-                                backgroundColor: '#F2F3F4', 
-                                width: 0.08, maxHeight: 0.6, 
-                                marginX: 3, 
-                                fontWeight: 'bold',
-                                '&:hover': {
-                                    backgroundColor: '#e0e0e0', // 設定 hover 狀態的背景顏色
-                                }
-                            }}
-                        >
-                            專案
-                        </Button>
-                        <Button disabled={canSave} loading={isSaving} onClick={() => saveProject(currentProject)} sx={{ transition: '0.3s ease', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.6, marginX: 3 }}>
-                            {showSuccess ? <CheckCircleIcon color="success" /> : <SaveIcon />}
-                        </Button>
-                        <Divider orientation="vertical" variant="middle" flexItem />
-                        <Box component="div" sx={{ fontSize: 22, paddingLeft: 3, color: 'rgb(90, 90, 90)', backgroundColor: '#F2F3F4', width: 0.08, maxHeight: 0.6, marginX: 3 }}>
-                            {currentProject}
-                        </Box>
-                    </Box>
-                    <Box sx={{ flexGrow: 1, display: 'flex', height: 50, marginTop:'-15px', float: 'left', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '.0rem .0rem .3rem .3rem'}}>
-                        <SwitchesGroup state={state} handleChange={handleChange} />
-                    </Box>
-                </Toolbar>
-            </AppBar> */}
             <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)' }}>
                 <Toolbar sx={{ p: 0, m: 0 }}>
                     <Box sx={{ flexGrow: 1, display: 'flex', height: 52, float: 'left', flexDirection: 'column', justifyContent: 'center' }}>
@@ -280,7 +223,7 @@ export default function DevNavBar({ toggleViewState }) {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchData={fetchData} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} />
+            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} />
         </>
     );
 }
