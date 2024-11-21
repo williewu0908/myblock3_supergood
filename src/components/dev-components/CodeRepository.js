@@ -34,7 +34,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML }) {
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
-    const { getXML } = useXML(); // 獲取getXML方法
+    const {  setXML, getXML } = useXML(); // 獲取getXML方法
 
     // 儲存到資料庫
     const handleSubmit = async (event) => {
@@ -70,6 +70,9 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                 console.log("Project added:", data);
                 // 設置新增專案的初始 JSON
                 setOriginXML(getXML());
+
+                // 清空畫面
+                setXML('');
                 // 更新專案列表
                 fetchProjects();
             } else {
@@ -97,7 +100,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                 }
             }}
         >
-            <DialogTitle>新專案</DialogTitle>
+            <DialogTitle>另存新檔</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     專案名稱請不要超過255個字
@@ -366,7 +369,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 <ListSubheader component="div" id="nested-list-subheader" sx={{ fontSize: 20, display: 'flex', justifyContent: 'space-between' }} >
                     我的專案
                     <Button variant="contained" disableElevation sx={{ margin: '6px 0' }} size="small" endIcon={<AddBoxIcon />} onClick={handleDialogOpen}>
-                        新專案
+                        另存新檔
                     </Button>
                 </ListSubheader>
                 <Divider />
