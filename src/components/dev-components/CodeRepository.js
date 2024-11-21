@@ -216,53 +216,56 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
         setRenameDialogOpen(false);
     };
 
-    // 刪除選擇專案
-    const deleteProject = async (projectName) => {
-        try {
-            const response = await fetch("http://127.0.0.1:5000/deleteFromDB", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ projectname: projectName })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                console.log("Project deleted:", data);
-                fetchProjects(); // Refresh data
-            } else {
-                console.error("Failed to delete project:", data);
+    // 刪除專案
+const deleteProject = async (projectName) => {
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/api/projects/${projectName}`, {
+            method: "DELETE",
+            credentials: 'include',  // 加入這行以發送 cookies
+            headers: {
+                "Content-Type": "application/json"
             }
-        } catch (error) {
-            console.error("Error deleting project:", error);
-        }
-        handleMenuClose();
-    };
+        });
 
-    const renameProject = async (oldProjectName, newProjectName) => {
-        try {
-            const response = await fetch("http://127.0.0.1:5000/changeProjectName", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ oldProjectName, newProjectName })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                console.log("Project renamed:", data);
-                fetchProjects(); // Refresh data
-            } else {
-                console.error("Failed to rename project:", data);
-            }
-        } catch (error) {
-            console.error("Error renaming project:", error);
+        const data = await response.json();
+        if (response.ok) {
+            console.log("Project deleted:", data);
+            fetchProjects(); // Refresh data
+        } else {
+            console.error("Failed to delete project:", data);
         }
-        handleRenameDialogClose();
-        handleMenuClose();
-    };
+    } catch (error) {
+        console.error("Error deleting project:", error);
+    }
+    handleMenuClose();
+};
+
+// 重新命名專案
+const renameProject = async (oldProjectName, newProjectName) => {
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/api/projects/${oldProjectName}/name`, {
+            method: "PUT",
+            credentials: 'include',  // 加入這行以發送 cookies
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ project_name: newProjectName })  // 修改傳送的資料格式
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            console.log("Project renamed:", data);
+            fetchProjects(); // Refresh data
+        } else {
+            console.error("Failed to rename project:", data);
+        }
+    } catch (error) {
+        console.error("Error renaming project:", error);
+    }
+    handleRenameDialogClose();
+    handleMenuClose();
+};
+
 
     // 載入先前的專案
     const loadProject = async (projectName) => {
