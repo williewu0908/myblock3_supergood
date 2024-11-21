@@ -222,7 +222,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
     // 刪除專案
 const deleteProject = async (projectName) => {
     try {
-        const response = await fetch(`http://127.0.0.1:5000/api/projects/${projectName}`, {
+        const response = await fetch(`/myblock3/api/projects/${projectName}`, {
             method: "DELETE",
             credentials: 'include',  // 加入這行以發送 cookies
             headers: {
@@ -246,7 +246,7 @@ const deleteProject = async (projectName) => {
 // 重新命名專案
 const renameProject = async (oldProjectName, newProjectName) => {
     try {
-        const response = await fetch(`http://127.0.0.1:5000/api/projects/${oldProjectName}/name`, {
+        const response = await fetch(`/myblock3/api/projects/${oldProjectName}/name`, {
             method: "PUT",
             credentials: 'include',  // 加入這行以發送 cookies
             headers: {
