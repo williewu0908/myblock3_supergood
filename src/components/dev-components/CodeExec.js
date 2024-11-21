@@ -64,10 +64,10 @@ const CodeExec = forwardRef((props, ref) => {
         });
     };
 
-    // async function checkCodeAvailability() {
-    //     const code = await getPythonCodeFromIndexedDB();
-    //     setIsCodeAvailable(code.trim() !== ""); // 檢查是否有代碼
-    // }
+    async function checkCodeAvailability() {
+        const code = await getPythonCodeFromIndexedDB();
+        setIsCodeAvailable(code.trim() !== ""); // 檢查是否有代碼
+    }
 
     useEffect(() => {
         // 載入 Skulpt
@@ -77,18 +77,18 @@ const CodeExec = forwardRef((props, ref) => {
             console.error('載入 Skulpt 失敗:', error);
         });
 
-        // const handleCheckCodeAvailabilityTrigger = () => {
-        //     checkCodeAvailability();
-        // };
+        const handleCheckCodeAvailabilityTrigger = () => {
+            checkCodeAvailability();
+        };
 
-        // // 監聽 pythonEditor 的改變
-        // window.addEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
+        // 監聽 pythonEditor 的改變
+        window.addEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
 
-        // checkCodeAvailability();
+        checkCodeAvailability();
 
-        // return () => {
-        //     window.removeEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
-        // };
+        return () => {
+            window.removeEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
+        };
     }, []);
 
     const runPythonCode = async () => {
@@ -141,7 +141,7 @@ const CodeExec = forwardRef((props, ref) => {
         <div id={styles.CodeExecContainer}>
             <div className={styles.boxtitle}>
                 <h2>執行結果</h2>
-                {/* <IconButton
+                <IconButton
                     aria-label="play"
                     size="large"
                     sx={{ color: '#a55b6d' }}
@@ -149,7 +149,7 @@ const CodeExec = forwardRef((props, ref) => {
                     disabled={!isCodeAvailable}
                 >
                     <PlayArrowIcon fontSize="inherit" />
-                </IconButton> */}
+                </IconButton>
             </div>
             <pre
                 id={styles.DisplayResult}
