@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, CssBaseline } from '@mui/material';
 import CodeRepository from '@/components/dev-components/CodeRepository';
-import { useXML } from '@/components/blockly/XMLContext';
+import { CodeContext } from '@/components/dev-components/CodeContext';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Menu from '@mui/material/Menu';
@@ -54,7 +54,7 @@ export default function DevNavBar({ toggleViewState }) {
     const [showSuccess, setShowSuccess] = React.useState(false);
     const [currentProject, setCurrentProject] = React.useState('新專案');
     const [originXML, setOriginXML] = React.useState('');
-    const { setXML, getXML } = useXML(); // 獲取getXML方法
+    const { contextCode, setContextCode } = useContext(CodeContext);
     const [state, setState] = React.useState({
         Blockly: true,
         FlowChart: true,
