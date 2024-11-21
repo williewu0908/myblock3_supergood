@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, CssBaseline } from '@mui/material';
 import CodeRepository from '@/components/dev-components/CodeRepository';
-import { useXML } from '@/components/blockly/XMLContext';
+import { CodeContext } from '@/components/dev-components/CodeContext';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Menu from '@mui/material/Menu';
@@ -54,7 +54,7 @@ export default function DevNavBar({ toggleViewState }) {
     const [showSuccess, setShowSuccess] = React.useState(false);
     const [currentProject, setCurrentProject] = React.useState('新專案');
     const [originXML, setOriginXML] = React.useState('');
-    const { setXML, getXML } = useXML(); // 獲取getXML方法
+    const { contextCode, setContextCode } = useContext(CodeContext);
     const [state, setState] = React.useState({
         Blockly: true,
         FlowChart: true,
@@ -162,36 +162,67 @@ export default function DevNavBar({ toggleViewState }) {
     const saveProject = async (project) => {
         try {
             setIsSaving(true);
-            const XMLcode = getXML(); // 獲取當前工作區的JSON
-            const requestBody = {
-                projectname: project,
-                XMLcode: XMLcode
-            };
-
-            const response = await fetch("http://127.0.0.1:5500/myblock3/api/projects", {
-                method: "POST",
+            
+            // 使用 CodeContext 中的 contextCode
+            const code = contextCode; 
+    
+            // 1. 先檢查專案是否已經存在
+            const listResponse = await fetch("/myblock3/api/projects", {
+                method: "GET",
+                credentials: 'include', // 確保攜帶 cookie 和驗證資訊
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+    
+            const listData = await listResponse.json();
+            const projectExists = listData.projects.some(p => p.project_name === project);
+    
+            // 2. 根據專案是否存在，選擇不同的 API 端點和方法
+            let apiUrl, method, requestBody;
+    
+            if (projectExists) {
+                // 如果專案已存在，使用更新 API
+                apiUrl = `/myblock3/api/projects/${project}/content`;
+                method = "PUT";
+                requestBody = { code: code };
+            } else {
+                // 如果專案不存在，使用創建 API
+                apiUrl = "/myblock3/api/projects";
+                method = "POST";
+                requestBody = { 
+                    project_name: project, 
+                    code: code 
+                };
+            }
+    
+            // 3. 發送 API 請求
+            const response = await fetch(apiUrl, {
+                method: method,
+                credentials: 'include',
                 headers: {
                     "Content-Type": "application/json"
                 },
-                withCredentials: true, // 設置為 include 以確保憑證被包含在請求中
                 body: JSON.stringify(requestBody)
             });
-
+    
             const data = await response.json();
+    
             if (response.ok) {
-                console.log("Project update:", data);
-                fetchProjects();
-                setOriginXML(XMLcode);
-                setShowSuccess(true); // 儲存成功，顯示成功圖案
+                console.log(projectExists ? "Project updated:" : "Project created:", data);
+                fetchProjects(); // 重新獲取專案列表
+                setShowSuccess(true);
+                
                 // 1秒後隱藏成功圖案
                 setTimeout(() => {
                     setShowSuccess(false);
                 }, 1500);
+                
                 setIsSaving(false);
             } else {
-                console.error("Failed to update project:", data);
+                console.error(projectExists ? "Failed to update project:" : "Failed to create project:", data);
             }
-
+    
         } catch (error) {
             console.error("Error:", error);
         }
