@@ -265,9 +265,9 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
     };
 
     // 載入先前的專案
-    const loadProject = async (projectId) => {
+    const loadProject = async (projectName) => {
         try {
-            const response = await fetch(`http://127.0.0.1:5500/api/projects/${projectId}/code`, {
+            const response = await fetch(`http://127.0.0.1:5500/api/projects/${projectName}/code`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -277,8 +277,8 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
             const data = await response.json();
             if (response.ok) {
                 console.log("Project loaded:", data);
-                setXML(data.XMLcode); // 假設後端返回的 JSON 中包含 XMLcode
-                setCurrentProject(projectId); // 更新當前項目 ID 或名稱
+                setXML(data.blockly_code); // 後端返回的 JSON 中包含 pythonCode
+                setCurrentProject(projectName); // 更新當前項目名稱
             } else {
                 console.error("Failed to load project:", data);
             }
@@ -290,9 +290,9 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
 
 
     // 搜尋過濾專案
-    const filteredProjects = repositoryData.projects.filter((project) =>
+    const filteredProjects = repositoryData?.projects?.filter((project) =>
         project.project_name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    ) || []; 
 
     // 更新輸入框時自動獲取焦點
     React.useEffect(() => {
@@ -381,18 +381,29 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
                         </Box>
                     ))
                 ) : (
-                    filteredProjects.map((text, index) => (
-                        <ListItem disablePadding key={text}
+                    filteredProjects.map((project, index) => (
+                        <ListItem
+                            disablePadding
+                            key={project.id}
                             secondaryAction={
-                                <IconButton edge="end" id="option-button" aria-controls="option-menu" aria-haspopup="true" aria-expanded={open ? 'true' : undefined} onClick={(event) => handleMenuClick(event, text)}>
+                                <IconButton
+                                    edge="end"
+                                    id="option-button"
+                                    aria-controls="option-menu"
+                                    aria-haspopup="true"
+                                    aria-expanded={open ? 'true' : undefined}
+                                    onClick={(event) => handleMenuClick(event, project)}
+                                >
                                     <MoreVertIcon />
                                 </IconButton>
-                            }>
-                            <ListItemButton onClick={() => loadProject(text)}>
-                                <ListItemText primary={text} />
+                            }
+                        >
+                            <ListItemButton onClick={() => loadProject(project)}>
+                                <ListItemText primary={project.project_name} />
                             </ListItemButton>
                         </ListItem>
                     ))
+
                 )}
                 <Menu
                     id="option-menu"

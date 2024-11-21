@@ -47,14 +47,14 @@ function SwitchesGroup({ state, handleChange }) {
 
 export default function DevNavBar({ toggleViewState }) {
     const [isOpen, setIsOpen] = React.useState(false); // 狀態控制Drawer是否打開
-    const [repositoryData, setRepositoryData] = React.useState([]); // 用於儲存後端取得的資料
+    const [repositoryData, setRepositoryData] = React.useState(); // 用於儲存後端取得的資料
     const [isLoading, setIsLoading] = React.useState(false);
     const [isSaving, setIsSaving] = React.useState(false); //控制顯示儲存的圖標
     const [canSave, setCanSave] = React.useState(false);
     const [showSuccess, setShowSuccess] = React.useState(false);
     const [currentProject, setCurrentProject] = React.useState('新專案');
     const [originXML, setOriginXML] = React.useState('');
-    const { getXML } = useXML(); // 獲取getXML方法
+    const { setXML, getXML } = useXML(); // 獲取getXML方法
     const [state, setState] = React.useState({
         Blockly: true,
         FlowChart: true,
@@ -113,7 +113,7 @@ export default function DevNavBar({ toggleViewState }) {
     // 取得現在所有專案的名字
     const fetchProjects = async () => {
         try {
-            const response = await fetch('http://localhost:5500/myblock3/api/projects', {method:'GET'});
+            const response = await fetch('/myblock3/api/projects', { method: 'GET' });
             if (response.ok) {
                 const data = await response.json();
                 setRepositoryData(data); // 更新狀態
@@ -125,6 +125,38 @@ export default function DevNavBar({ toggleViewState }) {
             console.error('Error fetching data:', error);
         }
     };
+
+    React.useEffect(() => {
+        // 當頁面第一次載入時，取得專案並載入最近更新的專案
+        const loadLatestProject = async () => {
+            try {
+                const response = await fetch('/myblock3/api/projects', { method: 'GET' });
+                if (response.ok) {
+                    const data = await response.json();
+                    const projects = data.projects;
+    
+                    if (projects && projects.length > 0) {
+                        // 根據 updated_at 排序，取出最新專案
+                        const latestProject = projects.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))[0];
+    
+                        // 更新 Blockly 的 XML
+                        setXML(latestProject.blockly_code);
+    
+                        // 更新狀態
+                        setCurrentProject(latestProject.project_name);
+                        setOriginXML(latestProject.blockly_code);
+                    }
+                } else {
+                    console.error('Error fetching data:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+    
+        loadLatestProject(); // 呼叫函式載入專案
+    }, []); // 確保只在初次載入時執行
+    
 
     // 儲存已存在專案的變更
     const saveProject = async (project) => {
@@ -210,7 +242,7 @@ export default function DevNavBar({ toggleViewState }) {
                         MenuListProps={{
                             'aria-labelledby': 'changeUIButton',
                         }}
-                        disableScrollLock={ true }
+                        disableScrollLock={true}
                     >
                         <SwitchesGroup state={state} handleChange={handleChange} />
                     </Menu>

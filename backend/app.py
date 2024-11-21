@@ -72,7 +72,7 @@ def list_projects():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
     
-    cursor.execute("SELECT id, project_name FROM blockly_projects WHERE user_id = %s", (user['Id'],))
+    cursor.execute("SELECT id, project_name, created_at, updated_at FROM blockly_projects WHERE user_id = %s", (user['Id'],))
     projects = cursor.fetchall()
     
     cursor.close()
