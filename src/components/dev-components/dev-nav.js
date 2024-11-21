@@ -61,6 +61,7 @@ export default function DevNavBar({ toggleViewState }) {
         Code: true,
         ChatWithAI: true,
     });
+    const codeRepositoryRef = React.useRef(null);
 
     // React.useEffect(() => {
     //     const currentJSON = getXML();  // 獲取當前的 JSON
@@ -138,13 +139,12 @@ export default function DevNavBar({ toggleViewState }) {
                     if (projects && projects.length > 0) {
                         // 根據 updated_at 排序，取出最新專案
                         const latestProject = projects.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))[0];
-    
+                        
                         // 更新 Blockly 的 XML
-                        setXML(latestProject.blockly_code);
+                        codeRepositoryRef.current.loadProject(latestProject.project_name);
     
                         // 更新狀態
                         setCurrentProject(latestProject.project_name);
-                        setOriginXML(latestProject.blockly_code);
                     }
                 } else {
                     console.error('Error fetching data:', response.statusText);
@@ -255,7 +255,7 @@ export default function DevNavBar({ toggleViewState }) {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} />
+            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} ref={codeRepositoryRef}/>
         </>
     );
 }

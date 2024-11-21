@@ -172,7 +172,7 @@ function RenameDialog({ open, handleClose, selectedProject, renameProject }) {
     );
 }
 
-export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositoryData, fetchProjects, loading, setCurrentProject, setOriginXML }) {
+const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, repositoryData, fetchProjects, loading, setCurrentProject, setOriginXML }, ref) => {
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [selectedProject, setSelectedProject] = React.useState(null);
@@ -267,7 +267,7 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
     // 載入先前的專案
     const loadProject = async (projectName) => {
         try {
-            const response = await fetch(`http://127.0.0.1:5500/api/projects/${projectName}/code`, {
+            const response = await fetch(`/myblock3/api/projects/${projectName}/code`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -287,6 +287,10 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
         }
         handleMenuClose();
     };
+
+    React.useImperativeHandle(ref, () => ({
+        loadProject,
+    }));
 
 
     // 搜尋過濾專案
@@ -447,4 +451,6 @@ export default function CodeRepository({ RepositoryOpen, toggleDrawer, repositor
             </Drawer>
         </>
     );
-}
+});
+
+export default CodeRepository;
