@@ -291,6 +291,7 @@ const renameProject = async (oldProjectName, newProjectName) => {
             if (response.ok) {
                 console.log("Project loaded:", data);
                 setContextCode(data.code)
+                setXML(data.blockly_code)
                 setCurrentProject(project.project_name); // 更新當前項目名稱
             } else {
                 console.error("Failed to load project:", data);
