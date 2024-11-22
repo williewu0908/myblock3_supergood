@@ -394,7 +394,8 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             if (response.ok) {
                 console.log("Project loaded:", data);
                 localStorage.setItem('isLoading', 'true'); // 儲存載入狀態，以暫停xml同步到python
-                window.dispatchEvent(new Event('isLoadingChanged'));
+                const event = new Event('isLoadingChanged');
+                window.dispatchEvent(event);
                 try {
                     // 更新程式碼
                     await updatePythonCodeInIndexedDB(data.code);
