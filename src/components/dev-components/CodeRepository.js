@@ -37,7 +37,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
     const { contextCode, setContextCode } = React.useContext(CodeContext);
-    const {  setXML, getXML } = useXML(); // 獲取getXML方法
+    const { setXML, getXML } = useXML(); // 獲取getXML方法
 
     // 儲存到資料庫
     const handleSubmit = async (event) => {
@@ -226,55 +226,84 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
     };
 
     // 刪除專案
-const deleteProject = async (project) => {
-    try {
-        console.log(project)
-        const response = await fetch(`/myblock3/api/projects/${project.project_name}`, {
-            method: "DELETE",
-            credentials: 'include',  // 加入這行以發送 cookies
-            headers: {
-                "Content-Type": "application/json"
+    const deleteProject = async (project) => {
+        try {
+            console.log(project)
+            const response = await fetch(`/myblock3/api/projects/${project.project_name}`, {
+                method: "DELETE",
+                credentials: 'include',  // 加入這行以發送 cookies
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Project deleted:", data);
+                fetchProjects(); // Refresh data
+            } else {
+                console.error("Failed to delete project:", data);
             }
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            console.log("Project deleted:", data);
-            fetchProjects(); // Refresh data
-        } else {
-            console.error("Failed to delete project:", data);
+        } catch (error) {
+            console.error("Error deleting project:", error);
         }
-    } catch (error) {
-        console.error("Error deleting project:", error);
-    }
-    handleMenuClose();
-};
+        handleMenuClose();
+    };
 
-// 重新命名專案
-const renameProject = async (oldProjectName, newProjectName) => {
-    try {
-        const response = await fetch(`/myblock3/api/projects/${oldProjectName.project_name}/name`, {
-            method: "PUT",
-            credentials: 'include',  // 加入這行以發送 cookies
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ project_name: newProjectName })  // 修改傳送的資料格式
-        });
+    // 重新命名專案
+    const renameProject = async (oldProjectName, newProjectName) => {
+        try {
+            const response = await fetch(`/myblock3/api/projects/${oldProjectName.project_name}/name`, {
+                method: "PUT",
+                credentials: 'include',  // 加入這行以發送 cookies
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ project_name: newProjectName })  // 修改傳送的資料格式
+            });
 
-        const data = await response.json();
-        if (response.ok) {
-            console.log("Project renamed:", data);
-            fetchProjects(); // Refresh data
-        } else {
-            console.error("Failed to rename project:", data);
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Project renamed:", data);
+                fetchProjects(); // Refresh data
+            } else {
+                console.error("Failed to rename project:", data);
+            }
+        } catch (error) {
+            console.error("Error renaming project:", error);
         }
-    } catch (error) {
-        console.error("Error renaming project:", error);
-    }
-    handleRenameDialogClose();
-    handleMenuClose();
-};
+        handleRenameDialogClose();
+        handleMenuClose();
+    };
+
+    const clearIndexedDB = async () => {
+        return new Promise((resolve, reject) => {
+            const openRequest = indexedDB.open('codeDatabase', 1);
+
+            openRequest.onerror = function (event) {
+                console.error('Error opening database:', event.target.errorCode);
+                reject(event.target.errorCode);
+            };
+
+            openRequest.onsuccess = function (event) {
+                const db = event.target.result;
+                const transaction = db.transaction(['codeStore'], 'readwrite');
+                const store = transaction.objectStore('codeStore');
+                const clearRequest = store.clear();
+
+                clearRequest.onsuccess = function () {
+                    console.log('IndexedDB cleared successfully');
+                    resolve();
+                };
+
+                clearRequest.onerror = function () {
+                    console.error('Error clearing store:', clearRequest.error);
+                    reject(clearRequest.error);
+                };
+            };
+        });
+    };
+
 
 
     // 載入先前的專案
@@ -290,6 +319,12 @@ const renameProject = async (oldProjectName, newProjectName) => {
             const data = await response.json();
             if (response.ok) {
                 console.log("Project loaded:", data);
+                try {
+                    await clearIndexedDB(); // 清空 IndexedDB
+                    console.log('IndexedDB cleared successfully');
+                } catch (error) {
+                    console.error('Error clearing IndexedDB:', error);
+                }
                 setContextCode(data.code)
                 setXML(data.blockly_code)
                 setCurrentProject(project.project_name); // 更新當前項目名稱
@@ -310,7 +345,7 @@ const renameProject = async (oldProjectName, newProjectName) => {
     // 搜尋過濾專案
     const filteredProjects = repositoryData?.projects?.filter((project) =>
         project.project_name.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || []; 
+    ) || [];
 
     // 更新輸入框時自動獲取焦點
     React.useEffect(() => {
