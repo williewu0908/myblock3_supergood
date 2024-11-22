@@ -47,6 +47,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
         if (!trimmedUserInput) return;
 
         // 檢查輸入的名稱是否存在
+        console.log('existingProjects', existingProjects)
         const projectExists = existingProjects.includes(trimmedUserInput || 'Myblock3');
         if (projectExists) {
             setIsExist(true);
@@ -276,10 +277,9 @@ const renameProject = async (oldProjectName, newProjectName) => {
 
 
     // 載入先前的專案
-    const loadProject = async (projectName) => {
+    const loadProject = async (project) => {
         try {
-            console.log('載入先前的專案', projectName)
-            const response = await fetch(`/myblock3/api/projects/${projectName}/code`, {
+            const response = await fetch(`/myblock3/api/projects/${project.project_name}/code`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
