@@ -403,9 +403,9 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 }
                 setTimeout(() => {
                     localStorage.setItem('isLoading', 'false');
-                  }, 100);
-                setXML('')
+                }, 100);
                 setContextCode(data.code)
+                setXML('')
                 setCurrentProject(project.project_name); // 更新當前項目名稱
             } else {
                 console.error("Failed to load project:", data);
