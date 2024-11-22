@@ -380,47 +380,9 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
     };
 
 
-    // 載入先前的專案old
-    // const loadProject = async (project) => {
-    //     try {
-    //         const response = await fetch(`/myblock3/api/projects/${project.project_name}/code`, {
-    //             method: "GET",
-    //             headers: {
-    //                 "Content-Type": "application/json"
-    //             }
-    //         });
-
-    //         const data = await response.json();
-    //         if (response.ok) {
-    //             console.log("Project loaded:", data);
-    //             localStorage.setItem('isLoading', 'true'); // 儲存載入狀態，以暫停xml同步到python
-    //             const event = new Event('isLoadingChanged');
-    //             window.dispatchEvent(event);
-    //             try {
-    //                 // 更新程式碼
-    //                 await updatePythonCodeInIndexedDB(data.code);
-    //                 console.log('Current code:', currentCode);
-    //             } catch (error) {
-    //                 console.error('Operation failed:', error);
-    //             }
-    //             setTimeout(() => {
-    //                 localStorage.setItem('isLoading', 'false');
-    //             }, 100);
-    //             setContextCode(data.code)
-    //             setXML('')
-    //             setCurrentProject(project.project_name); // 更新當前項目名稱
-    //         } else {
-    //             console.error("Failed to load project:", data);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error loading project:", error);
-    //     }
-    //     handleMenuClose();
-    // };
-
+    //載入先前的專案old
     const loadProject = async (project) => {
         try {
-            // 1. 首先獲取專案程式碼
             const response = await fetch(`/myblock3/api/projects/${project.project_name}/code`, {
                 method: "GET",
                 headers: {
@@ -429,73 +391,35 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             });
 
             const data = await response.json();
-            if (!response.ok) {
-                console.error("Failed to load project:", data);
-                return;
-            }
-
-            console.log("Project loaded:", data);
-            localStorage.setItem('isLoading', 'true');
-            const event = new Event('isLoadingChanged');
-            window.dispatchEvent(event);
-
-            try {
-                // 2. 在程式碼後面加上空格並更新
-                const codeWithSpace = data.code + " ";
-                await fetch(`/myblock3/api/projects/${project.project_name}/content`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        code: codeWithSpace
-                    })
-                });
-
-                // 3. 移除空格並再次更新
-                const codeWithoutSpace = codeWithSpace.trim();
+            if (response.ok) {
+                console.log("Project loaded:", data);
+                localStorage.setItem('isLoading', 'true'); // 儲存載入狀態，以暫停xml同步到python
+                const event = new Event('isLoadingChanged');
+                window.dispatchEvent(event);
                 try {
-                    const response = await fetch(`/myblock3/api/projects/${project.project_name}/content`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            code: codeWithoutSpace
-                        })
-                    });
-
-                    if (response.ok) {
-                        // 4. 更新本地狀態
-                        await updatePythonCodeInIndexedDB(codeWithoutSpace);
-                        setContextCode(codeWithoutSpace);
-                        setXML('');
-                        setCurrentProject(project.project_name);
-
-                        // 5. 設置延遲後關閉 loading 狀態
-                        setTimeout(() => {
-                            localStorage.setItem('isLoading', 'false');
-                            // 6. 重新整理視窗
-                            window.location.reload();
-                        }, 100);
-                    } else {
-                        console.log('更新失敗:', response.status);
-                    }
+                    // 更新程式碼
+                    await updatePythonCodeInIndexedDB(data.code);
+                    console.log('Current code:', currentCode);
                 } catch (error) {
-                    console.error('發生錯誤:', error);
+                    console.error('Operation failed:', error);
                 }
-
-            } catch (error) {
-                console.error('Operation failed:', error);
-                localStorage.setItem('isLoading', 'false');
+                setTimeout(() => {
+                    localStorage.setItem('isLoading', 'false');
+                }, 100);
+                setContextCode(data.code)
+                setXML('')
+                setCurrentProject(project.project_name); // 更新當前項目名稱
+            } else {
+                console.error("Failed to load project:", data);
             }
         } catch (error) {
             console.error("Error loading project:", error);
-            localStorage.setItem('isLoading', 'false');
         }
         handleMenuClose();
     };
 
+
+    
     React.useImperativeHandle(ref, () => ({
         loadProject,
     }));
