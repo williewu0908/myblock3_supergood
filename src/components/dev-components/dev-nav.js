@@ -287,7 +287,7 @@ export default function DevNavBar({ toggleViewState }) {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} ref={codeRepositoryRef}/>
+            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} ref={codeRepositoryRef} currentProject={currentProject}/>
         </>
     );
 }

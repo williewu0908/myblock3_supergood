@@ -25,6 +25,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Skeleton from '@mui/material/Skeleton';
+import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { useXML } from '@/components/blockly/XMLContext';
 import { CodeContext } from '@/components/dev-components/CodeContext';
 
@@ -33,7 +34,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 // 新增專案
-function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML }) {
+function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML, currentProject }) {
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
     const { contextCode, setContextCode } = React.useContext(CodeContext);
@@ -55,34 +56,62 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
         }
 
         try {
-            const requestBody = {
-                project_name: trimmedUserInput,
-                code: contextCode, // 使用 contextCode 儲存程式碼
-                blockly_code: '' // 留空
-            };
+            if (currentProject = '新專案') {
+                const requestBody = {
+                    project_name: trimmedUserInput,
+                    code: '', // 空程式碼
+                    blockly_code: '' // 留空
+                };
 
-            const response = await fetch("/api/projects", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: 'include',
-                body: JSON.stringify(requestBody)
-            });
+                const response = await fetch("/api/projects", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(requestBody)
+                });
 
-            const data = await response.json();
-            if (response.ok) {
-                console.log("Project added:", data);
-                // 設置新增專案的初始 JSON
-                setOriginXML(getXML());
-
-                // 清空畫面
-                setXML('');
-                // 更新專案列表
-                fetchProjects();
+                const data = await response.json();
+                if (response.ok) {
+                    console.log("Project added:", data);
+                    // 設置新增專案的初始 JSON
+                    setOriginXML('');
+                    setXML('');
+                    // 更新專案列表
+                    fetchProjects();
+                } else {
+                    console.error("Failed to add project:", data);
+                }
             } else {
-                console.error("Failed to add project:", data);
+                const requestBody = {
+                    project_name: trimmedUserInput,
+                    code: contextCode, // 使用 contextCode 儲存程式碼
+                    blockly_code: '' // 留空
+                };
+
+                const response = await fetch("/api/projects", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    console.log("Project added:", data);
+                    // 設置新增專案的初始 JSON
+                    setOriginXML(getXML());
+                    // 更新專案列表
+                    fetchProjects();
+                } else {
+                    console.error("Failed to add project:", data);
+                }
             }
+
+
 
         } catch (error) {
             console.error("Error:", error);
@@ -180,7 +209,7 @@ function RenameDialog({ open, handleClose, selectedProject, renameProject }) {
     );
 }
 
-const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, repositoryData, fetchProjects, loading, setCurrentProject, setOriginXML }, ref) => {
+const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, repositoryData, fetchProjects, loading, setCurrentProject, setOriginXML, currentProject }, ref) => {
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [selectedProject, setSelectedProject] = React.useState(null);
@@ -348,12 +377,11 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
         project.project_name.toLowerCase().includes(searchQuery.toLowerCase())
     ) || [];
 
-    // 更新輸入框時自動獲取焦點
-    React.useEffect(() => {
-        if (searchInputRef.current) {
-            searchInputRef.current.focus();
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            setSearchQuery(e.target.value); // 當按下 Enter 時更新搜尋查詢
         }
-    }, [searchQuery]);
+    };
 
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
@@ -407,17 +435,24 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 <StyledInputBase
                     placeholder="搜尋專案庫"
                     inputProps={{ 'aria-label': 'search' }}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyDown} // 監聽 Enter 鍵
                     inputRef={searchInputRef} // 綁定 ref
+                    defaultValue={searchQuery}
                 />
             </Search>
             <List>
                 <ListSubheader component="div" id="nested-list-subheader" sx={{ fontSize: 20, display: 'flex', justifyContent: 'space-between' }} >
                     我的專案
-                    <Button variant="contained" disableElevation sx={{ margin: '6px 0' }} size="small" endIcon={<AddBoxIcon />} onClick={handleDialogOpen}>
-                        另存新檔
-                    </Button>
+                    {
+                        currentProject === '新專案' ?
+                            <Button variant="contained" disableElevation sx={{ margin: '6px 0', backgroundColor: 'rgb(40, 187, 155)' }} size="small" endIcon={<SaveAsIcon />} onClick={handleDialogOpen}>
+                                另存新檔
+                            </Button>
+                            :
+                            <Button variant="contained" disableElevation sx={{ margin: '6px 0' }} size="small" endIcon={<AddBoxIcon />} onClick={handleDialogOpen}>
+                                新專案
+                            </Button>
+                    }
                 </ListSubheader>
                 <Divider />
                 {loading ? (
@@ -496,7 +531,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 disableScrollLock={true}
             >
                 {list()}
-                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProjects={fetchProjects} existingProjects={repositoryData} setOriginXML={setOriginXML} />
+                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProjects={fetchProjects} existingProjects={repositoryData} setOriginXML={setOriginXML} currentProject={currentProject} />
                 <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} renameProject={renameProject} selectedProject={selectedProject} />
             </Drawer>
         </>
