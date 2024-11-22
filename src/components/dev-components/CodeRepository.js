@@ -49,7 +49,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
 
         // 檢查輸入的名稱是否存在
         console.log('existingProjects', existingProjects)
-        const projectExists = existingProjects.includes(trimmedUserInput || 'Myblock3');
+        const projectExists = existingProjects.projects.includes(trimmedUserInput || 'Myblock3');
         if (projectExists) {
             setIsExist(true);
             return;
@@ -134,7 +134,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                 }
             }}
         >
-            {currentProject='新專案'? <DialogTitle>另存新檔</DialogTitle> : <DialogTitle>新專案</DialogTitle>}
+            {currentProject = '新專案' ? <DialogTitle>另存新檔</DialogTitle> : <DialogTitle>新專案</DialogTitle>}
             <DialogContent>
                 <DialogContentText>
                     專案名稱請不要超過255個字
