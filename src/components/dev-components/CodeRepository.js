@@ -33,6 +33,34 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const clearIndexedDB = async () => {
+    return new Promise((resolve, reject) => {
+        const openRequest = indexedDB.open('codeDatabase', 1);
+
+        openRequest.onerror = function (event) {
+            console.error('Error opening database:', event.target.errorCode);
+            reject(event.target.errorCode);
+        };
+
+        openRequest.onsuccess = function (event) {
+            const db = event.target.result;
+            const transaction = db.transaction(['codeStore'], 'readwrite');
+            const store = transaction.objectStore('codeStore');
+            const clearRequest = store.clear();
+
+            clearRequest.onsuccess = function () {
+                console.log('IndexedDB cleared successfully');
+                resolve();
+            };
+
+            clearRequest.onerror = function () {
+                console.error('Error clearing store:', clearRequest.error);
+                reject(clearRequest.error);
+            };
+        };
+    });
+};
+
 // 新增專案
 function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML, currentProject }) {
     const [userInput, setUserInput] = React.useState('');
@@ -76,8 +104,14 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                 if (response.ok) {
                     console.log("Project added:", data);
                     // 設置新增專案的初始 JSON
-                    setOriginXML('');
-                    setXML('');
+                    try {
+                        await clearIndexedDB(); // 清空 IndexedDB
+                        console.log('IndexedDB cleared successfully');
+                    } catch (error) {
+                        console.error('Error clearing IndexedDB:', error);
+                    }
+                    setXML('')
+                    setContextCode(data.code)
                     // 更新專案列表
                     fetchProjects();
                 } else {
@@ -305,35 +339,6 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
         handleRenameDialogClose();
         handleMenuClose();
     };
-
-    const clearIndexedDB = async () => {
-        return new Promise((resolve, reject) => {
-            const openRequest = indexedDB.open('codeDatabase', 1);
-
-            openRequest.onerror = function (event) {
-                console.error('Error opening database:', event.target.errorCode);
-                reject(event.target.errorCode);
-            };
-
-            openRequest.onsuccess = function (event) {
-                const db = event.target.result;
-                const transaction = db.transaction(['codeStore'], 'readwrite');
-                const store = transaction.objectStore('codeStore');
-                const clearRequest = store.clear();
-
-                clearRequest.onsuccess = function () {
-                    console.log('IndexedDB cleared successfully');
-                    resolve();
-                };
-
-                clearRequest.onerror = function () {
-                    console.error('Error clearing store:', clearRequest.error);
-                    reject(clearRequest.error);
-                };
-            };
-        });
-    };
-
 
 
     // 載入先前的專案
