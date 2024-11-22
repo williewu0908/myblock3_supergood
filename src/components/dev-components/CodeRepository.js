@@ -266,6 +266,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             if (response.ok) {
                 console.log("Project renamed:", data);
                 fetchProjects(); // Refresh data
+                window.location.reload();
             } else {
                 console.error("Failed to rename project:", data);
             }
