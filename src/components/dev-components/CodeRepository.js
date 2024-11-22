@@ -289,7 +289,6 @@ const renameProject = async (oldProjectName, newProjectName) => {
             const data = await response.json();
             if (response.ok) {
                 console.log("Project loaded:", data);
-                setXML(data.blockly_code); // 後端返回的 JSON 中包含 pythonCode
                 setContextCode(data.code)
                 setCurrentProject(project.project_name); // 更新當前項目名稱
             } else {
