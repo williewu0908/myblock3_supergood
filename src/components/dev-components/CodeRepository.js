@@ -111,7 +111,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                         console.error('Error clearing IndexedDB:', error);
                     }
                     setXML('')
-                    setContextCode(data.code)
+                    setContextCode('')
                     // 更新專案列表
                     fetchProjects();
                 } else {
