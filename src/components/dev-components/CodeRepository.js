@@ -354,14 +354,14 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             const data = await response.json();
             if (response.ok) {
                 console.log("Project loaded:", data);
+                setXML('')
+                setContextCode(data.code)
                 try {
                     await clearIndexedDB(); // 清空 IndexedDB
                     console.log('IndexedDB cleared successfully');
                 } catch (error) {
                     console.error('Error clearing IndexedDB:', error);
                 }
-                setXML('')
-                setContextCode(data.code)
                 setCurrentProject(project.project_name); // 更新當前項目名稱
             } else {
                 console.error("Failed to load project:", data);
