@@ -397,9 +397,6 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 try {
                     // 更新程式碼
                     await updatePythonCodeInIndexedDB(data.code);
-
-                    // 讀取程式碼
-                    const currentCode = await readPythonCodeFromIndexedDB();
                     console.log('Current code:', currentCode);
                 } catch (error) {
                     console.error('Operation failed:', error);
