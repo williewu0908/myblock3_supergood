@@ -465,17 +465,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 });
     
                 // 4. 更新本地狀態
-                await updatePythonCodeInIndexedDB(codeWithoutSpace);
-                setContextCode(codeWithoutSpace);
-                setXML('');
-                setCurrentProject(project.project_name);
-    
-                // 5. 設置延遲後關閉 loading 狀態
-                setTimeout(() => {
-                    localStorage.setItem('isLoading', 'false');
-                    // 6. 重新整理視窗
-                    window.location.reload();
-                }, 100);
+                window.location.reload();
     
             } catch (error) {
                 console.error('Operation failed:', error);
