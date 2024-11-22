@@ -134,7 +134,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                 }
             }}
         >
-            <DialogTitle>另存新檔</DialogTitle>
+            {currentProject='新專案'? <DialogTitle>另存新檔</DialogTitle> : <DialogTitle>新專案</DialogTitle>}
             <DialogContent>
                 <DialogContentText>
                     專案名稱請不要超過255個字
