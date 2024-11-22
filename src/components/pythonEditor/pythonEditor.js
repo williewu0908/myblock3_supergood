@@ -156,10 +156,33 @@ function PythonEditor() {
             checkIsLoadingAndUpdate();
         };
 
-        window.addEventListener('storage', handleStorageChange);
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
+        useEffect(() => {
+            const checkIsLoadingAndUpdate = async () => {
+                if (localStorage.getItem('isLoading') === 'true') {
+                    console.log("isLoading is true, updating code from IndexedDB...");
+                    const updatedCode = await getPythonCodeFromIndexedDB();
+                    setCode(updatedCode);
+                    setContextCode(updatedCode);
+                    setLineCount(updatedCode.split('\n').length); // 更新行數
+                }
+            };
+        
+            // 初次進入檢查
+            checkIsLoadingAndUpdate();
+        
+            // 自定義事件
+            const handleIsLoadingChange = () => {
+                checkIsLoadingAndUpdate();
+            };
+        
+            // 添加字定義事件
+            window.addEventListener('isLoadingChanged', handleIsLoadingChange);
+        
+            return () => {
+                window.removeEventListener('isLoadingChanged', handleIsLoadingChange);
+            };
+        }, []);
+        
     }, []);
 
     // 在程式碼編輯區編輯 python 後，觸發 codeUpdated，把 python 程式碼儲存到 IndexedDB
