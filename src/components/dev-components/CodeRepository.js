@@ -355,7 +355,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 } catch (error) {
                     console.error('Error clearing IndexedDB:', error);
                 }
-                setXML(data.blockly_code)
+                setXML('')
                 setContextCode(data.code)
                 setCurrentProject(project.project_name); // 更新當前項目名稱
             } else {
