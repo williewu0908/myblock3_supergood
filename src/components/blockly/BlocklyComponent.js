@@ -119,6 +119,11 @@ const BlocklyComponent = forwardRef((props, ref) => {
   }
 
   const handleWorkspaceChange = useCallback(() => {
+    if (localStorage.getItem('isLoading') === 'true') {
+      console.log('Workspace is loading. Changes are ignored.');
+      return; // 如果正在載入，則退出
+    }
+  
     const code = pythonGenerator.workspaceToCode(primaryWorkspace.current);
     const xml = Blockly.Xml.workspaceToDom(primaryWorkspace.current);
     saveWorkspaceToIndexedDB(xml);
@@ -127,11 +132,12 @@ const BlocklyComponent = forwardRef((props, ref) => {
         window.dispatchEvent(new CustomEvent('blockUpdated', {
           detail: {
             code: code,
-            source: 'BlocklyComponent'
-          }
+            source: 'BlocklyComponent',
+          },
         }));
       });
   }, []);
+  
 
   const handlePythonCodeUpdate = (newCode) => {
     if (primaryWorkspace.current) {

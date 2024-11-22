@@ -393,6 +393,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             const data = await response.json();
             if (response.ok) {
                 console.log("Project loaded:", data);
+                localStorage.setItem('isLoading', 'true'); // 儲存載入狀態，以暫停xml同步到python
                 try {
                     // 更新程式碼
                     await updatePythonCodeInIndexedDB(data.code);
@@ -403,6 +404,9 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 } catch (error) {
                     console.error('Operation failed:', error);
                 }
+                setTimeout(() => {
+                    localStorage.setItem('isLoading', 'false');
+                  }, 100);
                 setXML('')
                 setContextCode(data.code)
                 setCurrentProject(project.project_name); // 更新當前項目名稱
