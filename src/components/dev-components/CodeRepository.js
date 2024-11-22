@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useContext } from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -25,6 +26,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Skeleton from '@mui/material/Skeleton';
 import { useXML } from '@/components/blockly/XMLContext';
+import { CodeContext } from '@/components/dev-components/CodeContext';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -34,6 +36,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML }) {
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
+    const { contextCode } = React.useContext(CodeContext);
     const {  setXML, getXML } = useXML(); // 獲取getXML方法
 
     // 儲存到資料庫
@@ -52,16 +55,17 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
 
         try {
             const requestBody = {
-                projectname: trimmedUserInput,
-                XMLcode: getXML() // 獲取當前工作區的JSON
+                project_name: trimmedUserInput,
+                code: contextCode, // 使用 contextCode 儲存程式碼
+                blockly_code: '' // 留空
             };
 
-            const response = await fetch("http://127.0.0.1:5000/addToDB", {
+            const response = await fetch("/api/projects", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                withCredentials: true, // 設置為 include 以確保憑證被包含在請求中
+                credentials: 'include',
                 body: JSON.stringify(requestBody)
             });
 
@@ -274,6 +278,7 @@ const renameProject = async (oldProjectName, newProjectName) => {
     // 載入先前的專案
     const loadProject = async (projectName) => {
         try {
+            console.log('載入先前的專案', projectName)
             const response = await fetch(`/myblock3/api/projects/${projectName}/code`, {
                 method: "GET",
                 headers: {
