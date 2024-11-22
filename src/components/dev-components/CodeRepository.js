@@ -36,7 +36,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML }) {
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
-    const { contextCode } = React.useContext(CodeContext);
+    const { contextCode, setContextCode } = React.useContext(CodeContext);
     const {  setXML, getXML } = useXML(); // 獲取getXML方法
 
     // 儲存到資料庫
@@ -290,6 +290,7 @@ const renameProject = async (oldProjectName, newProjectName) => {
             if (response.ok) {
                 console.log("Project loaded:", data);
                 setXML(data.blockly_code); // 後端返回的 JSON 中包含 pythonCode
+                setContextCode(data.code)
                 setCurrentProject(project.project_name); // 更新當前項目名稱
             } else {
                 console.error("Failed to load project:", data);
