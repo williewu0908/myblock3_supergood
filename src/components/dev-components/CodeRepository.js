@@ -427,18 +427,18 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                     "Content-Type": "application/json"
                 }
             });
-    
+
             const data = await response.json();
             if (!response.ok) {
                 console.error("Failed to load project:", data);
                 return;
             }
-    
+
             console.log("Project loaded:", data);
             localStorage.setItem('isLoading', 'true');
             const event = new Event('isLoadingChanged');
             window.dispatchEvent(event);
-    
+
             try {
                 // 2. 在程式碼後面加上空格並更新
                 const codeWithSpace = data.code + " ";
@@ -451,22 +451,29 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                         code: codeWithSpace
                     })
                 });
-    
+
                 // 3. 移除空格並再次更新
                 const codeWithoutSpace = codeWithSpace.trim();
-                await fetch(`/myblock3/api/projects/${project.project_name}/content`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        code: codeWithoutSpace
-                    })
-                });
-    
-                // 4. 更新本地狀態
-                window.location.reload();
-    
+                try {
+                    const response = await fetch(`/myblock3/api/projects/${project.project_name}/content`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            code: codeWithoutSpace
+                        })
+                    });
+
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        console.log('更新失敗:', response.status);
+                    }
+                } catch (error) {
+                    console.error('發生錯誤:', error);
+                }
+
             } catch (error) {
                 console.error('Operation failed:', error);
                 localStorage.setItem('isLoading', 'false');
