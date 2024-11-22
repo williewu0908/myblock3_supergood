@@ -340,6 +340,45 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
         handleMenuClose();
     };
 
+    const updatePythonCodeInIndexedDB = async (newCode) => {
+        return new Promise((resolve, reject) => {
+            const openRequest = indexedDB.open('codeDatabase', 1);
+
+            openRequest.onupgradeneeded = function (event) {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('codeStore')) {
+                    db.createObjectStore('codeStore', { keyPath: 'id' });
+                }
+            };
+
+            openRequest.onsuccess = function (event) {
+                const db = event.target.result;
+                const transaction = db.transaction(['codeStore'], 'readwrite');
+                const store = transaction.objectStore('codeStore');
+
+                // 使用相同的 id 更新 code
+                const putRequest = store.put({
+                    id: 'python_code',
+                    code: newCode
+                });
+
+                putRequest.onsuccess = function () {
+                    resolve();
+                };
+
+                putRequest.onerror = function (event) {
+                    console.error('Error updating code:', event.target.error);
+                    reject(event.target.error);
+                };
+            };
+
+            openRequest.onerror = function (event) {
+                console.error('Error opening database:', event.target.error);
+                reject(event.target.error);
+            };
+        });
+    };
+
 
     // 載入先前的專案
     const loadProject = async (project) => {
@@ -354,14 +393,18 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             const data = await response.json();
             if (response.ok) {
                 console.log("Project loaded:", data);
+                try {
+                    // 更新程式碼
+                    await updatePythonCodeInIndexedDB(data.code);
+
+                    // 讀取程式碼
+                    const currentCode = await readPythonCodeFromIndexedDB();
+                    console.log('Current code:', currentCode);
+                } catch (error) {
+                    console.error('Operation failed:', error);
+                }
                 setXML('')
                 setContextCode(data.code)
-                try {
-                    await clearIndexedDB(); // 清空 IndexedDB
-                    console.log('IndexedDB cleared successfully');
-                } catch (error) {
-                    console.error('Error clearing IndexedDB:', error);
-                }
                 setCurrentProject(project.project_name); // 更新當前項目名稱
             } else {
                 console.error("Failed to load project:", data);
