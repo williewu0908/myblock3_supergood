@@ -187,6 +187,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
     const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
     const { getXML } = useXML(); // 獲取getXML方法
     const { setXML } = useXML(); // 獲取setXML方法
+    const { contextCode, setContextCode } = React.useContext(CodeContext);
     const open = Boolean(anchorEl);
     const [searchQuery, setSearchQuery] = React.useState(''); // 搜尋狀態
     const searchInputRef = React.useRef(null);
