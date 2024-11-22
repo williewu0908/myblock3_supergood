@@ -247,8 +247,7 @@ const deleteProject = async (project) => {
 // 重新命名專案
 const renameProject = async (oldProjectName, newProjectName) => {
     try {
-        console.log('舊和新的專題名稱', oldProjectName, newProjectName)
-        const response = await fetch(`/myblock3/api/projects/${oldProjectName}/name`, {
+        const response = await fetch(`/myblock3/api/projects/${oldProjectName.project_name}/name`, {
             method: "PUT",
             credentials: 'include',  // 加入這行以發送 cookies
             headers: {
