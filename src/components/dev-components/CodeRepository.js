@@ -466,6 +466,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                     });
 
                     if (response.ok) {
+                        localStorage.setItem('isLoading', 'false');
                         window.location.reload();
                     } else {
                         console.log('更新失敗:', response.status);
