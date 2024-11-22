@@ -63,7 +63,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                     blockly_code: '' // 留空
                 };
 
-                const response = await fetch("/api/projects", {
+                const response = await fetch("/myblock3/api/projects", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -90,7 +90,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                     blockly_code: '' // 留空
                 };
 
-                const response = await fetch("/api/projects", {
+                const response = await fetch("/myblock3/api/projects", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
