@@ -222,6 +222,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
     // 刪除專案
 const deleteProject = async (projectName) => {
     try {
+        console.log(projectName)
         const response = await fetch(`/myblock3/api/projects/${projectName}`, {
             method: "DELETE",
             credentials: 'include',  // 加入這行以發送 cookies
