@@ -46,7 +46,7 @@ function SwitchesGroup({ state, handleChange }) {
     );
 }
 
-export default function DevNavBar({ toggleViewState }) {
+export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
     const [isOpen, setIsOpen] = React.useState(false); // 狀態控制Drawer是否打開
     const [repositoryData, setRepositoryData] = React.useState(); // 用於儲存後端取得的資料
     const [isLoading, setIsLoading] = React.useState(false);
@@ -304,7 +304,7 @@ export default function DevNavBar({ toggleViewState }) {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} ref={codeRepositoryRef} currentProject={currentProject}/>
+            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} ref={codeRepositoryRef} currentProject={currentProject} handlegenerateXML={handlegenerateXML}/>
         </>
     );
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Box } from '@mui/material';
 import BlocklyComponent, { Block, Button, Category, Value, Field, Shadow, COLOR } from '@/components/blockly'
 import PythonEditor from '@/components/pythonEditor/pythonEditor';
@@ -11,7 +11,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import '@/components/blockly/blocks/customblocks';
 import '@/components/blockly/generator/generator';
 
-export default function CodeEditor({ viewState, codeExecRef }) {
+const CodeEditor = forwardRef(({ viewState, codeExecRef }, ref) => {
   const BlocklyRef = useRef();
   const [isCodeAvailable, setIsCodeAvailable] = useState(false);
   const [code, setCode] = useState(``);
@@ -23,6 +23,12 @@ export default function CodeEditor({ viewState, codeExecRef }) {
   const handleBlocklyCode = () => {
     if (BlocklyRef.current) {
       BlocklyRef.current.pythonCode(); // 調用子組件的方法
+    }
+  }
+
+  const handlegenerateXML = (pythonCode) => {
+    if (BlocklyRef.current) {
+      BlocklyRef.current.generateXML(pythonCode); // 調用子組件的方法
     }
   }
 
@@ -51,6 +57,12 @@ export default function CodeEditor({ viewState, codeExecRef }) {
       window.removeEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
     };
   }, []);
+
+  useImperativeHandle(ref, () => ({
+    generateXML: (pythonCode)=>{
+      handlegenerateXML(pythonCode);
+    }
+  }));
 
   return (
     <Box sx={{ width: '100%', height: '55%', display: 'flex' }}>
@@ -205,4 +217,6 @@ export default function CodeEditor({ viewState, codeExecRef }) {
         </Box>
     </Box>
   );
-}
+})
+
+export default CodeEditor;

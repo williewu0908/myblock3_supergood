@@ -19,15 +19,20 @@ export default function Index() {
   };
 
   const codeExecRef = useRef(); // 在 CodeExec 中的handleCheckCodeAvailabilityTrigger 和 runPythonCode引用
-
+  const codeEditorRef = useRef();
+  const handlegenerateXML = (pythonCode) => {
+    if (codeEditorRef.current) {
+      codeEditorRef.current.generateXML(pythonCode); // 調用codeEditor組件的方法
+    }
+  }
   return (
     <>
       <div className="container">
         <XMLProvider>
           <CodeProvider>
             {/* <ChatWithAI viewState={viewState} /> */}
-            <DevNavBar toggleViewState={toggleViewState} />
-            <CodeEditor viewState={viewState} codeExecRef={codeExecRef} />
+            <DevNavBar toggleViewState={toggleViewState} handlegenerateXML={handlegenerateXML}/>
+            <CodeEditor viewState={viewState} codeExecRef={codeExecRef} ref={codeEditorRef}/>
           </CodeProvider>
         </XMLProvider>
         <CodeExec ref={codeExecRef} />

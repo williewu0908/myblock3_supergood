@@ -172,6 +172,9 @@ const BlocklyComponent = forwardRef((props, ref) => {
     loadCode: (xml) => {
       const xmlText = Blockly.utils.xml.textToDom(xml);
       Blockly.Xml.domToWorkspace(xmlText, primaryWorkspace.current);
+    },
+    generateXML: (newCode) => {
+      handlePythonCodeUpdate(newCode);
     }
   }));
 

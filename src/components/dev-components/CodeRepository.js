@@ -246,7 +246,7 @@ function RenameDialog({ open, handleClose, selectedProject, renameProject }) {
     );
 }
 
-const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, repositoryData, fetchProjects, loading, setCurrentProject, setOriginXML, currentProject }, ref) => {
+const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, repositoryData, fetchProjects, loading, setCurrentProject, setOriginXML, currentProject, handlegenerateXML }, ref) => {
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [selectedProject, setSelectedProject] = React.useState(null);
@@ -420,9 +420,10 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 setTimeout(() => {
                     localStorage.setItem('isLoading', 'false');
                 }, 100);
-                setContextCode(data.code)
-                setXML('')
+                setContextCode(data.code);
+                setXML('');
                 setCurrentProject(project.project_name); // 更新當前項目名稱
+                handlegenerateXML(data.code);
             } else {
                 console.error("Failed to load project:", data);
             }
@@ -457,9 +458,10 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 setTimeout(() => {
                     localStorage.setItem('isLoading', 'false');
                 }, 100);
-                setContextCode(data.code)
-                setXML('')
+                setContextCode(data.code);
+                setXML('');
                 setCurrentProject(project.project_name); // 更新當前項目名稱
+                handlegenerateXML(data.code);
             } else {
                 console.error("Failed to load project:", data);
             }
@@ -490,9 +492,10 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 setTimeout(() => {
                     localStorage.setItem('isLoading', 'false');
                 }, 100);
-                setContextCode(data.code)
-                setXML('')
+                setContextCode(data.code);
+                setXML('');
                 setCurrentProject(project.project_name); // 更新當前項目名稱
+                handlegenerateXML(data.code);
             } else {
                 console.error("Failed to load project:", data);
             }
