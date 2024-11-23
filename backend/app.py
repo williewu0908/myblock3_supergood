@@ -292,6 +292,11 @@ def generate_flowchart():
         
         flowchart = Flowchart.from_code(python_code)
         diagram_code = flowchart.flowchart()
+
+        if 'st=>start' not in diagram_code:
+            diagram_code = 'st=>start: Start\n' + diagram_code
+        if 'e=>end' not in diagram_code:
+            diagram_code = diagram_code + '\ne=>end: End'
         
         return jsonify({
             'success': True,
