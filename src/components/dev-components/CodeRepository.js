@@ -414,7 +414,6 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 try {
                     // 更新程式碼
                     await updatePythonCodeInIndexedDB(data.code);
-                    console.log('Current code:', currentCode);
                 } catch (error) {
                     console.error('Operation failed:', error);
                 }
@@ -452,7 +451,6 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 try {
                     // 更新程式碼
                     await updatePythonCodeInIndexedDB(data.code);
-                    console.log('Current code:', currentCode);
                 } catch (error) {
                     console.error('Operation failed:', error);
                 }
@@ -486,7 +484,6 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 try {
                     // 更新程式碼
                     await updatePythonCodeInIndexedDB(data.code);
-                    console.log('Current code:', currentCode);
                 } catch (error) {
                     console.error('Operation failed:', error);
                 }
