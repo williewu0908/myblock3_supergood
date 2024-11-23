@@ -290,9 +290,11 @@ def generate_flowchart():
         data = request.get_json()
         python_code = data.get('code', '')
 
-        # 確保程式碼有正確的函數結構
+        # 確保程式碼有正確的函數結構和縮排
         if not python_code.strip().startswith('def '):
-            python_code = f"def main():\n   {python_code}"
+            # 將每一行都進行縮排
+            indented_code = '\n'.join('    ' + line for line in python_code.split('\n') if line.strip())
+            python_code = f"def main():\n{indented_code}"
         
         flowchart = Flowchart.from_code(python_code)
         diagram_code = flowchart.flowchart()
