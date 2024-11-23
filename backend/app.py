@@ -289,6 +289,10 @@ def generate_flowchart():
     try:
         data = request.get_json()
         python_code = data.get('code', '')
+
+        # 確保程式碼有正確的函數結構
+        if not python_code.strip().startswith('def '):
+            python_code = f"def main():\n{python_code}"
         
         flowchart = Flowchart.from_code(python_code)
         diagram_code = flowchart.flowchart()
@@ -297,6 +301,27 @@ def generate_flowchart():
             diagram_code = 'st=>start: Start\n' + diagram_code
         if 'e=>end' not in diagram_code:
             diagram_code = diagram_code + '\ne=>end: End'
+
+        # 確保連接關係正確
+        lines = diagram_code.split('\n')
+        has_connections = False
+        for line in lines:
+            if '->' in line:
+                has_connections = True
+                break
+                
+        if not has_connections:
+            # 尋找操作節點
+            operations = [line.split('=>')[0] for line in lines if '=>operation:' in line]
+            if operations:
+                connections = f"\nst->{operations[0]}"
+                if len(operations) > 1:
+                    for i in range(len(operations)-1):
+                        connections += f"->{operations[i+1]}"
+                connections += "->e"
+                diagram_code += connections
+            else:
+                diagram_code += "\nst->e"
         
         return jsonify({
             'success': True,
