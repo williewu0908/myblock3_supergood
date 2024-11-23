@@ -304,6 +304,17 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             const data = await response.json();
             if (response.ok) {
                 console.log("Project deleted:", data);
+
+                try {
+                    // 更新程式碼
+                    await updatePythonCodeInIndexedDB('');
+                } catch (error) {
+                    console.error('Operation failed:', error);
+                }
+                setContextCode('')
+                setXML('')
+
+
                 window.location.reload();
                 fetchProjects(); // Refresh data
             } else {
