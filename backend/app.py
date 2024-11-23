@@ -292,7 +292,7 @@ def generate_flowchart():
 
         # 確保程式碼有正確的函數結構
         if not python_code.strip().startswith('def '):
-            python_code = f"def main():\n{python_code}"
+            python_code = f"def main():\n   {python_code}"
         
         flowchart = Flowchart.from_code(python_code)
         diagram_code = flowchart.flowchart()
