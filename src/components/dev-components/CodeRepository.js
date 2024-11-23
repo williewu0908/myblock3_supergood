@@ -381,7 +381,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
     };
 
 
-    // 載入先前的專案
+    //載入先前的專案old
     const loadProject = async (project) => {
         try {
             const response = await fetch(`/myblock3/api/projects/${project.project_name}/code`, {
@@ -417,7 +417,43 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             console.error("Error loading project:", error);
         }
         handleMenuClose();
+        try {
+            const response = await fetch(`/myblock3/api/projects/${project.project_name}/code`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Project loaded:", data);
+                localStorage.setItem('isLoading', 'true'); // 儲存載入狀態，以暫停xml同步到python
+                const event = new Event('isLoadingChanged');
+                window.dispatchEvent(event);
+                try {
+                    // 更新程式碼
+                    await updatePythonCodeInIndexedDB(data.code);
+                    console.log('Current code:', currentCode);
+                } catch (error) {
+                    console.error('Operation failed:', error);
+                }
+                setTimeout(() => {
+                    localStorage.setItem('isLoading', 'false');
+                }, 100);
+                setContextCode(data.code)
+                setXML('')
+                setCurrentProject(project.project_name); // 更新當前項目名稱
+            } else {
+                console.error("Failed to load project:", data);
+            }
+        } catch (error) {
+            console.error("Error loading project:", error);
+        }
+        handleMenuClose();
     };
+
+
 
     React.useImperativeHandle(ref, () => ({
         loadProject,
