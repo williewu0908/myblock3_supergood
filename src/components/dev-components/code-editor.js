@@ -192,7 +192,7 @@ export default function CodeEditor({ viewState, codeExecRef }) {
             </IconButton>
           </div>
           <div className={styles.boxcontainer}>
-            <PythonEditor code={code} onUpdate={handleCodeUpdate} />
+            <PythonEditor code={code} onUpdate={handleCodeUpdate} pythonCode={handleBlocklyCode}/>
           </div>
         </Box>
 

@@ -71,7 +71,7 @@ const savePythonCodeToIndexedDB = async (newCode) => {
     });
 };
 
-function PythonEditor() {
+function PythonEditor({pythonCode}) {
     const [code, setCode] = useState("# Write your Python code here\n");
     const [isEditorFocused, setIsEditorFocused] = useState(false);
     const [lineCount, setLineCount] = useState(1); // 用於追蹤行數
