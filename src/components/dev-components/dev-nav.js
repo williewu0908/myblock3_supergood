@@ -129,7 +129,11 @@ export default function DevNavBar({ toggleViewState }) {
     };
 
     React.useEffect(() => {
-        // 當頁面第一次載入時，取得專案並載入最近更新的專案
+        if (!codeRepositoryRef.current) {
+            console.log('CodeRepository ref not initialized');
+            return;
+        }
+    
         const loadLatestProject = async () => {
             try {
                 const response = await fetch('/myblock3/api/projects', { method: 'GET' });
@@ -138,13 +142,18 @@ export default function DevNavBar({ toggleViewState }) {
                     const projects = data.projects;
     
                     if (projects && projects.length > 0) {
-                        // 根據 updated_at 排序，取出最新專案
-                        const latestProject = projects.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))[0];
+                        const latestProject = projects.sort((a, b) => 
+                            new Date(b.updated_at) - new Date(a.updated_at)
+                        )[0];
                         
-                        // 更新 Blockly 的 XML
-                        codeRepositoryRef.current.loadProjectsigle(latestProject);
+                        console.log('Latest project:', latestProject);
+                        try {
+                            codeRepositoryRef.current.loadProjectsigle(latestProject);
+                            console.log('Project loaded successfully');
+                        } catch (loadError) {
+                            console.error('Error loading project:', loadError);
+                        }
     
-                        // 更新狀態
                         setCurrentProject(latestProject.project_name);
                     }
                 } else {
@@ -155,8 +164,8 @@ export default function DevNavBar({ toggleViewState }) {
             }
         };
     
-        loadLatestProject(); // 呼叫函式載入專案
-    }, []); // 確保只在初次載入時執行
+        loadLatestProject();
+    }, []);
     
 
     // 儲存已存在專案的變更
