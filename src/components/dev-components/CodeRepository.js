@@ -85,9 +85,10 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
 
         try {
             if (currentProject = '新專案') {
+                // 若沒專案，儲存畫面上的程式碼
                 const requestBody = {
                     project_name: trimmedUserInput,
-                    code: '', // 空程式碼
+                    code: contextCode, // 使用 contextCode 儲存程式碼
                     blockly_code: '' // 留空
                 };
 
@@ -112,9 +113,10 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                     console.error("Failed to add project:", data);
                 }
             } else {
+                // 若以有專案，開空白專案
                 const requestBody = {
                     project_name: trimmedUserInput,
-                    code: contextCode, // 使用 contextCode 儲存程式碼
+                    code: '', // 空程式碼
                     blockly_code: '' // 留空
                 };
 
