@@ -62,7 +62,7 @@ const clearIndexedDB = async () => {
 };
 
 // 新增專案
-function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML, currentProject }) {
+function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML, isNewProject }) {
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
     const { contextCode, setContextCode } = React.useContext(CodeContext);
@@ -84,8 +84,8 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
         }
 
         try {
-            console.log('currentProject:', currentProject);
-            if (currentProject == '新專案') {
+            console.log('isNewProject:', isNewProject);
+            if (isNewProject) {
                 // 若沒專案，儲存畫面上的程式碼
                 const requestBody = {
                     project_name: trimmedUserInput,
@@ -172,7 +172,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                 }
             }}
         >
-            {currentProject = '新專案' ? <DialogTitle>另存新檔</DialogTitle> : <DialogTitle>新專案</DialogTitle>}
+            {isNewProject ? <DialogTitle>另存新檔</DialogTitle> : <DialogTitle>新專案</DialogTitle>}
             <DialogContent>
                 <DialogContentText>
                     專案名稱請不要超過255個字
@@ -252,12 +252,23 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [selectedProject, setSelectedProject] = React.useState(null);
     const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
+    const [isNewProject, setisNewProject] = React.useState(false);
     const { getXML } = useXML(); // 獲取getXML方法
     const { setXML } = useXML(); // 獲取setXML方法
     const { contextCode, setContextCode } = React.useContext(CodeContext);
     const open = Boolean(anchorEl);
     const [searchQuery, setSearchQuery] = React.useState(''); // 搜尋狀態
     const searchInputRef = React.useRef(null);
+
+    // useEffect 監聽 currentProject 的變化
+    React.useEffect(() => {
+        if (currentProject === '新專案') {
+            setisNewProject(true);
+        } else {
+            setisNewProject(false);
+        }
+    }, [currentProject]); // currentProject 變化時執行
+    
 
     // 打開輸入新專案名稱的視窗
     const handleDialogOpen = () => {
@@ -673,7 +684,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 disableScrollLock={true}
             >
                 {list()}
-                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProjects={fetchProjects} existingProjects={repositoryData} setOriginXML={setOriginXML} currentProject={currentProject} />
+                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProjects={fetchProjects} existingProjects={repositoryData} setOriginXML={setOriginXML} isNewProject={isNewProject} />
                 <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} renameProject={renameProject} selectedProject={selectedProject} />
             </Drawer>
         </>
