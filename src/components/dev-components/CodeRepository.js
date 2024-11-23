@@ -110,6 +110,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                     setOriginXML(getXML());
                     // 更新專案列表
                     fetchProjects();
+                    loadProject(trimmedUserInput);
                 } else {
                     console.error("Failed to add project:", data);
                 }
@@ -144,6 +145,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                     setContextCode('')
                     // 更新專案列表
                     fetchProjects();
+                    loadProject(trimmedUserInput);
                 } else {
                     console.error("Failed to add project:", data);
                 }
@@ -684,8 +686,8 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
                 disableScrollLock={true}
             >
                 {list()}
-                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProjects={fetchProjects} existingProjects={repositoryData} setOriginXML={setOriginXML} isNewProject={isNewProject} />
-                <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} renameProject={renameProject} selectedProject={selectedProject} />
+                <NewCodeDialog open={dialogOpen} handleClose={handleDialogClose} fetchProjects={fetchProjects} existingProjects={repositoryData} setOriginXML={setOriginXML} isNewProject={isNewProject} loadProject={loadProject}/>
+                <RenameDialog open={renameDialogOpen} handleClose={handleRenameDialogClose} renameProject={renameProject} selectedProject={selectedProject} loadProject={loadProject}/>
             </Drawer>
         </>
     );
