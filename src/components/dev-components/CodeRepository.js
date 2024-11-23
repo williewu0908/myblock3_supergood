@@ -84,7 +84,8 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
         }
 
         try {
-            if (currentProject = '新專案') {
+            console.log('currentProject:', currentProject);
+            if (currentProject == '新專案') {
                 // 若沒專案，儲存畫面上的程式碼
                 const requestBody = {
                     project_name: trimmedUserInput,
