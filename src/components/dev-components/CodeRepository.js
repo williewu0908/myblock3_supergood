@@ -28,7 +28,6 @@ import Skeleton from '@mui/material/Skeleton';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { useXML } from '@/components/blockly/XMLContext';
 import { CodeContext } from '@/components/dev-components/CodeContext';
-import { load } from 'blockly/core/serialization/workspaces';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
