@@ -28,6 +28,7 @@ import Skeleton from '@mui/material/Skeleton';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { useXML } from '@/components/blockly/XMLContext';
 import { CodeContext } from '@/components/dev-components/CodeContext';
+import { load } from 'blockly/core/serialization/workspaces';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -62,7 +63,7 @@ const clearIndexedDB = async () => {
 };
 
 // 新增專案
-function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML, isNewProject }) {
+function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, setOriginXML, isNewProject, loadProject }) {
     const [userInput, setUserInput] = React.useState('');
     const [isExist, setIsExist] = React.useState(false);
     const { contextCode, setContextCode } = React.useContext(CodeContext);
