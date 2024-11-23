@@ -303,6 +303,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
             const data = await response.json();
             if (response.ok) {
                 console.log("Project deleted:", data);
+                window.location.reload();
                 fetchProjects(); // Refresh data
             } else {
                 console.error("Failed to delete project:", data);
