@@ -142,7 +142,7 @@ export default function DevNavBar({ toggleViewState }) {
                         const latestProject = projects.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))[0];
                         
                         // 更新 Blockly 的 XML
-                        codeRepositoryRef.current.loadProject(latestProject.project_name);
+                        codeRepositoryRef.current.loadProjectsigle(latestProject.project_name);
     
                         // 更新狀態
                         setCurrentProject(latestProject.project_name);

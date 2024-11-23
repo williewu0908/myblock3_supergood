@@ -509,6 +509,7 @@ const CodeRepository = React.forwardRef(({ RepositoryOpen, toggleDrawer, reposit
 
     React.useImperativeHandle(ref, () => ({
         loadProject,
+        loadProjectsigle
     }));
 
 
