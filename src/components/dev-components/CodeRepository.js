@@ -101,17 +101,11 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                 });
 
                 const data = await response.json();
+
                 if (response.ok) {
                     console.log("Project added:", data);
                     // 設置新增專案的初始 JSON
-                    try {
-                        await clearIndexedDB(); // 清空 IndexedDB
-                        console.log('IndexedDB cleared successfully');
-                    } catch (error) {
-                        console.error('Error clearing IndexedDB:', error);
-                    }
-                    setXML('')
-                    setContextCode('')
+                    setOriginXML(getXML());
                     // 更新專案列表
                     fetchProjects();
                 } else {
@@ -137,7 +131,14 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
                 if (response.ok) {
                     console.log("Project added:", data);
                     // 設置新增專案的初始 JSON
-                    setOriginXML(getXML());
+                    try {
+                        await clearIndexedDB(); // 清空 IndexedDB
+                        console.log('IndexedDB cleared successfully');
+                    } catch (error) {
+                        console.error('Error clearing IndexedDB:', error);
+                    }
+                    setXML('')
+                    setContextCode('')
                     // 更新專案列表
                     fetchProjects();
                 } else {
