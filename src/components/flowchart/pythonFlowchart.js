@@ -6,8 +6,15 @@ const PythonFlowchart = () => {
     const ref = useRef(null);
     const containerRef = useRef(null);
     const [lastValidDiagram, setLastValidDiagram] = useState('');
+    const prevCodeRef = useRef(contextCode); // 新增：用於追踪前一個 contextCode 值
 
     useEffect(() => {
+        // 檢查 contextCode 是否真的改變
+        if (prevCodeRef.current === contextCode) {
+            return; // 如果沒有改變，直接返回
+        }
+        prevCodeRef.current = contextCode; // 更新前一個值
+
         const initFlowchart = async (diagramCode) => {
             if (typeof window !== 'undefined' && ref.current) {
                 ref.current.innerHTML = '';
@@ -15,7 +22,6 @@ const PythonFlowchart = () => {
                     const flowchart = await import('flowchart.js');
                     const diagram = flowchart.parse(diagramCode);
                     
-                    // 設置 SVG 的適應性渲染
                     diagram.drawSVG(ref.current, {
                         'line-width': 2,
                         'scale': 0.8,
@@ -28,7 +34,6 @@ const PythonFlowchart = () => {
                         }
                     });
 
-                    // 調整 SVG 大小以適應容器
                     const svg = ref.current.querySelector('svg');
                     if (svg) {
                         svg.style.maxWidth = '100%';
@@ -48,7 +53,6 @@ const PythonFlowchart = () => {
         };
 
         const fetchFlowchart = async () => {
-            // 新增：如果 contextCode 為空，清空流程圖並直接返回
             if (!contextCode || contextCode.trim() === '') {
                 if (ref.current) {
                     ref.current.innerHTML = '';
@@ -96,6 +100,7 @@ const PythonFlowchart = () => {
 
         fetchFlowchart();
 
+        // 匯出功能的事件監聽器設置
         const handleExportFlowchart = () => {
             if (ref.current) {
                 const svg = ref.current.querySelector('svg');
@@ -139,20 +144,18 @@ const PythonFlowchart = () => {
             window.removeEventListener('exportFlowchart', handleExportEvent);
         };
 
-    }, [contextCode, lastValidDiagram]);
+    }, [contextCode]); // 只依賴 contextCode
 
     return (
-        <div 
-            ref={containerRef}
-            style={{ 
-                width: '100%',
-                height: '100%',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden' // 防止外層溢出
-            }}
-        >
+        // JSX 部分保持不變
+        <div ref={containerRef} style={{ 
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+        }}>
             <div style={{ 
                 flex: '1 1 auto',
                 overflow: 'auto',
@@ -163,23 +166,18 @@ const PythonFlowchart = () => {
                 boxSizing: 'border-box',
                 backgroundColor: '#fff'
             }}>
-                <div 
-                    style={{
-                        position: 'relative',
-                        width: 'fit-content',
-                        minWidth: '100%',
-                        margin: '0 auto'
-                    }}
-                >
-                    <div 
-                        ref={ref}
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            minHeight: '100%'
-                        }}
-                    />
+                <div style={{
+                    position: 'relative',
+                    width: 'fit-content',
+                    minWidth: '100%',
+                    margin: '0 auto'
+                }}>
+                    <div ref={ref} style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '100%'
+                    }}/>
                 </div>
             </div>
         </div>
