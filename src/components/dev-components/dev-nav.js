@@ -133,19 +133,19 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
             console.log('CodeRepository ref not initialized');
             return;
         }
-    
+
         const loadLatestProject = async () => {
             try {
                 const response = await fetch('/myblock3/api/projects', { method: 'GET' });
                 if (response.ok) {
                     const data = await response.json();
                     const projects = data.projects;
-    
+
                     if (projects && projects.length > 0) {
-                        const latestProject = projects.sort((a, b) => 
+                        const latestProject = projects.sort((a, b) =>
                             new Date(b.updated_at) - new Date(a.updated_at)
                         )[0];
-                        
+
                         console.log('Latest project:', latestProject);
                         try {
                             setTimeout(() => {
@@ -161,7 +161,7 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                         } catch (loadError) {
                             console.error('Error loading project:', loadError);
                         }
-    
+
                         setCurrentProject(latestProject.project_name);
                     }
                 } else {
@@ -171,19 +171,19 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                 console.error('Error fetching data:', error);
             }
         };
-    
+
         loadLatestProject();
     }, []);
-    
+
 
     // 儲存已存在專案的變更
     const saveProject = async (project) => {
         try {
             setIsSaving(true);
-            
+
             // 使用 CodeContext 中的 contextCode
-            const code = contextCode; 
-    
+            const code = contextCode;
+
             // 1. 先檢查專案是否已經存在
             const listResponse = await fetch("/myblock3/api/projects", {
                 method: "GET",
@@ -192,13 +192,13 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                     "Content-Type": "application/json"
                 }
             });
-    
+
             const listData = await listResponse.json();
             const projectExists = listData.projects.some(p => p.project_name === project);
-    
+
             // 2. 根據專案是否存在，選擇不同的 API 端點和方法
             let apiUrl, method, requestBody;
-    
+
             if (projectExists) {
                 // 如果專案已存在，使用更新 API
                 apiUrl = `/myblock3/api/projects/${project}/content`;
@@ -208,12 +208,12 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                 // 如果專案不存在，使用創建 API
                 apiUrl = "/myblock3/api/projects";
                 method = "POST";
-                requestBody = { 
-                    project_name: project, 
-                    code: code 
+                requestBody = {
+                    project_name: project,
+                    code: code
                 };
             }
-    
+
             // 3. 發送 API 請求
             const response = await fetch(apiUrl, {
                 method: method,
@@ -223,24 +223,24 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                 },
                 body: JSON.stringify(requestBody)
             });
-    
+
             const data = await response.json();
-    
+
             if (response.ok) {
                 console.log(projectExists ? "Project updated:" : "Project created:", data);
                 fetchProjects(); // 重新獲取專案列表
                 setShowSuccess(true);
-                
+
                 // 1秒後隱藏成功圖案
                 setTimeout(() => {
                     setShowSuccess(false);
                 }, 1500);
-                
+
                 setIsSaving(false);
             } else {
                 console.error(projectExists ? "Failed to update project:" : "Failed to create project:", data);
             }
-    
+
         } catch (error) {
             console.error("Error:", error);
         }
@@ -273,7 +273,13 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                             利用 AI 來幫您編寫程式碼 v3.10-202401109
                         </Typography>
                     </Box>
-                    <Button color="inherit">首頁</Button>
+                    <Button
+                        color="inherit"
+                        onClick={() => window.location.href = 'https://sw-hie-ie.nknu.edu.tw/'}
+                    >
+                        首頁
+                    </Button>
+
                     <Button color="inherit" onClick={toggleDrawer(true)}>專案</Button>
                     <Button
                         aria-haspopup="true"
@@ -304,7 +310,7 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} ref={codeRepositoryRef} currentProject={currentProject} handlegenerateXML={handlegenerateXML}/>
+            <CodeRepository RepositoryOpen={isOpen} toggleDrawer={toggleDrawer} repositoryData={repositoryData} fetchProjects={fetchProjects} loading={isLoading} setCurrentProject={handleProjectName} setOriginXML={setOriginXML} ref={codeRepositoryRef} currentProject={currentProject} handlegenerateXML={handlegenerateXML} />
         </>
     );
 }
