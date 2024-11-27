@@ -439,6 +439,8 @@ function ChatInterface({ viewState }) {
       setShowInputFields({ type: "singleInt", fullText: question.fullText });
     } else if (question.label === "解釋") {
       sendQuestionToAI(question.fullText, true); // 包含所有程式碼的請求
+    } else if (question.fullText.includes("{String}")) {
+      setShowInputFields({ type: "string", fullText: question.fullText });
     } else {
       sendQuestionToAI(question.fullText);
     }
