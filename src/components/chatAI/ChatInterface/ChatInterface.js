@@ -401,7 +401,7 @@ function ChatInterface({ viewState }) {
     };
 
     try {
-      const response = await fetch("/myblock3/api/generate-answer", {
+      const response = await fetch("/myblock3/generate-answer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
