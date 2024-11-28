@@ -233,7 +233,7 @@ function PythonEditor({pythonCode}) {
                     model: "Llama3-8B"
                 };
     
-                const response = await fetch("/myblock3/generate-answer", {
+                const response = await fetch("/myblock3/api/generate-answer", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
