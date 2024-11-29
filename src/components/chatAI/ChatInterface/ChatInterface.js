@@ -104,14 +104,6 @@ function ChatInterface({ viewState }) {
     }
   };
 
-  // 檢測 API Key
-  useEffect(() => {
-    const encryptedKey = localStorage.getItem("encryptedApiKey");
-    if (!encryptedKey) {
-      setShowApiKeyModal(true); // 如果沒有存儲，顯示提示框要求輸入
-    }
-  }, []);
-
   // 載入對話紀錄和設定
   useEffect(() => {
     const chatHistory = JSON.parse(localStorage.getItem('chatLog')) || defaultChat;
@@ -745,11 +737,12 @@ function ChatInterface({ viewState }) {
           {alert('showApiKeyModal 已被觸發！')}
           <div className={styles.apiKeyModal}>
             <p>請輸入您的 Openai API Key：</p>
-            <input
-              type="text"
-              onChange={(e) => setUserApiKeyInput(e.target.value)}
-            />
-            <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
+              <input
+                type="text"
+                value={userApiKeyInput} // 綁定輸入值
+                onChange={(e) => setUserApiKeyInput(e.target.value)} // 更新狀態
+              />
+              <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
           </div>
         </>
       )}
