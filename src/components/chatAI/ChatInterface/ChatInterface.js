@@ -41,8 +41,9 @@ function ChatInterface({ viewState }) {
   const [character, setCharacter] = useState('CodingExpert');
   const [showModal, setShowModal] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const chatLogRef = useRef(null);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [userApiKeyInput, setUserApiKeyInput] = useState('')
 
   const publicKeyPem = `
   -----BEGIN PUBLIC KEY-----
@@ -98,10 +99,8 @@ function ChatInterface({ viewState }) {
   // 保存 API Key
   const saveApiKey = (key) => {
     const encryptedKey = encryptApiKey(key);
-    localStorage.setItem("encryptedApiKey", encryptedKey);
-    if (encryptedKey){
-      setShowApiKeyModal(false);
-    }
+    localStorage.setItem("encryptedApiKey", encryptedKey); // 保存加密的 API Key 到本地存儲
+    setShowApiKeyModal(false); // 隱藏 API Key 提示框
   };
 
   // 載入對話紀錄和設定
@@ -733,18 +732,15 @@ function ChatInterface({ viewState }) {
 
       {/* api輸入提示框 */}
       {showApiKeyModal && (
-        <>
-          {alert('showApiKeyModal 已被觸發！')}
-          <div className={styles.apiKeyModal}>
-            <p>請輸入您的 Openai API Key：</p>
-              <input
-                type="text"
-                value={userApiKeyInput} // 綁定輸入值
-                onChange={(e) => setUserApiKeyInput(e.target.value)} // 更新狀態
-              />
-              <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
-          </div>
-        </>
+        <div className={styles.apiKeyModal}>
+          <p>請輸入您的 Openai API Key：</p>
+          <input
+            type="text"
+            value={userApiKeyInput} // 綁定輸入框的值
+            onChange={(e) => setUserApiKeyInput(e.target.value)} // 更新狀態
+          />
+          <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
+        </div>
       )}
 
       <form id={styles.chatform} onSubmit={handleSubmit}>
