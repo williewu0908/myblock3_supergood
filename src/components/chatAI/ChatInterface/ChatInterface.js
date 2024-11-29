@@ -99,7 +99,9 @@ function ChatInterface({ viewState }) {
   const saveApiKey = (key) => {
     const encryptedKey = encryptApiKey(key);
     localStorage.setItem("encryptedApiKey", encryptedKey);
-    setShowApiKeyModal(false);
+    if (encryptedKey){
+      setShowApiKeyModal(false);
+    }
   };
 
   // 檢測 API Key
@@ -739,14 +741,17 @@ function ChatInterface({ viewState }) {
 
       {/* api輸入提示框 */}
       {showApiKeyModal && (
-        <div className={styles.apiKeyModal}>
-          <p>請輸入您的 Openai API Key：</p>
-          <input
-            type="text"
-            onChange={(e) => setUserApiKeyInput(e.target.value)}
-          />
-          <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
-        </div>
+        <>
+          {alert('showApiKeyModal 已被觸發！')}
+          <div className={styles.apiKeyModal}>
+            <p>請輸入您的 Openai API Key：</p>
+            <input
+              type="text"
+              onChange={(e) => setUserApiKeyInput(e.target.value)}
+            />
+            <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
+          </div>
+        </>
       )}
 
       <form id={styles.chatform} onSubmit={handleSubmit}>
