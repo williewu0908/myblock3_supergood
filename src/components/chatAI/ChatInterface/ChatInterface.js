@@ -426,6 +426,7 @@ function ChatInterface({ viewState }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log('encryptedApiKey', localStorage.getItem("encryptedApiKey"));
 
     const trimmedUserInput = userInput.trim();
     if (!trimmedUserInput) return;
