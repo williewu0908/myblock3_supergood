@@ -12,6 +12,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons'; // 新增 faTimes
 import IconButton from '@mui/material/IconButton';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
+import forge from "node-forge";
 
 function ChatInterface({ viewState }) {
   const countTrueValues = Object.values(viewState).filter(value => value === true).length;
@@ -42,10 +43,30 @@ function ChatInterface({ viewState }) {
   const [isCopied, setIsCopied] = useState(false);
   const chatLogRef = useRef(null);
 
+  const publicKeyPem = `
+  -----BEGIN PUBLIC KEY-----
+  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr8Q4XBMMuvltWTz+b1kD
+  y8lXx4s0lddXztmMOrGbyrIqh31ztDyQRi9CI1EIk3KANpx9Z0hZ3iLM7K1BfBoG
+  jO/5wQ6FrdlIpb2ogwpHv1J6oAAwCU4K6ZwAPlPMDNcDCQ7mtJRbM6iDlt/1lAjv
+  GEyOaJBo/X6DAlUyWrOsWHbVeiPL0983BBYYwMmyl5mC9l6vyP8SZDJC5v/G/mCR
+  LMIWC8kUF70FrWr7NS879v2oMLB+lg8VFP3YuW8+1aqiCiEmcD5tn89+eoNLN/9Y
+  yr+dJhrjADmfv9Sc1fmEkh9VEzkodAB2gA8dQDlVnObxbzQzJ75uOSGDSJ4KFK6W
+  EwIDAQAB
+  -----END PUBLIC KEY-----
+  `;
+
   // 設定語言模型
   const handleModel = (model) => {
     setModel(model);
     localStorage.setItem('selectedModel', model);
+
+    // 如果切換到需要 API Key 的模型，檢查是否存在 API Key
+    if (model !== 'Llama3-8B') {
+      const encryptedKey = localStorage.getItem("encryptedApiKey");
+      if (!encryptedKey) {
+        setShowApiKeyModal(true); // 提示使用者輸入 API Key
+      }
+    }
   };
 
   // 設定角色
@@ -64,6 +85,29 @@ function ChatInterface({ viewState }) {
     setChatLog(defaultChat);
     handleModal(false); // 關閉警示框
   };
+
+  const encryptApiKey = (apiKey) => {
+    const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
+    const encrypted = publicKey.encrypt(apiKey, "RSA-OAEP", {
+      md: forge.md.sha256.create(),
+    });
+    return forge.util.encode64(encrypted); // 加密後以 Base64 儲存
+  };
+
+  // 保存 API Key
+  const saveApiKey = (key) => {
+    const encryptedKey = encryptApiKey(key);
+    localStorage.setItem("encryptedApiKey", encryptedKey);
+    setShowApiKeyModal(false);
+  };
+
+  // 檢測 API Key
+  useEffect(() => {
+    const encryptedKey = localStorage.getItem("encryptedApiKey");
+    if (!encryptedKey) {
+      setShowApiKeyModal(true); // 如果沒有存儲，顯示提示框要求輸入
+    }
+  }, []);
 
   // 載入對話紀錄和設定
   useEffect(() => {
@@ -385,6 +429,8 @@ function ChatInterface({ viewState }) {
     const trimmedUserInput = userInput.trim();
     if (!trimmedUserInput) return;
 
+    const encryptedApiKey = localStorage.getItem("encryptedApiKey"); // 取得加密的 API Key
+
     const currentTime = new Date().toLocaleTimeString('it-IT');
     const newChatLog = [
       ...chatLog,
@@ -400,6 +446,10 @@ function ChatInterface({ viewState }) {
       model: model
     };
 
+    if (model !== 'Llama3-8B' && encryptedApiKey) {
+      requestBody.encryptedApiKey = encryptedApiKey; // 僅當模型需要 API Key 時添加
+    }
+
     try {
       const response = await fetch("/myblock3/api/generate-answer", {
         method: "POST",
@@ -408,6 +458,15 @@ function ChatInterface({ viewState }) {
         },
         body: JSON.stringify(requestBody)
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.error && errorData.error.includes("缺少加密的 API Key")) {
+          setShowApiKeyModal(true); // 提示使用者輸入 API Key
+        }
+        throw new Error(errorData.error || "未知錯誤");
+      }
+
       const data = await response.json();
       const airesponse = data.airesponse;
 
@@ -673,6 +732,18 @@ function ChatInterface({ viewState }) {
             />
           )}
           <FontAwesomeIcon icon={faTimes} onClick={() => setShowInputFields(null)} className={styles.cancelButton} />
+        </div>
+      )}
+
+      {/* api輸入提示框 */}
+      {showApiKeyModal && (
+        <div className={styles.apiKeyModal}>
+          <p>請輸入您的 Openai API Key：</p>
+          <input
+            type="text"
+            onChange={(e) => setUserApiKeyInput(e.target.value)}
+          />
+          <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
         </div>
       )}
 
