@@ -41,6 +41,7 @@ function ChatInterface({ viewState }) {
   const [character, setCharacter] = useState('CodingExpert');
   const [showModal, setShowModal] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const chatLogRef = useRef(null);
 
   const publicKeyPem = `
