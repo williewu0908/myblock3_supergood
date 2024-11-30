@@ -70,26 +70,34 @@ const CodeExec = forwardRef((props, ref) => {
     }
 
     useEffect(() => {
-        // 載入 Skulpt
-        loadSkulpt().then(() => {
-            console.log('Skulpt 已載入');
-        }).catch((error) => {
-            console.error('載入 Skulpt 失敗:', error);
-        });
-
+        // 一秒後載入 Skulpt
+        const skulptTimeout = setTimeout(() => {
+            loadSkulpt()
+                .then(() => {
+                    console.log('Skulpt 已載入');
+                })
+                .catch((error) => {
+                    console.error('載入 Skulpt 失敗:', error);
+                });
+        }, 1000); // 延遲 1 秒
+    
         const handleCheckCodeAvailabilityTrigger = () => {
             checkCodeAvailability();
         };
-
+    
         // 監聽 pythonEditor 的改變
         window.addEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
-
+    
+        // 初始檢查代碼可用性
         checkCodeAvailability();
-
+    
         return () => {
+            // 清除事件監聽和定時器
             window.removeEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
+            clearTimeout(skulptTimeout);
         };
     }, []);
+    
 
     const runPythonCode = async () => {
         const code = await getPythonCodeFromIndexedDB();
