@@ -148,15 +148,13 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
 
                         console.log('Latest project:', latestProject);
                         try {
+                            codeRepositoryRef.current.loadProjectsigle(latestProject);
                             setTimeout(() => {
                                 codeRepositoryRef.current.loadProjectsigle(latestProject);
-                            }, 1000);
+                            }, 500);
                             setTimeout(() => {
                                 codeRepositoryRef.current.loadProjectsigle(latestProject);
-                            }, 2000);
-                            setTimeout(() => {
-                                codeRepositoryRef.current.loadProjectsigle(latestProject);
-                            }, 3000);
+                            }, 700);
                             console.log('Project loaded successfully');
                         } catch (loadError) {
                             console.error('Error loading project:', loadError);
