@@ -38,3 +38,5 @@ next-env.d.ts
 /.metadata/
 /backend/.metadata/
 
+# private key
+/backend/AI/private_key.pem
