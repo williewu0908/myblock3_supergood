@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import DevNavBar from "@/components/dev-components/dev-nav";
 import CodeEditor from '@/components/dev-components/code-editor';
@@ -14,35 +14,6 @@ export default function Index() {
     Code: true,
     ChatWithAI: true,
   });
-
-  // 檢查用戶登入狀態
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const response = await fetch('/myblock3/whois', {
-          credentials: 'include'
-        });
-        
-        if (!response.ok) {
-          // 如果響應不是 200，重定向到登入頁面
-          window.location.href = 'https://sw-hie-ie.nknu.edu.tw/';
-          return;
-        }
-
-        const data = await response.json();
-        if (!data.username) {
-          // 如果沒有用戶名，也重定向到登入頁面
-          window.location.href = 'https://sw-hie-ie.nknu.edu.tw/';
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        // 發生錯誤時重定向到登入頁面
-        window.location.href = 'https://sw-hie-ie.nknu.edu.tw/';
-      }
-    };
-
-    checkAuthStatus();
-  }, []); // 空依賴數組表示只在組件首次渲染時執行
 
   const toggleViewState = (newState) => {
     setViewState(newState);
