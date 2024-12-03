@@ -56,12 +56,14 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         user, error = get_user_from_session()
         if error:
-            if request.is_json:
-                return jsonify({'error': 'Unauthorized', 'redirect': LOGIN_URL}), 401
-            return redirect(LOGIN_URL)
+            return jsonify({
+                'error': 'Unauthorized',
+                'message': '請先登入'
+            }), 401
         return f(*args, **kwargs)
-    decorated_function.__name__ = f.__name__
+    decorated_function.__name__ = f.__name__ 
     return decorated_function
+
 
 @app.route('/api/projects', methods=['GET'])
 @login_required
