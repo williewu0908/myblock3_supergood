@@ -94,7 +94,7 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
     React.useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await fetch('/whois', {
+                const response = await fetch('/myblock3/whois', {
                     method: 'GET',
                     credentials: 'include' // 確保攜帶 cookie
                 });
