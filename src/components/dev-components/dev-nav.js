@@ -56,6 +56,7 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
     const [currentProject, setCurrentProject] = React.useState('新專案');
     const [originXML, setOriginXML] = React.useState('');
     const { contextCode, setContextCode } = useContext(CodeContext);
+    const [isAuthenticated, setIsAuthenticated] = React.useState(false);
     const [state, setState] = React.useState({
         Blockly: true,
         FlowChart: true,
@@ -88,6 +89,34 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
         }
 
     }); // 依賴 currentProject 和 getXML 返回的 JSON 值
+
+    // 添加驗證使用者的 useEffect
+    React.useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await fetch('/whois', {
+                    method: 'GET',
+                    credentials: 'include' // 確保攜帶 cookie
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.username) {
+                        setIsAuthenticated(true);
+                    } else {
+                        setIsAuthenticated(false);
+                    }
+                } else {
+                    setIsAuthenticated(false);
+                }
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                setIsAuthenticated(false);
+            }
+        };
+
+        checkAuth();
+    }, []); // 空依賴陣列表示只在組件首次載入時執行
 
     const handleChange = (event) => {
         setState({
@@ -268,7 +297,7 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                             myBlock 3
                         </Typography>
                         <Typography variant="h6" component="div" sx={{ color: 'rgb(90, 90, 90)', fontSize: 10, paddingTop: 0.5 }}>
-                            利用 AI 來幫您編寫程式碼 v3.10-202401109
+                            利用 AI 來幫您編寫程式碼 v3.10-202401206
                         </Typography>
                     </Box>
                     <Button
@@ -278,7 +307,9 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                         首頁
                     </Button>
 
-                    <Button color="inherit" onClick={toggleDrawer(true)}>專案</Button>
+                    {isAuthenticated && (
+                        <Button color="inherit" onClick={toggleDrawer(true)}>專案</Button>
+                    )}
                     <Button
                         aria-haspopup="true"
                         color="inherit"
