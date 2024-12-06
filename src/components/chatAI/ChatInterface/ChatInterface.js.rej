@@ -1,0 +1,9 @@
+diff a/src/components/chatAI/ChatInterface/ChatInterface.js b/src/components/chatAI/ChatInterface/ChatInterface.js	(rejected hunks)
+@@ -440,7 +440,6 @@
+       model: model
+     };
+ 
+-
+     try {
+       const response = await fetch("/myblock3/api/generate-answer", {
+         method: "POST",
