@@ -29,13 +29,7 @@ export default function Index() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column", // 讓內容與 footer 垂直排列
-        minHeight: "100vh", // 確保佔滿整個頁面高度
-      }}
-    >
+    <div>
       {/* 主內容 */}
       <div style={{ flex: 1 }}>
         <XMLProvider>
