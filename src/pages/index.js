@@ -21,7 +21,7 @@ export default function Index() {
 
   const codeExecRef = useRef();
   const codeEditorRef = useRef();
-
+  
   const handlegenerateXML = (pythonCode) => {
     if (codeEditorRef.current) {
       codeEditorRef.current.generateXML(pythonCode);
@@ -29,25 +29,23 @@ export default function Index() {
   }
 
   return (
-    <div>
-      {/* 主內容 */}
-      <div style={{ flex: 1 }}>
+    <>
+      <div className="container">
         <XMLProvider>
           <CodeProvider>
-            <DevNavBar
-              toggleViewState={toggleViewState}
+            <DevNavBar 
+              toggleViewState={toggleViewState} 
               handlegenerateXML={handlegenerateXML}
             />
-            <CodeEditor
-              viewState={viewState}
-              codeExecRef={codeExecRef}
+            <CodeEditor 
+              viewState={viewState} 
+              codeExecRef={codeExecRef} 
               ref={codeEditorRef}
             />
           </CodeProvider>
         </XMLProvider>
         <CodeExec ref={codeExecRef} />
       </div>
-
       {/* 頁腳 */}
       <footer
         style={{
@@ -76,6 +74,6 @@ export default function Index() {
         <p>Information Education Center, National Kaohsiung Normal University, Taiwan.</p>
         <p>Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), XXX-XXX XXX (吳威廷)</p>
       </footer>
-    </div>
+    </>
   );
 }
