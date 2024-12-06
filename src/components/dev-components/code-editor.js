@@ -65,7 +65,7 @@ const CodeEditor = forwardRef(({ viewState, codeExecRef }, ref) => {
   }));
 
   return (
-    <Box sx={{ width: '100%', height: '48%', display: 'flex' }}>
+    <Box sx={{ width: '100%', height: '45%', display: 'flex' }}>
         <Box sx={{ flex: 1, height: '100%', backgroundColor: '#F8F8F8', display: viewState.Blockly ? 'block' : 'none' }}>
           <div className={styles.boxtitle}>
             <h2>積木</h2>
