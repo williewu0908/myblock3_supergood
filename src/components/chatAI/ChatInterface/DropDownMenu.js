@@ -1,12 +1,14 @@
 import styles from '@/components/chatAI/ChatInterface/DropDownMenu.module.css';
 import Image from 'next/image';
 
-export default function DropDownMenu({ character, model, countTrueValues, onGetModel, onGetCharacter, onGetShowModal, includeChatHistory, setIncludeChatHistory}) {
+export default function DropDownMenu({ character, model, countTrueValues, onGetModel, onGetCharacter, onGetShowModal, includeChatHistory, setIncludeChatHistory }) {
     return (
         <nav className="navBox">
             <Image src="/myblock3c/AIchat/media/robot.jpg" width={20} height={20} className={styles.characterTitleImg} alt="robot" />
             <h1 className={styles.title}>Chat with AI</h1>
-            <div className={styles.subtitle}><span id={styles.showCharacter}>{character}</span>（<span id={styles.showModel}>{model}</span>）</div>
+            <div className={styles.subtitle}>
+                <span id={styles.showCharacter}>{character}</span>（<span id={styles.showModel}>{model}</span>）
+            </div>
             <input type="checkbox" id={styles.menuButton} />
             <label htmlFor={styles.menuButton} className={styles.line}>
                 <div className={styles.menuButton}></div>
@@ -14,6 +16,7 @@ export default function DropDownMenu({ character, model, countTrueValues, onGetM
 
             <div className={styles.menuList}>
                 <ul>
+                    {/* 更換模型 */}
                     <li>
                         <a>更換模型</a>
                         <ul className={`${styles.secondMenu} ${styles.models}`}>
@@ -22,27 +25,25 @@ export default function DropDownMenu({ character, model, countTrueValues, onGetM
                             <li id="GPT4" onClick={(e) => onGetModel(e.currentTarget.id)}><a href="javascript:void(0);">GPT-4</a></li>
                         </ul>
                     </li>
-                    {/* <li>
-                        <a>切換角色</a>
-                        <ul className={`${styles.secondMenu} ${styles.character}`}>
-                            <li id="CodingExpert" onClick={(e) => onGetCharacter(e.currentTarget.id)}><a href="javascript:void(0);">Python 專家</a></li>
-                            <li id="Wife" onClick={(e) => onGetCharacter(e.currentTarget.id)}><a href="javascript:void(0);">老婆</a></li>
-                            <li id="CatMaid" onClick={(e) => onGetCharacter(e.currentTarget.id)}><a href="javascript:void(0);">Cat Maid</a></li>
-                        </ul>
-                    </li> */}
-                    <li id={styles.Delete} onClick={()=> onGetShowModal()}>
-                        <a>刪除對話</a>
+
+                    {/* 包含聊天紀錄 */}
+                    <li>
+                        <label className={styles.checkboxLabel}>
+                            <input
+                                type="checkbox"
+                                checked={includeChatHistory}
+                                onChange={() => setIncludeChatHistory(!includeChatHistory)}
+                            />
+                            包含聊天紀錄
+                        </label>
+                    </li>
+
+                    {/* 刪除對話 */}
+                    <li id={styles.Delete} onClick={() => onGetShowModal()}>
+                        <a href="javascript:void(0);">刪除對話</a>
                     </li>
                 </ul>
             </div>
-            <label>
-                <input
-                type="checkbox"
-                checked={includeChatHistory}
-                onChange={() => setIncludeChatHistory(!includeChatHistory)}
-                />
-                包含聊天紀錄
-            </label>
         </nav>
     );
 }
