@@ -45,6 +45,7 @@ function ChatInterface({ viewState }) {
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [userApiKeyInput, setUserApiKeyInput] = useState('')
   const [includeChatHistory, setIncludeChatHistory] = useState(false);
+  const API_ENDPOINT = '/myblock3/api/generate-answer';
 
   const publicKeyPem = `
   -----BEGIN PUBLIC KEY-----
@@ -426,7 +427,7 @@ function ChatInterface({ viewState }) {
     if (!trimmedUserInput) return;
 
     const encryptedApiKey = localStorage.getItem("encryptedApiKey"); // 取得加密的 API Key
-    
+
     const currentTime = new Date().toLocaleTimeString('it-IT');
     const newChatLog = [
       ...chatLog,
@@ -447,7 +448,7 @@ function ChatInterface({ viewState }) {
     }
 
     try {
-      const response = await fetch("/myblock3/api/generate-answer", {
+      const response = await fetch(API_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -597,7 +598,7 @@ function ChatInterface({ viewState }) {
     }
   
     try {
-      const response = await fetch('/myblock3/api/generate-answer', {
+      const response = await fetch(API_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -662,7 +663,19 @@ function ChatInterface({ viewState }) {
               model: model,
           };
 
-          const response = await fetch("/myblock3/api/generate-answer", {
+          // 添加加密的 API Key，僅當模型不是 Llama-3 8B
+          if (model !== 'Llama3-8B') {
+              const encryptedApiKey = localStorage.getItem("encryptedApiKey");
+              if (encryptedApiKey) {
+                  requestBody.encryptedApiKey = encryptedApiKey;
+              } else {
+                  console.error("加密的 API Key 丟失，請重新輸入。");
+                  setShowApiKeyModal(true);
+                  return;
+              }
+          }
+
+          const response = await fetch(API_ENDPOINT, {
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
