@@ -264,7 +264,7 @@
   box-sizing: border-box;
 }
 
-.bubbleButton .checkButton {
+.bubbleButton {
   /* float: right; */
   background-color: #e0e0e0;
   border: none;
@@ -279,7 +279,17 @@
 }
 
 .checkButton {
-  background-color: #ffb8b8;
+  /* float: right; */
+  background-color: #ffcaca;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  margin: 2px 5px;
+  font-size: 12px; /* 調整泡泡的字體大小 */
+  cursor: pointer;
+  transition: background-color 0.3s;
+  white-space: nowrap; /* 確保泡泡文字不換行 */
+  color: rgb(86, 86, 86);
 }
 
 .bubbleButton:hover {
