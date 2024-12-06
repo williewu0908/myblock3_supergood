@@ -112,11 +112,20 @@
 }
 
 /* 大標題 */
-.menuList>ul>li>a {
+.menuList>ul>li>a:not(#Delete a) {
     padding: 10px;
     display: block;
     font-size: 1.1em;
     text-decoration: none;
+}
+
+#Delete {
+    padding: 10px;
+    display: block;
+    font-size: 1.1em;
+    text-decoration: none;
+    color: darkred !important;
+    cursor: pointer;
 }
 
 .menuList>ul>li:hover {
@@ -197,18 +206,4 @@
     display: flex;
     align-items: center; /* 垂直居中對齊 */
     justify-content: space-between; /* 左右分布 */
-}
-
-/* .menuList ul li input[type="checkbox"] {
-    margin-right: 8px;
-    cursor: pointer;
-}
-
-.menuList ul li input[type="checkbox"]:hover {
-    background-color: #f0f0f0;
-} */
-
-#Delete {
-    color: darkred !important;
-    cursor: pointer;
 }
