@@ -625,6 +625,68 @@ function ChatInterface({ viewState }) {
     }
   };
   
+  const checkSyntaxErrors = async () => {
+      try {
+          // 從 IndexedDB 獲取所有程式碼
+          const allCode = await getAllCodeFromIndexedDB();
+
+          // 如果沒有程式碼，提示用戶
+          if (!allCode) {
+              const updatedChatLog = [
+                  ...chatLog,
+                  { role: 'assistant', content: '目前無任何程式碼可以檢查。' },
+              ];
+              setChatLog(updatedChatLog);
+              saveChatLog(updatedChatLog);
+              return;
+          }
+
+          const currentTime = new Date().toLocaleTimeString('it-IT');
+          const newChatLog = [
+              ...chatLog,
+              { role: 'user', content: '請檢查以下程式碼的語法：\n' + allCode, time: currentTime },
+              { role: 'assistant', content: 'loading' },
+          ];
+          setChatLog(newChatLog);
+          saveChatLog(newChatLog);
+
+          const requestBody = {
+              chatLog: [
+                  { role: 'user', content: `請檢查以下程式碼的語法：\n${allCode}`, time: currentTime },
+              ],
+              selectedCharacter: character,
+              model: model,
+          };
+
+          const response = await fetch("/myblock3/api/generate-answer", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestBody),
+          });
+
+          const data = await response.json();
+          const aiResponse = data.airesponse;
+
+          const updatedChatLog = [
+              ...chatLog,
+              { role: 'user', content: '請檢查以下程式碼的語法：\n' + allCode, time: currentTime },
+              { role: 'assistant', content: aiResponse },
+          ];
+          setChatLog(updatedChatLog);
+          saveChatLog(updatedChatLog);
+      } catch (error) {
+          console.error("Error:", error);
+          const updatedChatLog = [
+              ...chatLog,
+              { role: 'user', content: '請檢查以下程式碼的語法。' },
+              { role: 'assistant', content: 'Error: 檢查語法時發生錯誤。' },
+          ];
+          setChatLog(updatedChatLog);
+          saveChatLog(updatedChatLog);
+      }
+  };
 
   return (
     <div className={styles.container}>
@@ -742,6 +804,14 @@ function ChatInterface({ viewState }) {
           <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
         </div>
       )}
+      <div className={styles.toolbar}>
+          <button
+              onClick={checkSyntaxErrors}
+              className={styles.checkButton}
+          >
+              檢查語法
+          </button>
+      </div>
 
       <form id={styles.chatform} onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
