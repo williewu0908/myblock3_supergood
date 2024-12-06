@@ -10,7 +10,6 @@ export default function Footer() {
         color: "white",
         lineHeight: 1.5,
         fontFamily: "'Poppins', sans-serif",
-        padding: "15px 0",
         height: "17.1%%"
       }}
     >
