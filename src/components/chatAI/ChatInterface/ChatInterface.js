@@ -121,130 +121,149 @@ function ChatInterface({ viewState }) {
 
   useEffect(() => {
     chatLog.forEach((message, index) => {
-      if (message.role === 'assistant' && message.hasAddCodeButton) {
-        const element = document.getElementById(`message-${index}`);
-        if (element) {
-          // 對每個 <pre><code> 元素進行高亮顯示並添加複製按鈕
-          element.querySelectorAll('pre code').forEach((block, blockIndex) => {
-            hljs.highlightElement(block);
+        if (message.role === 'assistant' && message.hasAddCodeButton) {
+            const element = document.getElementById(`message-${index}`);
+            if (element) {
+                // 處理三引號與 Markdown 的 ``` 代碼區塊
+                const transformCodeBlocks = (content) => {
+                    // 處理 Markdown 格式的 ```...``` 
+                    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+                    content = content.replace(codeBlockRegex, (match, lang, code) => {
+                        const languageClass = lang ? `class="language-${lang}"` : '';
+                        return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
+                    });
 
-            // 為每個代碼塊創建一個獨立的複製按鈕組件
-            const CopyButton = () => {
-              const [isCopied, setIsCopied] = useState(false);
+                    // 處理三引號格式 '''...'''
+                    const tripleQuoteRegex = /'''(\w+)?\n([\s\S]*?)'''/g;
+                    content = content.replace(tripleQuoteRegex, (match, lang, code) => {
+                        const languageClass = lang ? `class="language-${lang}"` : '';
+                        return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
+                    });
 
-              const handleCopy = () => {
-                navigator.clipboard.writeText(block.innerText)
-                  .then(() => {
-                    setIsCopied(true);
-                    setTimeout(() => setIsCopied(false), 2000);
-                  })
-                  .catch(err => console.error('複製失敗', err));
-              };
+                    return content;
+                };
 
-              return (
-                <IconButton
-                  aria-label="copy"
-                  size="small"
-                  onClick={handleCopy}
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    backgroundColor: 'transparent',
-                  }}
-                >
-                  {isCopied ?
-                    <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} /> :
-                    <ContentCopyIcon fontSize="inherit" />
-                  }
-                </IconButton>
-              );
-            };
+                // 轉換訊息內容
+                const transformedContent = transformCodeBlocks(message.content);
+                element.innerHTML = transformedContent;
 
-            // 創建容器並設置定位
-            const preBlock = block.closest('pre');
-            if (preBlock) {
-              preBlock.style.position = 'relative';
+                // 對每個 <pre><code> 元素進行高亮顯示並添加複製按鈕
+                element.querySelectorAll('pre code').forEach((block, blockIndex) => {
+                    hljs.highlightElement(block);
 
-              // 創建「加進程式碼」按鈕
-              const AddCodeButton = () => {
-                  const handleAddCode = async () => {
-                      try {
-                          await addCodeToIndexedDB(block.innerText, message.positionRow); // 替換指定行
-                      } catch (error) {
-                          console.error('無法替代程式碼：', error);
-                      }
-                  };
+                    // 創建複製按鈕組件
+                    const CopyButton = () => {
+                        const [isCopied, setIsCopied] = useState(false);
 
-                  return (
-                      <button
-                          style={{
-                              marginTop: '8px',
-                              display: 'block',
-                              backgroundColor: '#4CAF50',
-                              color: 'white',
-                              border: 'none',
-                              padding: '5px 10px',
-                              cursor: 'pointer',
-                              borderRadius: '4px',
-                          }}
-                          onClick={handleAddCode}
-                      >
-                          加進程式碼
-                      </button>
-                  );
-              };
+                        const handleCopy = () => {
+                            navigator.clipboard.writeText(block.innerText)
+                                .then(() => {
+                                    setIsCopied(true);
+                                    setTimeout(() => setIsCopied(false), 2000);
+                                })
+                                .catch(err => console.error('複製失敗', err));
+                        };
 
-              // 創建新的容器元素
-              const copyButtonContainer = document.createElement('div');
-              copyButtonContainer.id = `copy-button-${index}-${blockIndex}`;
-              preBlock.appendChild(copyButtonContainer);
+                        return (
+                            <IconButton
+                                aria-label="copy"
+                                size="small"
+                                onClick={handleCopy}
+                                style={{
+                                    position: 'absolute',
+                                    top: '8px',
+                                    right: '8px',
+                                    backgroundColor: 'transparent',
+                                }}
+                            >
+                                {isCopied ?
+                                    <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} /> :
+                                    <ContentCopyIcon fontSize="inherit" />
+                                }
+                            </IconButton>
+                        );
+                    };
 
-              // 渲染複製按鈕組件
-              ReactDOM.render(
-                <CopyButton />,
-                copyButtonContainer
-              );
+                    const preBlock = block.closest('pre');
+                    if (preBlock) {
+                        preBlock.style.position = 'relative';
 
-              // 創建按鈕容器
-              const buttonContainer = document.createElement('div');
-              buttonContainer.style.marginTop = '8px';
-              buttonContainer.id = `add-button-${index}-${blockIndex}`;
+                        // 創建「加進程式碼」按鈕
+                        const AddCodeButton = () => {
+                            const handleAddCode = async () => {
+                                try {
+                                    await addCodeToIndexedDB(block.innerText, message.positionRow); // 替換指定行
+                                } catch (error) {
+                                    console.error('無法替代程式碼：', error);
+                                }
+                            };
 
-              // 添加到 preBlock
-              preBlock.appendChild(buttonContainer);
+                            return (
+                                <button
+                                    style={{
+                                        marginTop: '8px',
+                                        display: 'block',
+                                        backgroundColor: '#4CAF50',
+                                        color: 'white',
+                                        border: 'none',
+                                        padding: '5px 10px',
+                                        cursor: 'pointer',
+                                        borderRadius: '4px',
+                                    }}
+                                    onClick={handleAddCode}
+                                >
+                                    加進程式碼
+                                </button>
+                            );
+                        };
 
-              // 渲染按鈕
-              ReactDOM.render(<AddCodeButton />, buttonContainer);
+                        // 創建複製按鈕容器
+                        const copyButtonContainer = document.createElement('div');
+                        copyButtonContainer.id = `copy-button-${index}-${blockIndex}`;
+                        preBlock.appendChild(copyButtonContainer);
+
+                        // 渲染複製按鈕組件
+                        ReactDOM.render(<CopyButton />, copyButtonContainer);
+
+                        // 創建「加進程式碼」按鈕容器
+                        const addButtonContainer = document.createElement('div');
+                        addButtonContainer.style.marginTop = '8px';
+                        addButtonContainer.id = `add-button-${index}-${blockIndex}`;
+                        preBlock.appendChild(addButtonContainer);
+
+                        // 渲染「加進程式碼」按鈕
+                        ReactDOM.render(<AddCodeButton />, addButtonContainer);
+                    }
+                });
             }
-          });
         }
-      }
 
-      // 滾動到最新消息
-      const current = chatLogRef.current;
-      if (current) {
-        current.scrollTo({ top: current.scrollHeight, behavior: 'smooth' });
-      }
+        // 滾動到最新消息
+        const current = chatLogRef.current;
+        if (current) {
+            current.scrollTo({ top: current.scrollHeight, behavior: 'smooth' });
+        }
     });
+
     return () => {
-      chatLog.forEach((message, index) => {
-        const element = document.getElementById(`message-${index}`);
-        if (element) {
-          element.querySelectorAll('pre').forEach((pre, blockIndex) => {
-            const container = document.getElementById(`copy-button-${index}-${blockIndex}`);
-            const container2 = document.getElementById(`add-button-${index}-${blockIndex}`);
-            if (container) {
-              ReactDOM.unmountComponentAtNode(container);
+        chatLog.forEach((message, index) => {
+            const element = document.getElementById(`message-${index}`);
+            if (element) {
+                element.querySelectorAll('pre').forEach((pre, blockIndex) => {
+                    const container = document.getElementById(`copy-button-${index}-${blockIndex}`);
+                    const container2 = document.getElementById(`add-button-${index}-${blockIndex}`);
+                    if (container) {
+                        ReactDOM.unmountComponentAtNode(container);
+                    }
+                    if (container2) {
+                        ReactDOM.unmountComponentAtNode(container2);
+                    }
+                });
             }
-            if (container2) {
-              ReactDOM.unmountComponentAtNode(container2);
-            }
-          });
-        }
-      });
+        });
     };
-  }, [chatLog]);
+}, [chatLog]);
+
 
   useEffect(() => {
       const handlePythonEditorResponse = (event) => {
