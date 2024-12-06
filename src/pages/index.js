@@ -29,8 +29,15 @@ export default function Index() {
   }
 
   return (
-    <>
-      <div className="container">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column", // 讓內容與 footer 垂直排列
+        minHeight: "100vh", // 確保佔滿整個頁面高度
+      }}
+    >
+      {/* 主內容 */}
+      <div style={{ flex: 1 }}>
         <XMLProvider>
           <CodeProvider>
             <DevNavBar
@@ -46,30 +53,35 @@ export default function Index() {
         </XMLProvider>
         <CodeExec ref={codeExecRef} />
       </div>
+
+      {/* 頁腳 */}
       <footer
-        style={{display: "block", position: "fixed", bottom: "0", width: "100%", textAlign: "center", background: "#4b5c66", color: "white", lineHeight: 1.5, fontFamily: "'Poppins', sans-serif", }}
+        style={{
+          display: "block",
+          width: "100%",
+          textAlign: "center",
+          background: "#4b5c66",
+          color: "white",
+          lineHeight: 1.5,
+          fontFamily: "'Poppins', sans-serif",
+          padding: "15px 0",
+        }}
       >
-        <p style={{ margin: "15px" }}>&emsp;</p>
-        <p style={{ margin: "15px" }}>
+        <p>&emsp;</p>
+        <p>
           <a style={{ color: "white" }} href="https://sites.google.com/mail.nknu.edu.tw/cph/home">
             🌏HIE Lab | Ⓖ 🚀 Ⓖ | 🛸 Ⓖ | 🚜 Ⓦ&emsp;
           </a>
         </p>
-        <p style={{ margin: "15px" }}>
+        <p>
           <a style={{ color: "white" }} href="https://sites.google.com/mail.nknu.edu.tw/iecnknu/%E9%A6%96%E9%A0%81">
             &emsp;🌏NKNU-IEC Ⓖ Ⓕ Ⓑ
           </a>
         </p>
-        <p style={{ margin: "15px" }}>
-          © 2008-2025 Power by Po-Hsun Cheng (鄭伯壎) and Li-Wei Chen (陳立偉),
-        </p>
-        <p style={{ margin: "15px" }}>
-          Information Education Center, National Kaohsiung Normal University, Taiwan.
-        </p>
-        <p style={{ margin: "15px" }}>
-          Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), XXX-XXX XXX (吳威廷)
-        </p>
+        <p>© 2008-2025 Power by Po-Hsun Cheng (鄭伯壎) and Li-Wei Chen (陳立偉),</p>
+        <p>Information Education Center, National Kaohsiung Normal University, Taiwan.</p>
+        <p>Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), XXX-XXX XXX (吳威廷)</p>
       </footer>
-    </>
+    </div>
   );
 }
