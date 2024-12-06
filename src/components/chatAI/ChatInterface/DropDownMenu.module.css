@@ -165,11 +165,6 @@
     transform: scale(1);
 }
 
-#Delete {
-    color: darkred !important;
-    cursor: pointer;
-}
-
 /* 滑鼠移至標題時，展開下面的子標題 */
 .menuList>ul>li:hover .secondMenu li {
     max-height: 50px;
@@ -212,3 +207,8 @@
 .menuList ul li input[type="checkbox"]:hover {
     background-color: #f0f0f0;
 } */
+
+#Delete {
+    color: darkred !important;
+    cursor: pointer;
+}
