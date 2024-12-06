@@ -9,6 +9,7 @@ export default function Footer() {
         background: "#4b5c66",
         color: "white",
         lineHeight: 1.5,
+        padding: "15px 0",
         fontFamily: "'Poppins', sans-serif",
         height: "17.1%%"
       }}
