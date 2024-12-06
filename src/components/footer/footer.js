@@ -3,18 +3,15 @@ export default function Footer() {
     <footer
       className="footer"
       style={{
-        display: "flex", // 使用 flex 布局
-        flexDirection: "column", // 元素垂直排列
-        alignItems: "flex-start", // 將元素靠上排列
-        justifyContent: "flex-start", // 垂直方向靠上
+        display: "block",
         width: "100%",
-        textAlign: "left", // 文字靠左
+        textAlign: "center",
         background: "#4b5c66",
         color: "white",
         lineHeight: 1.5,
-        padding: "15px",
+        padding: "15px 0",
         fontFamily: "'Poppins', sans-serif",
-        height: "auto",
+        height: "17.1%%"
       }}
     >
       <p>&emsp;</p>
@@ -30,7 +27,9 @@ export default function Footer() {
       </p>
       <p>© 2008-2025 Power by Po-Hsun Cheng (鄭伯壎) and Li-Wei Chen (陳立偉),</p>
       <p>Information Education Center, National Kaohsiung Normal University, Taiwan.</p>
-      <p>Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), XXX-XXX XXX (吳威廷)</p>
+      <p style={{ marginBottom: "0", paddingBottom: "15px" }}>
+        Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), XXX-XXX XXX (吳威廷)
+      </p>
     </footer>
   );
 }
