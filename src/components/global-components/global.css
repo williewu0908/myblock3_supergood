@@ -20,13 +20,3 @@ body {
   margin: 0;
   float: left;
 }
-
-footer {
-  text-align: center;
-  background: #4b5c66;
-  color: white;
-  line-height: 1.5;
-  font-family: 'Poppins', sans-serif;
-  padding: 15px 0;
-  width: 100%;
-}
