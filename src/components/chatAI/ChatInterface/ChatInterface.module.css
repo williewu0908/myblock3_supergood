@@ -264,7 +264,7 @@
   box-sizing: border-box;
 }
 
-.bubbleButton {
+.bubbleButton .checkButton {
   /* float: right; */
   background-color: #e0e0e0;
   border: none;
@@ -276,6 +276,10 @@
   transition: background-color 0.3s;
   white-space: nowrap; /* 確保泡泡文字不換行 */
   color: rgb(86, 86, 86);
+}
+
+.checkButton {
+  background-color: #ffb8b8;
 }
 
 .bubbleButton:hover {
