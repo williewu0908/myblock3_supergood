@@ -112,20 +112,11 @@
 }
 
 /* 大標題 */
-.menuList>ul>li>a:not(#Delete a) {
+.menuList>ul>li>a {
     padding: 10px;
     display: block;
     font-size: 1.1em;
     text-decoration: none;
-}
-
-#Delete {
-    padding: 10px;
-    display: block;
-    font-size: 1.1em;
-    text-decoration: none;
-    color: darkred !important;
-    cursor: pointer;
 }
 
 .menuList>ul>li:hover {
@@ -172,6 +163,11 @@
 
 .secondMenu a:active {
     transform: scale(1);
+}
+
+#Delete {
+    color: darkred;
+    cursor: pointer;
 }
 
 /* 滑鼠移至標題時，展開下面的子標題 */
