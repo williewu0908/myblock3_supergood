@@ -3,15 +3,18 @@ export default function Footer() {
     <footer
       className="footer"
       style={{
-        display: "block",
+        display: "flex", // 使用 flex 布局
+        flexDirection: "column", // 元素垂直排列
+        alignItems: "flex-start", // 將元素靠上排列
+        justifyContent: "flex-start", // 垂直方向靠上
         width: "100%",
-        textAlign: "center",
+        textAlign: "left", // 文字靠左
         background: "#4b5c66",
         color: "white",
         lineHeight: 1.5,
-        padding: "15px 0",
+        padding: "15px",
         fontFamily: "'Poppins', sans-serif",
-        height: "17.1%%"
+        height: "auto",
       }}
     >
       <p>&emsp;</p>
