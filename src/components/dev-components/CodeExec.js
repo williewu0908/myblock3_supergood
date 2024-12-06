@@ -1,52 +1,76 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { IconButton } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import styles from '@/components/dev-components/CodeExec.module.css';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from "react";
+import { IconButton } from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import styles from "@/components/dev-components/CodeExec.module.css";
 
 const CodeExec = forwardRef((props, ref) => {
     const [isCodeAvailable, setIsCodeAvailable] = useState(false);
     const [output, setOutput] = useState("");
+    const [error, setError] = useState(""); // 新增 error 状态来保存错误信息
+    const [pyodide, setPyodide] = useState(null);
 
-    // 載入 Skulpt 庫的函數
-    const loadSkulpt = () => {
-        const loadScript = (src) =>
-            new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.async = true;
-                script.onload = resolve;
-                script.onerror = reject;
-                document.body.appendChild(script);
-            });
+    // 初始化 Pyodide
+    useEffect(() => {
+        const loadPyodide = async () => {
+            try {
+                const pyodideModule = await fetch(
+                    "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
+                )
+                    .then((res) => res.text())
+                    .then((scriptContent) => {
+                        const script = document.createElement("script");
+                        script.type = "text/javascript";
+                        script.textContent = scriptContent;
+                        document.body.appendChild(script);
+                        return window.loadPyodide;
+                    });
 
-        return Promise.all([
-            loadScript('https://cdn.jsdelivr.net/gh/skulpt/skulpt-dist/skulpt.min.js'),
-            loadScript('https://cdn.jsdelivr.net/gh/skulpt/skulpt-dist/skulpt-stdlib.js')
-        ]);
-    };
+                const pyodideInstance = await pyodideModule({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/",
+                });
 
-    // 獲取 IndexedDB 中的 Python 代碼
+                setPyodide(pyodideInstance);
+                console.log("Pyodide 已成功加載");
+
+                // 設置 stdout 捕獲
+                pyodideInstance.setStdout({
+                    batched: (msg) => {
+                        setOutput((prevOutput) => prevOutput + msg + "\n");
+                    },
+                });
+
+            } catch (error) {
+                console.error("加載 Pyodide 失敗:", error);
+                setError(`加載 Pyodide 失敗: ${error.message}`); // 设置错误信息
+            }
+        };
+
+        loadPyodide();
+    }, []);
+
+
+    // 從 IndexedDB 獲取 Python 代碼
     const getPythonCodeFromIndexedDB = async () => {
         return new Promise((resolve, reject) => {
-            const openRequest = indexedDB.open('codeDatabase', 1);
+            const openRequest = indexedDB.open("codeDatabase", 1);
 
             openRequest.onupgradeneeded = (event) => {
                 const db = event.target.result;
-                if (!db.objectStoreNames.contains('codeStore')) {
-                    db.createObjectStore('codeStore', { keyPath: 'id' });
+                if (!db.objectStoreNames.contains("codeStore")) {
+                    db.createObjectStore("codeStore", { keyPath: "id" });
                 }
             };
 
             openRequest.onerror = (event) => {
-                console.error('開啟資料庫錯誤:', event.target.errorCode);
+                console.error("開啟資料庫錯誤:", event.target.errorCode);
                 reject(event.target.errorCode);
             };
 
             openRequest.onsuccess = (event) => {
                 const db = event.target.result;
-                const transaction = db.transaction(['codeStore'], 'readonly');
-                const store = transaction.objectStore('codeStore');
-                const getRequest = store.get('python_code');
+                const transaction = db.transaction(["codeStore"], "readonly");
+                const store = transaction.objectStore("codeStore");
+                const getRequest = store.get("python_code");
 
                 getRequest.onsuccess = () => {
                     if (getRequest.result) {
@@ -57,91 +81,62 @@ const CodeExec = forwardRef((props, ref) => {
                 };
 
                 getRequest.onerror = () => {
-                    console.error('獲取代碼錯誤:', getRequest.error);
+                    console.error("獲取代碼錯誤:", getRequest.error);
                     reject(getRequest.error);
                 };
             };
         });
     };
 
-    async function checkCodeAvailability() {
+    // 檢查是否有代碼
+    const checkCodeAvailability = async () => {
         const code = await getPythonCodeFromIndexedDB();
-        setIsCodeAvailable(code.trim() !== ""); // 檢查是否有代碼
-    }
+        setIsCodeAvailable(code.trim() !== "");
+    };
 
+    // 初始化代碼可用性檢查
     useEffect(() => {
-        // 一秒後載入 Skulpt
-        const skulptTimeout = setTimeout(() => {
-            loadSkulpt()
-                .then(() => {
-                    console.log('Skulpt 已載入');
-                })
-                .catch((error) => {
-                    console.error('載入 Skulpt 失敗:', error);
-                });
-        }, 1000); // 延遲 1 秒
-    
         const handleCheckCodeAvailabilityTrigger = () => {
             checkCodeAvailability();
         };
-    
-        // 監聽 pythonEditor 的改變
-        window.addEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
-    
-        // 初始檢查代碼可用性
+
+        window.addEventListener(
+            "checkCodeAvailabilityTrigger",
+            handleCheckCodeAvailabilityTrigger
+        );
+
         checkCodeAvailability();
-    
+
         return () => {
-            // 清除事件監聽和定時器
-            window.removeEventListener('checkCodeAvailabilityTrigger', handleCheckCodeAvailabilityTrigger);
-            clearTimeout(skulptTimeout);
+            window.removeEventListener(
+                "checkCodeAvailabilityTrigger",
+                handleCheckCodeAvailabilityTrigger
+            );
         };
     }, []);
-    
 
+    // 執行 Python 代碼
     const runPythonCode = async () => {
         const code = await getPythonCodeFromIndexedDB();
-        console.log('Code to Execute: ' + code);
+        console.log("執行的代碼:", code);
         setOutput(""); // 清空輸出
+        setError(""); // 清空錯誤
 
-        // 配置 Skulpt 的輸出函數
-        function outf(text) {
-            setOutput((prevOutput) => prevOutput + text);
+        if (!pyodide) {
+            setError("Pyodide 尚未加載完成，請稍後再試。");
+            return;
         }
 
-        function builtinRead(file) {
-            if (Sk.builtinFiles === undefined || Sk.builtinFiles.files[file] === undefined) {
-                throw "File not found: '" + file + "'";
-            }
-            return Sk.builtinFiles.files[file];
-        }
-
-        // 確認 Skulpt 已經載入後再配置
-        if (window.Sk) {
-            window.Sk.configure({
-                output: outf,
-                read: builtinRead,
-                __future__: window.Sk.python3,
-            });
-
-            try {
-                const myPromise = window.Sk.misceval.asyncToPromise(() =>
-                    window.Sk.importMainWithBody("<stdin>", false, code, true)
-                );
-
-                await myPromise;
-                console.log("執行成功");
-            } catch (err) {
-                console.error("執行錯誤:", err.toString());
-                setOutput(<span style={{ color: 'red' }}>{err.toString()}</span>);
-            }
+        try {
+            await pyodide.runPythonAsync(code);
+        } catch (error) {
+            setError(`錯誤: ${error.message || "未知錯誤"}`); // 捕获并显示错误
         }
     };
 
-    // 使用 useImperativeHandle 暴露方法
+    // 暴露方法給父組件
     useImperativeHandle(ref, () => ({
         getPythonCodeFromIndexedDB,
-        // checkCodeAvailability,
         runPythonCode,
     }));
 
@@ -152,7 +147,7 @@ const CodeExec = forwardRef((props, ref) => {
                 <IconButton
                     aria-label="play"
                     size="large"
-                    sx={{ color: '#a55b6d' }}
+                    sx={{ color: "#a55b6d" }}
                     onClick={runPythonCode}
                     disabled={!isCodeAvailable}
                 >
@@ -161,14 +156,16 @@ const CodeExec = forwardRef((props, ref) => {
             </div>
             <pre
                 id={styles.DisplayResult}
-                style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
+                style={{
+                    whiteSpace: "pre-wrap",
+                    wordWrap: "break-word",
+                    color: error ? "red" : "inherit", // 如果有錯誤，顯示為紅色
+                }}
             >
-                {output}
+                {error || output} {/* 如果有錯誤信息則顯示錯誤，否則顯示正常輸出 */}
             </pre>
-            <div id="mycanvas"></div>
         </div>
     );
 });
-
 
 export default CodeExec;
