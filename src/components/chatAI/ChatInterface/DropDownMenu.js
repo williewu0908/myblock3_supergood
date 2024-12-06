@@ -1,7 +1,7 @@
 import styles from '@/components/chatAI/ChatInterface/DropDownMenu.module.css';
 import Image from 'next/image';
 
-export default function DropDownMenu({ character, model, countTrueValues, onGetModel, onGetCharacter, onGetShowModal}) {
+export default function DropDownMenu({ character, model, countTrueValues, onGetModel, onGetCharacter, onGetShowModal, includeChatHistory, setIncludeChatHistory}) {
     return (
         <nav className="navBox">
             <Image src="/myblock3c/AIchat/media/robot.jpg" width={20} height={20} className={styles.characterTitleImg} alt="robot" />
@@ -35,6 +35,14 @@ export default function DropDownMenu({ character, model, countTrueValues, onGetM
                     </li>
                 </ul>
             </div>
+            <label>
+                <input
+                type="checkbox"
+                checked={includeChatHistory}
+                onChange={() => setIncludeChatHistory(!includeChatHistory)}
+                />
+                包含聊天紀錄
+            </label>
         </nav>
     );
 }
