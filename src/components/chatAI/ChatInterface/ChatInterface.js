@@ -747,6 +747,14 @@ function ChatInterface({ viewState }) {
             {question.label}
           </button>
         ))}
+        <div className={styles.toolbar}>
+          <button
+              onClick={checkSyntaxErrors}
+              className={styles.checkButton}
+          >
+              檢查語法
+          </button>
+        </div>
       </div>
 
       {/* 行號輸入框 */}
@@ -804,14 +812,6 @@ function ChatInterface({ viewState }) {
           <button onClick={() => saveApiKey(userApiKeyInput)}>保存</button>
         </div>
       )}
-      <div className={styles.toolbar}>
-          <button
-              onClick={checkSyntaxErrors}
-              className={styles.checkButton}
-          >
-              檢查語法
-          </button>
-      </div>
 
       <form id={styles.chatform} onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
