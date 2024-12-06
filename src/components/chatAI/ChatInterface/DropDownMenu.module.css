@@ -175,7 +175,7 @@
 }
 
 #Delete {
-    color: darkred;
+    color: darkred !important;;
     cursor: pointer;
 }
 
