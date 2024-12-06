@@ -294,10 +294,10 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                 <Toolbar sx={{ p: 0, m: 0 }}>
                     <Box sx={{ flexGrow: 1, display: 'flex', height: 52, float: 'left', flexDirection: 'column', justifyContent: 'center' }}>
                         <Typography variant="h1" component="div" sx={{ fontSize: 26 }}>
-                            myBlock 3
+                            myBlock3
                         </Typography>
                         <Typography variant="h6" component="div" sx={{ color: 'rgb(90, 90, 90)', fontSize: 10, paddingTop: 0.5 }}>
-                            利用 AI 來幫您編寫程式碼 v3.10-202401206
+                            利用 AI 來幫您編寫程式碼 v3.11-202401207
                         </Typography>
                     </Box>
                     <Button
