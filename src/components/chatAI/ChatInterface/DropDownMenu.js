@@ -26,6 +26,11 @@ export default function DropDownMenu({ character, model, countTrueValues, onGetM
                         </ul>
                     </li>
 
+                    {/* 刪除對話 */}
+                    <li id={styles.Delete} onClick={() => onGetShowModal()}>
+                        <a href="javascript:void(0);">刪除對話</a>
+                    </li>
+
                     {/* 包含聊天紀錄 */}
                     <li>
                         <label className={styles.checkboxLabel}>
@@ -36,11 +41,6 @@ export default function DropDownMenu({ character, model, countTrueValues, onGetM
                             />
                             包含聊天紀錄
                         </label>
-                    </li>
-
-                    {/* 刪除對話 */}
-                    <li id={styles.Delete} onClick={() => onGetShowModal()}>
-                        <a href="javascript:void(0);">刪除對話</a>
                     </li>
                 </ul>
             </div>

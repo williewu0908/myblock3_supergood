@@ -165,6 +165,22 @@
     transform: scale(1);
 }
 
+.menuList ul li label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+.menuList ul li input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.menuList ul li input[type="checkbox"]:hover {
+    background-color: #f0f0f0;
+}
+
 #Delete {
     color: darkred;
     cursor: pointer;
@@ -202,20 +218,4 @@
     display: flex;
     align-items: center; /* 垂直居中對齊 */
     justify-content: space-between; /* 左右分布 */
-}
-
-.menuList ul li label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 8px 12px;
-}
-
-.menuList ul li input[type="checkbox"] {
-    margin-right: 8px;
-    cursor: pointer;
-}
-
-.menuList ul li input[type="checkbox"]:hover {
-    background-color: #f0f0f0;
 }
