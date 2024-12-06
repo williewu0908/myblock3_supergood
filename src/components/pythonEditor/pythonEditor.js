@@ -166,28 +166,6 @@ function PythonEditor({pythonCode}) {
     const handleChange = (newCode) => {
         const newLineCount = newCode.split('\n').length;
     
-        // 延遲執行，以確保 Enter 動作完成後再取得游標位置和行數
-        setTimeout(() => {
-            const cursorPosition = editorRef.current.getCursorPosition();
-    
-            // 如果行數增加，且游標在新行開頭，確認是 Enter 鍵新增一行
-            if (newLineCount > lineCount && cursorPosition.column === 0) {
-                const previousLineCode = newCode.split('\n')[cursorPosition.row - 1];
-                // console.log(`第 ${cursorPosition.row} 行的程式碼:`, previousLineCode);
-    
-                // 加上提示詞
-                const message = `${previousLineCode}\n請幫我看看這一行的意義與有沒有語法錯誤，並以一句話簡單回應。`;
-    
-                // 檢查請求是否在進行中，若沒有才發送新的請求
-                if (!isRequestPending) {
-                    sendToAI(message, cursorPosition.row);
-                }
-            }
-    
-            // 更新行數
-            setLineCount(newLineCount);
-        }, 0); // 使用 setTimeout 延遲執行
-    
         // 更新程式碼
         setCode(newCode);
         setContextCode(newCode);

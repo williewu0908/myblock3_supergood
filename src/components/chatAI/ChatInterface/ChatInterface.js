@@ -44,6 +44,7 @@ function ChatInterface({ viewState }) {
   const chatLogRef = useRef(null);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [userApiKeyInput, setUserApiKeyInput] = useState('')
+  const [includeChatHistory, setIncludeChatHistory] = useState(false);
 
   const publicKeyPem = `
   -----BEGIN PUBLIC KEY-----
@@ -534,37 +535,29 @@ function ChatInterface({ viewState }) {
   // 發送請求的函數
   const sendQuestionToAI = async (content, includeAllCode = false) => {
     const currentTime = new Date().toLocaleTimeString('it-IT');
-  
     let extractedCode = '';
   
+    // 決定是否提取程式碼
     if (includeAllCode) {
       if (showInputFields?.type === 'singleInt') {
-        // 提取指定行的程式碼
+        // 提取單行程式碼
         const lineNum = parseInt(singleLineInput, 10);
         if (!isNaN(lineNum)) {
           extractedCode = await getCodeFromIndexedDB(lineNum, lineNum); // 單行程式碼
           extractedCode += '\n以下是全部程式碼：\n' + await getAllCodeFromIndexedDB();
         }
-      }
-      else{
+      } else if (showInputFields?.type === 'range') {
+        // 提取範圍內的程式碼
+        const startLineNum = parseInt(startLine, 10);
+        const endLineNum = parseInt(endLine, 10);
+        if (!isNaN(startLineNum) && !isNaN(endLineNum)) {
+          extractedCode = await getCodeFromIndexedDB(startLineNum, endLineNum);
+        }
+      } else {
         // 提取所有程式碼
         extractedCode = await getAllCodeFromIndexedDB();
       }
-    } else if (showInputFields?.type === 'range') {
-      // 提取範圍內的程式碼
-      const startLineNum = parseInt(startLine, 10);
-      const endLineNum = parseInt(endLine, 10);
-      if (!isNaN(startLineNum) && !isNaN(endLineNum)) {
-        extractedCode = await getCodeFromIndexedDB(startLineNum, endLineNum);
-      }
-    } 
-    // else if (showInputFields?.type === 'singleInt') {
-    //   // 提取指定行的程式碼
-    //   const lineNum = parseInt(singleLineInput, 10);
-    //   if (!isNaN(lineNum)) {
-    //     extractedCode = await getCodeFromIndexedDB(lineNum, lineNum); // 單行程式碼
-    //   }
-    // }
+    }
   
     // 用於顯示的內容
     const displayContent = content;
@@ -577,39 +570,37 @@ function ChatInterface({ viewState }) {
     // 更新聊天室（僅顯示用戶的指令）
     const newChatLog = [
       ...chatLog,
-      { role: 'user', content: displayContent, time: currentTime }, // 顯示簡單指令
-      { role: 'assistant', content: 'loading' } // 加載狀態
+      { role: 'user', content: displayContent, time: currentTime },
+      { role: 'assistant', content: 'loading' },
     ];
   
     setChatLog(newChatLog);
     saveChatLog(newChatLog);
   
-    // 發送包含完整內容的請求
+    // 根據 includeChatHistory 判斷是否包含聊天紀錄
     const requestBody = {
-      chatLog: [
-        ...chatLog,
-        { role: 'user', content: fullContent, time: currentTime } // 發送完整內容
-      ],
+      chatLog: includeChatHistory ? [...chatLog, { role: 'user', content: fullContent, time: currentTime }] : [{ role: 'user', content: fullContent, time: currentTime }],
       selectedCharacter: character,
-      model: model
+      model: model,
     };
   
     try {
-      const response = await fetch("/myblock3/api/generate-answer", {
-        method: "POST",
+      const response = await fetch('/myblock3/api/generate-answer', {
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
       });
+  
       const data = await response.json();
       const airesponse = data.airesponse;
   
       // 更新聊天室，顯示 AI 回應
       const updatedChatLog = [
         ...chatLog,
-        { role: 'user', content: displayContent, time: currentTime }, // 保持用戶顯示內容
-        { role: 'assistant', content: airesponse }
+        { role: 'user', content: displayContent, time: currentTime },
+        { role: 'assistant', content: airesponse },
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
@@ -618,18 +609,81 @@ function ChatInterface({ viewState }) {
       const updatedChatLog = [
         ...chatLog,
         { role: 'user', content: displayContent, time: currentTime },
-        { role: 'assistant', content: 'Error: Unable to fetch response.' }
+        { role: 'assistant', content: 'Error: Unable to fetch response.' },
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
     }
   };
   
+  
+  const checkSyntaxErrors = async () => {
+      try {
+          // 從 IndexedDB 獲取所有程式碼
+          const allCode = await getAllCodeFromIndexedDB();
+
+          // 如果沒有程式碼，提示用戶
+          if (!allCode) {
+              const updatedChatLog = [
+                  ...chatLog,
+                  { role: 'assistant', content: '目前無任何程式碼可以檢查。' },
+              ];
+              setChatLog(updatedChatLog);
+              saveChatLog(updatedChatLog);
+              return;
+          }
+
+          const currentTime = new Date().toLocaleTimeString('it-IT');
+          const newChatLog = [
+              ...chatLog,
+              { role: 'user', content: '請檢查以下程式碼的語法：\n' + allCode, time: currentTime },
+              { role: 'assistant', content: 'loading' },
+          ];
+          setChatLog(newChatLog);
+          saveChatLog(newChatLog);
+
+          const requestBody = {
+              chatLog: [
+                  { role: 'user', content: `請檢查以下程式碼的語法：\n${allCode}`, time: currentTime },
+              ],
+              selectedCharacter: character,
+              model: model,
+          };
+
+          const response = await fetch("/myblock3/api/generate-answer", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestBody),
+          });
+
+          const data = await response.json();
+          const aiResponse = data.airesponse;
+
+          const updatedChatLog = [
+              ...chatLog,
+              { role: 'user', content: '請檢查以下程式碼的語法：\n' + allCode, time: currentTime },
+              { role: 'assistant', content: aiResponse },
+          ];
+          setChatLog(updatedChatLog);
+          saveChatLog(updatedChatLog);
+      } catch (error) {
+          console.error("Error:", error);
+          const updatedChatLog = [
+              ...chatLog,
+              { role: 'user', content: '請檢查以下程式碼的語法。' },
+              { role: 'assistant', content: 'Error: 檢查語法時發生錯誤。' },
+          ];
+          setChatLog(updatedChatLog);
+          saveChatLog(updatedChatLog);
+      }
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.titleContainer}>
-        <DropDownMenu character={character} model={model} countTrueValues={countTrueValues} onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} />
+        <DropDownMenu character={character} model={model} countTrueValues={countTrueValues} onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} includeChatHistory={includeChatHistory} setIncludeChatHistory={setIncludeChatHistory} />
       </div>
 
       <div id={styles.chatlog} ref={chatLogRef} style={{ width: '100%' }}>
@@ -685,6 +739,14 @@ function ChatInterface({ viewState }) {
             {question.label}
           </button>
         ))}
+        <div className={styles.toolbar}>
+          <button
+              onClick={checkSyntaxErrors}
+              className={styles.checkButton}
+          >
+              檢查語法
+          </button>
+        </div>
       </div>
 
       {/* 行號輸入框 */}
