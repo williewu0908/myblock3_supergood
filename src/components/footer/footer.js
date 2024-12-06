@@ -11,7 +11,7 @@ export default function Footer() {
         lineHeight: 1.5,
         fontFamily: "'Poppins', sans-serif",
         padding: "15px 0",
-        height: "20.6%"
+        height: "17.1%%"
       }}
     >
       <p>&emsp;</p>
