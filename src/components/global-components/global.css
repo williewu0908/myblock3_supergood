@@ -1,24 +1,24 @@
 html, body {
-  height: 100%; /* 設置為 100% 高度，允許頁面根據內容自適應 */
+  height: 1100px;
   margin: 0;
   overflow-y: auto; /* 垂直滾動條 */
 }
-
-#__next {
-  min-height: 100%; /* 使用最小高度以撐滿視窗 */
-  display: flex; /* 使用 Flexbox */
-  flex-direction: column; /* 垂直排列 */
+#__next{
+  height: 100%;
+  margin: 0;
 }
 
 body {
   background-color: #ffffff;
   font-family: sans-serif;
-  margin: 0;
+  overflow: hidden;
 }
 
-.container {
-  flex: 1; /* 主內容區域撐開剩餘空間 */
+.container{
   width: 100%;
+  height: 100%;
+  margin: 0;
+  float: left;
 }
 
 footer {
