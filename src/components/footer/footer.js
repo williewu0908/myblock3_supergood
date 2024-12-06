@@ -9,7 +9,7 @@ export default function Footer() {
         background: "#4b5c66",
         color: "white",
         lineHeight: 1.5,
-        padding: "15px 0",
+        padding: "0px 0",
         fontFamily: "'Poppins', sans-serif",
         height: "17.1%%"
       }}
@@ -27,9 +27,7 @@ export default function Footer() {
       </p>
       <p>© 2008-2025 Power by Po-Hsun Cheng (鄭伯壎) and Li-Wei Chen (陳立偉),</p>
       <p>Information Education Center, National Kaohsiung Normal University, Taiwan.</p>
-      <p style={{ marginBottom: "0", paddingBottom: "15px" }}>
-        Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), XXX-XXX XXX (吳威廷)
-      </p>
+      <p>Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), XXX-XXX XXX (吳威廷)</p>
     </footer>
   );
 }
