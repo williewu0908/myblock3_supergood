@@ -28,7 +28,7 @@ export default function DropDownMenu({ character, model, countTrueValues, onGetM
 
                     {/* 刪除對話 */}
                     <li id={styles.Delete} onClick={() => onGetShowModal()}>
-                        <a href="javascript:void(0);">刪除對話</a>
+                        <a>刪除對話</a>
                     </li>
 
                     {/* 包含聊天紀錄 */}
