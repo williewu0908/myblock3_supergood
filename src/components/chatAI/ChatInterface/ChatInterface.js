@@ -425,8 +425,6 @@ function ChatInterface({ viewState }) {
     const trimmedUserInput = userInput.trim();
     if (!trimmedUserInput) return;
 
-    const encryptedApiKey = localStorage.getItem("encryptedApiKey"); // 取得加密的 API Key
-
     const currentTime = new Date().toLocaleTimeString('it-IT');
     const newChatLog = [
       ...chatLog,
@@ -441,10 +439,6 @@ function ChatInterface({ viewState }) {
       selectedCharacter: character,
       model: model
     };
-
-    if (model !== 'Llama3-8B' && encryptedApiKey) {
-      requestBody.encryptedApiKey = encryptedApiKey; // 僅當模型需要 API Key 時添加
-    }
 
     try {
       const response = await fetch("/myblock3/api/generate-answer", {
@@ -583,6 +577,18 @@ function ChatInterface({ viewState }) {
       selectedCharacter: character,
       model: model,
     };
+
+    // 添加加密的 API Key，僅當模型不是 Llama-3 8B
+    if (model !== 'Llama3-8B') {
+      const encryptedApiKey = localStorage.getItem("encryptedApiKey");
+      if (encryptedApiKey) {
+        requestBody.encryptedApiKey = encryptedApiKey;
+      } else {
+        console.error("加密的 API Key 丟失，請重新輸入。");
+        setShowApiKeyModal(true);
+        return;
+      }
+    }
   
     try {
       const response = await fetch('/myblock3/api/generate-answer', {
