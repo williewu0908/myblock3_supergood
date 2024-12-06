@@ -21,7 +21,7 @@ export default function Index() {
 
   const codeExecRef = useRef();
   const codeEditorRef = useRef();
-  
+
   const handlegenerateXML = (pythonCode) => {
     if (codeEditorRef.current) {
       codeEditorRef.current.generateXML(pythonCode);
@@ -33,13 +33,13 @@ export default function Index() {
       <div className="container">
         <XMLProvider>
           <CodeProvider>
-            <DevNavBar 
-              toggleViewState={toggleViewState} 
+            <DevNavBar
+              toggleViewState={toggleViewState}
               handlegenerateXML={handlegenerateXML}
             />
-            <CodeEditor 
-              viewState={viewState} 
-              codeExecRef={codeExecRef} 
+            <CodeEditor
+              viewState={viewState}
+              codeExecRef={codeExecRef}
               ref={codeEditorRef}
             />
           </CodeProvider>
@@ -47,16 +47,7 @@ export default function Index() {
         <CodeExec ref={codeExecRef} />
       </div>
       <footer
-        style={{
-          display: "block",
-          position: "absolute",
-          width: "100%",
-          textAlign: "center",
-          background: "#4b5c66",
-          color: "white",
-          lineHeight: 1.5,
-          fontFamily: "'Poppins', sans-serif",
-        }}
+        style={{display: "block", position: "fixed", bottom: "0", width: "100%", textAlign: "center", background: "#4b5c66", color: "white", lineHeight: 1.5, fontFamily: "'Poppins', sans-serif", }}
       >
         <p style={{ margin: "15px" }}>&emsp;</p>
         <p style={{ margin: "15px" }}>
