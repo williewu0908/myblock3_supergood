@@ -6,7 +6,7 @@ export default function Footer() {
         display: "block",
         width: "100%",
         textAlign: "center",
-        background: "#4b5c66",
+        background: "#7E92A9",
         color: "white",
         lineHeight: 1.5,
         padding: "1px 0",
@@ -14,7 +14,7 @@ export default function Footer() {
         height: "17.1%%"
       }}
     >
-      <p>&emsp;</p>
+      {/* <p>&emsp;</p> */}
       <p>
         <a style={{ color: "white" }} href="https://sites.google.com/mail.nknu.edu.tw/cph/home">
           🌏HIE Lab | Ⓖ 🚀 Ⓖ | 🛸 Ⓖ | 🚜 Ⓦ&emsp;
@@ -27,7 +27,7 @@ export default function Footer() {
       </p>
       <p>© 2008-2025 Power by Po-Hsun Cheng (鄭伯壎) and Li-Wei Chen (陳立偉),</p>
       <p>Information Education Center, National Kaohsiung Normal University, Taiwan.</p>
-      <p>Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), XXX-XXX XXX (吳威廷)</p>
+      <p>Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), Wei-Ting Wu (吳威廷)</p>
     </footer>
   );
 }
