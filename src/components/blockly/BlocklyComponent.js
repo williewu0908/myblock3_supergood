@@ -150,7 +150,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
         const blocks = converter.convertSource('', newCode);
 
         // 將轉換後的積木加載到工作區
-        // console.log(blocks.xml);
+        console.log(blocks.xml);
         const xml = Blockly.utils.xml.textToDom(blocks.xml);
         Blockly.Xml.domToWorkspace(xml, primaryWorkspace.current);
       } catch (error) {
