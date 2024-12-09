@@ -880,26 +880,28 @@ BlockMirrorTextToBlocks.BLOCKS.push({
     //"extensions": ["math_op_tooltip"]
 });
 
-BlockMirrorTextToBlocks.BLOCKS.push({
-    "type": "ast_BinOp",
-    "message0": "%1 %2 %3",
-    "args0": [
-        { "type": "input_value", "name": "A" },
-        { "type": "field_dropdown", "name": "OP", "options": BINOPS_BLOCKLY_DISPLAY },
-        { "type": "input_value", "name": "B" }
-    ],
-    "inputsInline": true,
-    "output": null,
-    "colour": BlockMirrorTextToBlocks.COLOR.MATH
-    //"extensions": ["math_op_tooltip"]
-});
+// 捨棄ast_BinOp，全部改用ast_BinOpFull
+// BlockMirrorTextToBlocks.BLOCKS.push({
+//     "type": "ast_BinOp",
+//     "message0": "%1 %2 %3",
+//     "args0": [
+//         { "type": "input_value", "name": "A" },
+//         { "type": "field_dropdown", "name": "OP", "options": BINOPS_BLOCKLY_DISPLAY },
+//         { "type": "input_value", "name": "B" }
+//     ],
+//     "inputsInline": true,
+//     "output": null,
+//     "colour": BlockMirrorTextToBlocks.COLOR.MATH
+//     //"extensions": ["math_op_tooltip"]
+// });
 
 BlockMirrorTextToBlocks.prototype['ast_BinOp'] = function (node, parent) {
     let left = node.left;
     let op = node.op.name;
     let right = node.right;
 
-    let blockName = (BINOPS_SIMPLE.indexOf(op) >= 0) ? "ast_BinOp" : 'ast_BinOpFull';
+    // let blockName = (BINOPS_SIMPLE.indexOf(op) >= 0) ? "ast_BinOp" : 'ast_BinOpFull';
+    let blockName = 'ast_BinOpFull';
 
     return BlockMirrorTextToBlocks.create_block(blockName, node.lineno, {
         "OP": op

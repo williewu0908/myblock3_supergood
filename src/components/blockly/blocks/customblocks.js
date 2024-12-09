@@ -3107,40 +3107,41 @@ Blockly.Blocks['ast_AttributeFull'] = {
 
 
 // ast_BinOp
-var BINOPS_SIMPLE = ['Add', 'Sub', 'Mult', 'Div', 'Mod', 'Pow'];
+// var BINOPS_SIMPLE = ['Add', 'Sub', 'Mult', 'Div', 'Mod', 'Pow'];
 var BINOPS_BLOCKLY_DISPLAY_FULL = BlockMirrorTextToBlocks.BINOPS.map(
   binop => [binop[0], binop[1]]
 );
-var BINOPS_BLOCKLY_DISPLAY = BINOPS_BLOCKLY_DISPLAY_FULL.filter(
-  binop => BINOPS_SIMPLE.indexOf(binop[1]) >= 0
-);
+// var BINOPS_BLOCKLY_DISPLAY = BINOPS_BLOCKLY_DISPLAY_FULL.filter(
+//   binop => BINOPS_SIMPLE.indexOf(binop[1]) >= 0
+// );
 
-Blockly.Blocks['ast_BinOp'] = {
-  init: function () {
-    this.jsonInit({
-      "type": "ast_BinOp",
-      "message0": "%1 %2 %3",  // 用来表示操作数和运算符
-      "args0": [
-        {
-          "type": "input_value",  // 输入第一个操作数
-          "name": "A"
-        },
-        {
-          "type": "field_dropdown",  // 下拉菜单选择操作符
-          "name": "OP",
-          "options": BINOPS_BLOCKLY_DISPLAY  // 绑定操作符
-        },
-        {
-          "type": "input_value",  // 输入第二个操作数
-          "name": "B"
-        }
-      ],
-      "inputsInline": true,  // 将所有输入放在一行
-      "output": null,  // 该块输出一个值
-      "colour": BlockMirrorTextToBlocks.COLOR.MATH  // 设置颜色
-    });
-  }
-};
+// 捨棄ast_BinOp，全部改用ast_BinOpFull
+// Blockly.Blocks['ast_BinOp'] = {
+//   init: function () {
+//     this.jsonInit({
+//       "type": "ast_BinOp",
+//       "message0": "%1 %2 %3",  // 用来表示操作数和运算符
+//       "args0": [
+//         {
+//           "type": "input_value",  // 输入第一个操作数
+//           "name": "A"
+//         },
+//         {
+//           "type": "field_dropdown",  // 下拉菜单选择操作符
+//           "name": "OP",
+//           "options": BINOPS_BLOCKLY_DISPLAY  // 绑定操作符
+//         },
+//         {
+//           "type": "input_value",  // 输入第二个操作数
+//           "name": "B"
+//         }
+//       ],
+//       "inputsInline": true,  // 将所有输入放在一行
+//       "output": null,  // 该块输出一个值
+//       "colour": BlockMirrorTextToBlocks.COLOR.MATH  // 设置颜色
+//     });
+//   }
+// };
 
 Blockly.Blocks['ast_BinOpFull'] = {
   init: function () {
