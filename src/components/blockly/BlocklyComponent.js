@@ -123,7 +123,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
       console.log('Workspace is loading. Changes are ignored.');
       return; // 如果正在載入，則退出
     }
-  
+
     const code = pythonGenerator.workspaceToCode(primaryWorkspace.current);
     const xml = Blockly.Xml.workspaceToDom(primaryWorkspace.current);
     saveWorkspaceToIndexedDB(xml);
@@ -150,7 +150,7 @@ const BlocklyComponent = forwardRef((props, ref) => {
         const blocks = converter.convertSource('', newCode);
 
         // 將轉換後的積木加載到工作區
-        // console.log(blocks.xml);
+        console.log(blocks.xml);
         const xml = Blockly.utils.xml.textToDom(blocks.xml);
         Blockly.Xml.domToWorkspace(xml, primaryWorkspace.current);
       } catch (error) {
@@ -302,11 +302,11 @@ const BlocklyComponent = forwardRef((props, ref) => {
         // 當顯示狀態恢復時，重新加載狀態並調整大小
         setTimeout(() => {
           resizeBlocklyWorkspace();
-          loadWorkspaceFromIndexedDB((workspaceXML) => {
-            if (workspaceXML) {
-              restoreWorkspaceState(workspaceXML);
-            }
-          });
+          // loadWorkspaceFromIndexedDB((workspaceXML) => {
+          //   if (workspaceXML) {
+          //     restoreWorkspaceState(workspaceXML);
+          //   }
+          // });
         }, 0);
       }
     }
