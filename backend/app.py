@@ -383,9 +383,9 @@ def handler():
             url = 'http://192.168.194.39:8000/v1/'
             api_key = 'sk-no-require'  # llama3 不需要 API key
         elif model == 'GPT3.5':
-            model = 'gpt-3.5-turbo-0125'
+            model = 'gpt-4o-mini'
         elif model == 'GPT4':
-            model = 'gpt-4o'
+            model = 'gpt-4o-mini'
 
         ai_response = generate_ans(url, api_key, model, chat_log, selected_character)
 
