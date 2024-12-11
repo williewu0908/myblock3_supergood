@@ -27,7 +27,7 @@ export default function Footer() {
       </p>
       <p>© 2008-2025 Power by Po-Hsun Cheng (鄭伯壎) and Li-Wei Chen (陳立偉),</p>
       <p>Information Education Center, National Kaohsiung Normal University, Taiwan.</p>
-      <p>Source: Yu-Kun Tsai (蔡煜堃), XXX-XXX XXX (陳彥宇), Wei-Ting Wu (吳威廷)</p>
+      <p>Source: Yu-Kun Tsai (蔡煜堃), YAN-YU CHEN (陳彥宇), Wei-Ting Wu (吳威廷)</p>
     </footer>
   );
 }
