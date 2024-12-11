@@ -498,7 +498,7 @@ function ChatInterface({ viewState }) {
       const updatedChatLog = [
         ...chatLog,
         { role: 'user', content: trimmedUserInput, time: currentTime },
-        { role: 'assistant', content: 'Error: Unable to fetch response.' }
+        { role: 'assistant', content: 'Error: Unable to fetch response1.' }
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
@@ -641,7 +641,7 @@ function ChatInterface({ viewState }) {
       const updatedChatLog = [
         ...chatLog,
         { role: 'user', content: displayContent, time: currentTime },
-        { role: 'assistant', content: 'Error: Unable to fetch response.' },
+        { role: 'assistant', content: 'Error: Unable to fetch response2.' },
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
