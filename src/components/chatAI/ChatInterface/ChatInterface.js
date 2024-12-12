@@ -729,7 +729,7 @@ function ChatInterface({ viewState }) {
       <div className={styles.titleContainer}>
         <DropDownMenu character={character} model={model} countTrueValues={countTrueValues} onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} includeChatHistory={includeChatHistory} setIncludeChatHistory={setIncludeChatHistory} />
       </div>
-
+      
       <div id={styles.chatlog} ref={chatLogRef} style={{ width: '100%' }}>
         {chatLog.map((content, index) => (
           <div key={index} className={`${styles[`${content.role}ReplyContainer`]}`}>
