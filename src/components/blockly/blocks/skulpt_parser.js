@@ -8581,4 +8581,12 @@ Sk.exportSymbol("Sk.astFromParse", Sk.astFromParse);
 Sk.exportSymbol("Sk.astDump", Sk.astDump);
 Sk.exportSymbol("Sk.INHERITANCE_MAP", Sk.INHERITANCE_MAP);
 
+// 為所有匿名函數設定名稱
+Object.keys(Sk.astnodes).forEach(key => {
+  const func = Sk.astnodes[key];
+  if (typeof func === 'function' && !func.name) {
+    Object.defineProperty(func, 'name', { value: key, configurable: true });
+  }
+});
+
 export default Sk;
