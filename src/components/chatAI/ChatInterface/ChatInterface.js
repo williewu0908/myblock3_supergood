@@ -228,35 +228,44 @@ function ChatInterface({ viewState }) {
   const getCodeFromIndexedDB = async (startLine, endLine) => {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open('codeDatabase', 1);
-
+  
       openRequest.onsuccess = function (event) {
         const db = event.target.result;
         const transaction = db.transaction(['codeStore'], 'readonly');
         const store = transaction.objectStore('codeStore');
         const getRequest = store.get('python_code');
-
+  
         getRequest.onsuccess = function () {
           if (getRequest.result) {
             const codeLines = getRequest.result.code.split('\n');
+  
+            // 檢查行號範圍是否超出有效行數
+            if (startLine > codeLines.length || endLine > codeLines.length) {
+              console.error('行號超出範圍');
+              resolve('提取行號超出範圍，請確認行號是否正確');
+              return;
+            }
+  
             const selectedCode = codeLines.slice(startLine - 1, endLine).join('\n');
             resolve(selectedCode);
           } else {
-            resolve('');
+            resolve(''); // 回傳空字串，表示無程式碼
           }
         };
-
+  
         getRequest.onerror = function () {
           console.error('Error fetching code from IndexedDB:', getRequest.error);
           reject(getRequest.error);
         };
       };
-
+  
       openRequest.onerror = function (event) {
         console.error('Error opening IndexedDB:', event.target.errorCode);
         reject(event.target.errorCode);
       };
     });
   };
+  
 
   const getAllCodeFromIndexedDB = async () => {
     return new Promise((resolve, reject) => {
@@ -441,33 +450,56 @@ function ChatInterface({ viewState }) {
   // 泡泡按鈕點擊處理
   const handleBubbleClick = (question) => {
     if (question.fullText.includes("{int}~{int}")) {
+      // 顯示行號輸入框，等待用戶輸入範圍
       setShowInputFields({ type: "range", fullText: question.fullText });
     } else if (question.fullText.includes("{int}")) {
+      // 顯示單行號輸入框
       setShowInputFields({ type: "singleInt", fullText: question.fullText });
     } else if (question.label === "解釋") {
-      sendQuestionToAI(question.fullText, true); // 包含所有程式碼的請求
+      // 傳送整段程式碼
+      sendQuestionToAI(question.fullText, true);
     } else if (question.fullText.includes("{String}")) {
+      // 顯示文字輸入框
       setShowInputFields({ type: "string", fullText: question.fullText });
     } else {
+      // 傳送其他問題
       sendQuestionToAI(question.fullText);
     }
   };
+  
 
   // 修改確認輸入的函數，不再使用按鈕，而是在點擊容器時發送
   const confirmInputOnContainerClick = async () => {
     if (showInputFields?.type === 'range' && startLine && endLine) {
-      const filledText = showInputFields.fullText.replace('{int}~{int}', `${startLine}~${endLine}`);
-      await sendQuestionToAI(filledText); // 傳送包含行數範圍的問題
-      resetInputs();
+      const startLineNum = parseInt(startLine, 10);
+      const endLineNum = parseInt(endLine, 10);
+  
+      if (!isNaN(startLineNum) && !isNaN(endLineNum)) {
+        const filledText = showInputFields.fullText.replace('{int}~{int}', `${startLineNum}~${endLineNum}`);
+        const extractedCode = await getCodeFromIndexedDB(startLineNum, endLineNum);
+  
+        // 傳送包含行數範圍的問題和程式碼
+        await sendQuestionToAI(`${filledText}\n以下是提取的程式碼：\n${extractedCode}`);
+      }
     } else if (showInputFields?.type === 'singleInt' && singleLineInput) {
-      const filledText = showInputFields.fullText.replace('{int}', singleLineInput);
-      await sendQuestionToAI(filledText, true); // 傳送包含單行的問題
-      resetInputs();
+      const lineNum = parseInt(singleLineInput, 10);
+  
+      if (!isNaN(lineNum)) {
+        const filledText = showInputFields.fullText.replace('{int}', `${lineNum}`);
+        const extractedCode = await getCodeFromIndexedDB(lineNum, lineNum);
+  
+        // 傳送單行的問題和程式碼
+        await sendQuestionToAI(`${filledText}\n以下是提取的程式碼：\n${extractedCode}`);
+      }
     } else if (showInputFields?.type === 'string' && textInput) {
       const filledText = showInputFields.fullText.replace('{String}', textInput);
+  
+      // 傳送包含文字輸入的問題
       await sendQuestionToAI(filledText);
-      resetInputs();
     }
+  
+    // 重置輸入框
+    resetInputs();
   };
 
   const handleCommentLine = (lineNumber) => {
@@ -661,7 +693,7 @@ function ChatInterface({ viewState }) {
       <div className={styles.titleContainer}>
         <DropDownMenu character={character} model={model} countTrueValues={countTrueValues} onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} includeChatHistory={includeChatHistory} setIncludeChatHistory={setIncludeChatHistory} />
       </div>
-      
+
       <div id={styles.chatlog} ref={chatLogRef} style={{ width: '100%' }}>
         {chatLog.map((content, index) => (
           <div key={index} className={`${styles[`${content.role}ReplyContainer`]}`}>
