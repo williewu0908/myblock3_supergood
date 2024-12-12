@@ -119,151 +119,83 @@ function ChatInterface({ viewState }) {
     if (savedCharacter) setCharacter(savedCharacter);
   }, []);
 
-  useEffect(() => {
-    chatLog.forEach((message, index) => {
-        if (message.role === 'assistant' && message.hasAddCodeButton) {
-            const element = document.getElementById(`message-${index}`);
-            if (element) {
-                // 處理三引號與 Markdown 的 ``` 代碼區塊
-                const transformCodeBlocks = (content) => {
-                    // 處理 Markdown 格式的 ```...``` 
-                    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-                    content = content.replace(codeBlockRegex, (match, lang, code) => {
-                        const languageClass = lang ? `class="language-${lang}"` : '';
-                        return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
-                    });
+  // 標註程式碼區塊
+  const CodeBlock = ({ content, language = 'javascript', onAddCode }) => {
+    const codeRef = useRef(null);
+  
+    useEffect(() => {
+      if (codeRef.current) {
+        hljs.highlightElement(codeRef.current); // 高亮程式碼
+      }
+    }, [content]);
+  
+    return (
+      <div style={{ position: 'relative', marginBottom: '16px' }}>
+        <pre>
+          <code ref={codeRef} className={`language-${language}`}>
+            {content}
+          </code>
+        </pre>
+        <CopyButton code={content} />
+        <AddCodeButton code={content} onAddCode={onAddCode} />
+      </div>
+    );
+  };
 
-                    // 處理三引號格式 '''...'''
-                    const tripleQuoteRegex = /'''(\w+)?\n([\s\S]*?)'''/g;
-                    content = content.replace(tripleQuoteRegex, (match, lang, code) => {
-                        const languageClass = lang ? `class="language-${lang}"` : '';
-                        return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
-                    });
+  // 按鈕元件：複製按鈕
+  const CopyButton = ({ code }) => {
+    const [isCopied, setIsCopied] = useState(false);
 
-                    return content;
-                };
-
-                // 轉換訊息內容
-                const transformedContent = transformCodeBlocks(message.content);
-                element.innerHTML = transformedContent;
-
-                // 對每個 <pre><code> 元素進行高亮顯示並添加複製按鈕
-                element.querySelectorAll('pre code').forEach((block, blockIndex) => {
-                    hljs.highlightElement(block);
-
-                    // 創建複製按鈕組件
-                    const CopyButton = () => {
-                        const [isCopied, setIsCopied] = useState(false);
-
-                        const handleCopy = () => {
-                            navigator.clipboard.writeText(block.innerText)
-                                .then(() => {
-                                    setIsCopied(true);
-                                    setTimeout(() => setIsCopied(false), 2000);
-                                })
-                                .catch(err => console.error('複製失敗', err));
-                        };
-
-                        return (
-                            <IconButton
-                                aria-label="copy"
-                                size="small"
-                                onClick={handleCopy}
-                                style={{
-                                    position: 'absolute',
-                                    top: '8px',
-                                    right: '8px',
-                                    backgroundColor: 'transparent',
-                                }}
-                            >
-                                {isCopied ?
-                                    <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} /> :
-                                    <ContentCopyIcon fontSize="inherit" />
-                                }
-                            </IconButton>
-                        );
-                    };
-
-                    const preBlock = block.closest('pre');
-                    if (preBlock) {
-                        preBlock.style.position = 'relative';
-
-                        // 創建「加進程式碼」按鈕
-                        const AddCodeButton = () => {
-                            const handleAddCode = async () => {
-                                try {
-                                    await addCodeToIndexedDB(block.innerText, message.positionRow); // 替換指定行
-                                } catch (error) {
-                                    console.error('無法替代程式碼：', error);
-                                }
-                            };
-
-                            return (
-                                <button
-                                    style={{
-                                        marginTop: '8px',
-                                        display: 'block',
-                                        backgroundColor: '#4CAF50',
-                                        color: 'white',
-                                        border: 'none',
-                                        padding: '5px 10px',
-                                        cursor: 'pointer',
-                                        borderRadius: '4px',
-                                    }}
-                                    onClick={handleAddCode}
-                                >
-                                    加進程式碼
-                                </button>
-                            );
-                        };
-
-                        // 創建複製按鈕容器
-                        const copyButtonContainer = document.createElement('div');
-                        copyButtonContainer.id = `copy-button-${index}-${blockIndex}`;
-                        preBlock.appendChild(copyButtonContainer);
-
-                        // 渲染複製按鈕組件
-                        ReactDOM.render(<CopyButton />, copyButtonContainer);
-
-                        // 創建「加進程式碼」按鈕容器
-                        const addButtonContainer = document.createElement('div');
-                        addButtonContainer.style.marginTop = '8px';
-                        addButtonContainer.id = `add-button-${index}-${blockIndex}`;
-                        preBlock.appendChild(addButtonContainer);
-
-                        // 渲染「加進程式碼」按鈕
-                        ReactDOM.render(<AddCodeButton />, addButtonContainer);
-                    }
-                });
-            }
-        }
-
-        // 滾動到最新消息
-        const current = chatLogRef.current;
-        if (current) {
-            current.scrollTo({ top: current.scrollHeight, behavior: 'smooth' });
-        }
-    });
-
-    return () => {
-        chatLog.forEach((message, index) => {
-            const element = document.getElementById(`message-${index}`);
-            if (element) {
-                element.querySelectorAll('pre').forEach((pre, blockIndex) => {
-                    const container = document.getElementById(`copy-button-${index}-${blockIndex}`);
-                    const container2 = document.getElementById(`add-button-${index}-${blockIndex}`);
-                    if (container) {
-                        ReactDOM.unmountComponentAtNode(container);
-                    }
-                    if (container2) {
-                        ReactDOM.unmountComponentAtNode(container2);
-                    }
-                });
-            }
-        });
+    const handleCopy = () => {
+      navigator.clipboard.writeText(code)
+        .then(() => {
+          setIsCopied(true);
+          setTimeout(() => setIsCopied(false), 2000);
+        })
+        .catch(err => console.error('複製失敗:', err));
     };
-}, [chatLog]);
 
+    return (
+      <IconButton
+        aria-label="copy"
+        size="small"
+        onClick={handleCopy}
+        style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: 'transparent' }}
+      >
+        {isCopied ? (
+          <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} />
+        ) : (
+          <ContentCopyIcon fontSize="inherit" />
+        )}
+      </IconButton>
+    );
+  };
+
+  // 按鈕元件：加進程式碼按鈕
+  const AddCodeButton = ({ code, onAddCode }) => (
+    <button
+      style={{
+        marginTop: '8px',
+        display: 'block',
+        backgroundColor: '#4CAF50',
+        color: 'white',
+        border: 'none',
+        padding: '5px 10px',
+        cursor: 'pointer',
+        borderRadius: '4px',
+      }}
+      onClick={() => onAddCode(code)}
+    >
+      加進程式碼
+    </button>
+  );
+
+  // 程式碼高亮
+  useEffect(() => {
+    if (chatLogRef.current) {
+      chatLogRef.current.scrollTo({ top: chatLogRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  }, [chatLog]);
 
   useEffect(() => {
       const handlePythonEditorResponse = (event) => {
@@ -729,7 +661,7 @@ function ChatInterface({ viewState }) {
       <div className={styles.titleContainer}>
         <DropDownMenu character={character} model={model} countTrueValues={countTrueValues} onGetModel={handleModel} onGetCharacter={handleCharacter} onGetShowModal={handleModal} includeChatHistory={includeChatHistory} setIncludeChatHistory={setIncludeChatHistory} />
       </div>
-
+      
       <div id={styles.chatlog} ref={chatLogRef} style={{ width: '100%' }}>
         {chatLog.map((content, index) => (
           <div key={index} className={`${styles[`${content.role}ReplyContainer`]}`}>
@@ -740,32 +672,11 @@ function ChatInterface({ viewState }) {
               </div>
             )}
             <div className={`${styles[`${content.role}Reply`]} ${styles.chatCard}`}>
-                {content.content === 'loading' ? (
-                    <div className={styles.loadingIcon}>
-                        <FontAwesomeIcon icon={faSpinner} spin />
-                    </div>
-                ) : (
-                    <>
-                        <pre className={styles.message} id={`message-${index}`} dangerouslySetInnerHTML={{ __html: content.content }} style={{ width: '100%', whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}></pre>
-                        {content.hasCommentButton && (
-                            <button
-                                onClick={() => handleCommentLine(content.positionRow)} // 點擊後呼叫函數
-                                style={{
-                                    marginTop: '8px',
-                                    display: 'block',
-                                    backgroundColor: '#4CAF50',
-                                    color: 'white',
-                                    border: 'none',
-                                    padding: '5px 10px',
-                                    cursor: 'pointer',
-                                    borderRadius: '4px',
-                                }}
-                            >
-                                註解此行
-                            </button>
-                        )}
-                    </>
-                )}
+              {content.role === 'assistant' && content.hasAddCodeButton ? (
+                <CodeBlock content={content.content} language="javascript" onAddCode={addCodeToIndexedDB} />
+              ) : (
+                <p>{content.content}</p>
+              )}
             </div>
             {content.time && <div className={styles.time}>{content.time}</div>}
           </div>
