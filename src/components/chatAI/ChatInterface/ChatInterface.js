@@ -119,83 +119,151 @@ function ChatInterface({ viewState }) {
     if (savedCharacter) setCharacter(savedCharacter);
   }, []);
 
-  // 標註程式碼區塊
-  const CodeBlock = ({ content, language = 'javascript', onAddCode }) => {
-    const codeRef = useRef(null);
-  
-    useEffect(() => {
-      if (codeRef.current) {
-        hljs.highlightElement(codeRef.current); // 高亮程式碼
-      }
-    }, [content]);
-  
-    return (
-      <div style={{ position: 'relative', marginBottom: '16px' }}>
-        <pre>
-          <code ref={codeRef} className={`language-${language}`}>
-            {content}
-          </code>
-        </pre>
-        <CopyButton code={content} />
-        <AddCodeButton code={content} onAddCode={onAddCode} />
-      </div>
-    );
-  };
-
-  // 按鈕元件：複製按鈕
-  const CopyButton = ({ code }) => {
-    const [isCopied, setIsCopied] = useState(false);
-
-    const handleCopy = () => {
-      navigator.clipboard.writeText(code)
-        .then(() => {
-          setIsCopied(true);
-          setTimeout(() => setIsCopied(false), 2000);
-        })
-        .catch(err => console.error('複製失敗:', err));
-    };
-
-    return (
-      <IconButton
-        aria-label="copy"
-        size="small"
-        onClick={handleCopy}
-        style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: 'transparent' }}
-      >
-        {isCopied ? (
-          <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} />
-        ) : (
-          <ContentCopyIcon fontSize="inherit" />
-        )}
-      </IconButton>
-    );
-  };
-
-  // 按鈕元件：加進程式碼按鈕
-  const AddCodeButton = ({ code, onAddCode }) => (
-    <button
-      style={{
-        marginTop: '8px',
-        display: 'block',
-        backgroundColor: '#4CAF50',
-        color: 'white',
-        border: 'none',
-        padding: '5px 10px',
-        cursor: 'pointer',
-        borderRadius: '4px',
-      }}
-      onClick={() => onAddCode(code)}
-    >
-      加進程式碼
-    </button>
-  );
-
-  // 程式碼高亮
   useEffect(() => {
-    if (chatLogRef.current) {
-      chatLogRef.current.scrollTo({ top: chatLogRef.current.scrollHeight, behavior: 'smooth' });
-    }
-  }, [chatLog]);
+    chatLog.forEach((message, index) => {
+        if (message.role === 'assistant' && message.hasAddCodeButton) {
+            const element = document.getElementById(`message-${index}`);
+            if (element) {
+                // 處理三引號與 Markdown 的 ``` 代碼區塊
+                const transformCodeBlocks = (content) => {
+                    // 處理 Markdown 格式的 ```...``` 
+                    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+                    content = content.replace(codeBlockRegex, (match, lang, code) => {
+                        const languageClass = lang ? `class="language-${lang}"` : '';
+                        return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
+                    });
+
+                    // 處理三引號格式 '''...'''
+                    const tripleQuoteRegex = /'''(\w+)?\n([\s\S]*?)'''/g;
+                    content = content.replace(tripleQuoteRegex, (match, lang, code) => {
+                        const languageClass = lang ? `class="language-${lang}"` : '';
+                        return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
+                    });
+
+                    return content;
+                };
+
+                // 轉換訊息內容
+                const transformedContent = transformCodeBlocks(message.content);
+                element.innerHTML = transformedContent;
+
+                // 對每個 <pre><code> 元素進行高亮顯示並添加複製按鈕
+                element.querySelectorAll('pre code').forEach((block, blockIndex) => {
+                    hljs.highlightElement(block);
+
+                    // 創建複製按鈕組件
+                    const CopyButton = () => {
+                        const [isCopied, setIsCopied] = useState(false);
+
+                        const handleCopy = () => {
+                            navigator.clipboard.writeText(block.innerText)
+                                .then(() => {
+                                    setIsCopied(true);
+                                    setTimeout(() => setIsCopied(false), 2000);
+                                })
+                                .catch(err => console.error('複製失敗', err));
+                        };
+
+                        return (
+                            <IconButton
+                                aria-label="copy"
+                                size="small"
+                                onClick={handleCopy}
+                                style={{
+                                    position: 'absolute',
+                                    top: '8px',
+                                    right: '8px',
+                                    backgroundColor: 'transparent',
+                                }}
+                            >
+                                {isCopied ?
+                                    <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} /> :
+                                    <ContentCopyIcon fontSize="inherit" />
+                                }
+                            </IconButton>
+                        );
+                    };
+
+                    const preBlock = block.closest('pre');
+                    if (preBlock) {
+                        preBlock.style.position = 'relative';
+
+                        // 創建「加進程式碼」按鈕
+                        const AddCodeButton = () => {
+                            const handleAddCode = async () => {
+                                try {
+                                    await addCodeToIndexedDB(block.innerText, message.positionRow); // 替換指定行
+                                } catch (error) {
+                                    console.error('無法替代程式碼：', error);
+                                }
+                            };
+
+                            return (
+                                <button
+                                    style={{
+                                        marginTop: '8px',
+                                        display: 'block',
+                                        backgroundColor: '#4CAF50',
+                                        color: 'white',
+                                        border: 'none',
+                                        padding: '5px 10px',
+                                        cursor: 'pointer',
+                                        borderRadius: '4px',
+                                    }}
+                                    onClick={handleAddCode}
+                                >
+                                    加進程式碼
+                                </button>
+                            );
+                        };
+
+                        // 創建複製按鈕容器
+                        const copyButtonContainer = document.createElement('div');
+                        copyButtonContainer.id = `copy-button-${index}-${blockIndex}`;
+                        preBlock.appendChild(copyButtonContainer);
+
+                        // 渲染複製按鈕組件
+                        ReactDOM.render(<CopyButton />, copyButtonContainer);
+
+                        // 創建「加進程式碼」按鈕容器
+                        const addButtonContainer = document.createElement('div');
+                        addButtonContainer.style.marginTop = '8px';
+                        addButtonContainer.id = `add-button-${index}-${blockIndex}`;
+                        preBlock.appendChild(addButtonContainer);
+
+                        // 渲染「加進程式碼」按鈕
+                        ReactDOM.render(<AddCodeButton />, addButtonContainer);
+                    }
+                });
+            }
+        }
+
+        // 滾動到最新消息
+        const current = chatLogRef.current;
+        if (current) {
+            current.scrollTo({ top: current.scrollHeight, behavior: 'smooth' });
+        }
+    });
+
+    return () => {
+        chatLog.forEach((message, index) => {
+            const element = document.getElementById(`message-${index}`);
+            if (element) {
+                element.querySelectorAll('pre').forEach((pre, blockIndex) => {
+                    const container = document.getElementById(`copy-button-${index}-${blockIndex}`);
+                    const container2 = document.getElementById(`add-button-${index}-${blockIndex}`);
+                    if (container) {
+                        ReactDOM.unmountComponentAtNode(container);
+                    }
+                    if (container2) {
+                        ReactDOM.unmountComponentAtNode(container2);
+                    }
+                });
+            }
+        });
+    };
+}, [chatLog]);
+
 
   useEffect(() => {
       const handlePythonEditorResponse = (event) => {
@@ -228,44 +296,35 @@ function ChatInterface({ viewState }) {
   const getCodeFromIndexedDB = async (startLine, endLine) => {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open('codeDatabase', 1);
-  
+
       openRequest.onsuccess = function (event) {
         const db = event.target.result;
         const transaction = db.transaction(['codeStore'], 'readonly');
         const store = transaction.objectStore('codeStore');
         const getRequest = store.get('python_code');
-  
+
         getRequest.onsuccess = function () {
           if (getRequest.result) {
             const codeLines = getRequest.result.code.split('\n');
-  
-            // 檢查行號範圍是否超出有效行數
-            if (startLine > codeLines.length || endLine > codeLines.length) {
-              console.error('行號超出範圍');
-              resolve('提取行號超出範圍，請確認行號是否正確');
-              return;
-            }
-  
             const selectedCode = codeLines.slice(startLine - 1, endLine).join('\n');
             resolve(selectedCode);
           } else {
-            resolve(''); // 回傳空字串，表示無程式碼
+            resolve('');
           }
         };
-  
+
         getRequest.onerror = function () {
           console.error('Error fetching code from IndexedDB:', getRequest.error);
           reject(getRequest.error);
         };
       };
-  
+
       openRequest.onerror = function (event) {
         console.error('Error opening IndexedDB:', event.target.errorCode);
         reject(event.target.errorCode);
       };
     });
   };
-  
 
   const getAllCodeFromIndexedDB = async () => {
     return new Promise((resolve, reject) => {
@@ -450,56 +509,33 @@ function ChatInterface({ viewState }) {
   // 泡泡按鈕點擊處理
   const handleBubbleClick = (question) => {
     if (question.fullText.includes("{int}~{int}")) {
-      // 顯示行號輸入框，等待用戶輸入範圍
       setShowInputFields({ type: "range", fullText: question.fullText });
     } else if (question.fullText.includes("{int}")) {
-      // 顯示單行號輸入框
       setShowInputFields({ type: "singleInt", fullText: question.fullText });
     } else if (question.label === "解釋") {
-      // 傳送整段程式碼
-      sendQuestionToAI(question.fullText, true);
+      sendQuestionToAI(question.fullText, true); // 包含所有程式碼的請求
     } else if (question.fullText.includes("{String}")) {
-      // 顯示文字輸入框
       setShowInputFields({ type: "string", fullText: question.fullText });
     } else {
-      // 傳送其他問題
       sendQuestionToAI(question.fullText);
     }
   };
-  
 
   // 修改確認輸入的函數，不再使用按鈕，而是在點擊容器時發送
   const confirmInputOnContainerClick = async () => {
     if (showInputFields?.type === 'range' && startLine && endLine) {
-      const startLineNum = parseInt(startLine, 10);
-      const endLineNum = parseInt(endLine, 10);
-  
-      if (!isNaN(startLineNum) && !isNaN(endLineNum)) {
-        const filledText = showInputFields.fullText.replace('{int}~{int}', `${startLineNum}~${endLineNum}`);
-        const extractedCode = await getCodeFromIndexedDB(startLineNum, endLineNum);
-  
-        // 傳送包含行數範圍的問題和程式碼
-        await sendQuestionToAI(`${filledText}\n以下是提取的程式碼：\n${extractedCode}`);
-      }
+      const filledText = showInputFields.fullText.replace('{int}~{int}', `${startLine}~${endLine}`);
+      await sendQuestionToAI(filledText); // 傳送包含行數範圍的問題
+      resetInputs();
     } else if (showInputFields?.type === 'singleInt' && singleLineInput) {
-      const lineNum = parseInt(singleLineInput, 10);
-  
-      if (!isNaN(lineNum)) {
-        const filledText = showInputFields.fullText.replace('{int}', `${lineNum}`);
-        const extractedCode = await getCodeFromIndexedDB(lineNum, lineNum);
-  
-        // 傳送單行的問題和程式碼
-        await sendQuestionToAI(`${filledText}\n以下是提取的程式碼：\n${extractedCode}`);
-      }
+      const filledText = showInputFields.fullText.replace('{int}', singleLineInput);
+      await sendQuestionToAI(filledText, true); // 傳送包含單行的問題
+      resetInputs();
     } else if (showInputFields?.type === 'string' && textInput) {
       const filledText = showInputFields.fullText.replace('{String}', textInput);
-  
-      // 傳送包含文字輸入的問題
       await sendQuestionToAI(filledText);
+      resetInputs();
     }
-  
-    // 重置輸入框
-    resetInputs();
   };
 
   const handleCommentLine = (lineNumber) => {
@@ -704,11 +740,32 @@ function ChatInterface({ viewState }) {
               </div>
             )}
             <div className={`${styles[`${content.role}Reply`]} ${styles.chatCard}`}>
-              {content.role === 'assistant' && content.hasAddCodeButton ? (
-                <CodeBlock content={content.content} language="javascript" onAddCode={addCodeToIndexedDB} />
-              ) : (
-                <p>{content.content}</p>
-              )}
+                {content.content === 'loading' ? (
+                    <div className={styles.loadingIcon}>
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                    </div>
+                ) : (
+                    <>
+                        <pre className={styles.message} id={`message-${index}`} dangerouslySetInnerHTML={{ __html: content.content }} style={{ width: '100%', whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}></pre>
+                        {content.hasCommentButton && (
+                            <button
+                                onClick={() => handleCommentLine(content.positionRow)} // 點擊後呼叫函數
+                                style={{
+                                    marginTop: '8px',
+                                    display: 'block',
+                                    backgroundColor: '#4CAF50',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '5px 10px',
+                                    cursor: 'pointer',
+                                    borderRadius: '4px',
+                                }}
+                            >
+                                註解此行
+                            </button>
+                        )}
+                    </>
+                )}
             </div>
             {content.time && <div className={styles.time}>{content.time}</div>}
           </div>
