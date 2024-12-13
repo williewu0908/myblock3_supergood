@@ -124,24 +124,32 @@ function ChatInterface({ viewState }) {
         if (message.role === 'assistant' && message.hasAddCodeButton) {
             const element = document.getElementById(`message-${index}`);
             if (element) {
-                // 處理三引號與 Markdown 的 ``` 代碼區塊
-                // const transformCodeBlocks = (content) => {
-                //     // 處理 Markdown 格式的 ```...``` 
-                //     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-                //     content = content.replace(codeBlockRegex, (match, lang, code) => {
-                //         const languageClass = lang ? `class="language-${lang}"` : '';
-                //         return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
-                //     });
+                const transformCodeBlocks = (content) => {
+                    // 處理 Markdown 格式的 ```...``` 
+                    const codeBlockPythonRegex = /```python(\w+)?\n([\s\S]*?)```/g;
+                    content = content.replace(codeBlockPythonRegex, (match, lang, code) => {
+                        return `<pre><code class="language-python">${code.trim()}</code></pre>`;
+                    });
 
-                //     // 處理三引號格式 '''...'''
-                //     const tripleQuoteRegex = /'''(\w+)?\n([\s\S]*?)'''/g;
-                //     content = content.replace(tripleQuoteRegex, (match, lang, code) => {
-                //         const languageClass = lang ? `class="language-${lang}"` : '';
-                //         return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
-                //     });
-
-                //     return content;
-                // };
+                    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+                    content = content.replace(codeBlockRegex, (match, lang, code) => {
+                        return `<pre><code class="language-python">${code.trim()}</code></pre>`;
+                    });
+                
+                    // 處理三引號格式 '''...'''
+                    const tripleQuoteRegex = /`(\w+)?\n([\s\S]*?)`/g;
+                    content = content.replace(tripleQuoteRegex, (match, lang, code) => {
+                        return `<pre><code class="language-python">${code.trim()}</code></pre>`;
+                    });
+                
+                    // 處理原生的 <pre><code> 區塊
+                    const preCodeRegex = /<pre><code>([\s\S]*?)<\/code><\/pre>/g;
+                    content = content.replace(preCodeRegex, (match, code) => {
+                        return `<pre><code class="language-python">${code.trim()}</code></pre>`;
+                    });
+                
+                    return content;
+                };
 
                 // 轉換訊息內容
                 const transformedContent = transformCodeBlocks(message.content);
