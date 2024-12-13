@@ -497,7 +497,7 @@ function ChatInterface({ viewState }) {
       const updatedChatLog = [
         ...chatLog,
         { role: 'user', content: trimmedUserInput, time: currentTime },
-        { role: 'assistant', content: airesponse , hasAddCodeButton: true}
+        { role: 'assistant', content: airesponse}
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
@@ -640,7 +640,7 @@ function ChatInterface({ viewState }) {
       const updatedChatLog = [
         ...chatLog,
         { role: 'user', content: displayContent, time: currentTime },
-        { role: 'assistant', content: airesponse , hasAddCodeButton: true},
+        { role: 'assistant', content: airesponse},
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
@@ -716,7 +716,7 @@ function ChatInterface({ viewState }) {
           const updatedChatLog = [
               ...chatLog,
               { role: 'user', content: '請檢查以下程式碼的語法：\n' + allCode, time: currentTime },
-              { role: 'assistant', content: aiResponse , hasAddCodeButton: true},
+              { role: 'assistant', content: aiResponse},
           ];
           setChatLog(updatedChatLog);
           saveChatLog(updatedChatLog);
