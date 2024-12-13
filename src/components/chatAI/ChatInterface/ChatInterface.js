@@ -121,7 +121,7 @@ function ChatInterface({ viewState }) {
 
   useEffect(() => {
     chatLog.forEach((message, index) => {
-        if (message.role === 'assistant' && message.hasAddCodeButton) {
+        if (message.role === 'assistant') {
             const element = document.getElementById(`message-${index}`);
             if (element) {
                 const transformCodeBlocks = (content) => {
