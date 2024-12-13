@@ -121,7 +121,7 @@ function ChatInterface({ viewState }) {
 
   useEffect(() => {
     chatLog.forEach((message, index) => {
-        if (message.role === 'assistant') {
+        if (message.role === 'assistant' && message.hasAddCodeButton) {
             const element = document.getElementById(`message-${index}`);
             if (element) {
                 const transformCodeBlocks = (content) => {
@@ -459,7 +459,7 @@ function ChatInterface({ viewState }) {
     const newChatLog = [
       ...chatLog,
       { role: 'user', content: trimmedUserInput, time: currentTime },
-      { role: 'assistant', content: 'loading' }
+      { role: 'assistant', content: 'loading'}
     ];
     setChatLog(newChatLog);
     saveChatLog(newChatLog);
@@ -497,7 +497,7 @@ function ChatInterface({ viewState }) {
       const updatedChatLog = [
         ...chatLog,
         { role: 'user', content: trimmedUserInput, time: currentTime },
-        { role: 'assistant', content: airesponse }
+        { role: 'assistant', content: airesponse , hasAddCodeButton: true}
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
@@ -640,7 +640,7 @@ function ChatInterface({ viewState }) {
       const updatedChatLog = [
         ...chatLog,
         { role: 'user', content: displayContent, time: currentTime },
-        { role: 'assistant', content: airesponse },
+        { role: 'assistant', content: airesponse , hasAddCodeButton: true},
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
@@ -716,7 +716,7 @@ function ChatInterface({ viewState }) {
           const updatedChatLog = [
               ...chatLog,
               { role: 'user', content: '請檢查以下程式碼的語法：\n' + allCode, time: currentTime },
-              { role: 'assistant', content: aiResponse },
+              { role: 'assistant', content: aiResponse , hasAddCodeButton: true},
           ];
           setChatLog(updatedChatLog);
           saveChatLog(updatedChatLog);
