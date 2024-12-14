@@ -243,7 +243,11 @@ function ChatInterface({ viewState }) {
                         const addButtonContainer = document.createElement('div');
                         addButtonContainer.id = `add-button-${index}-${blockIndex}`;
                         addButtonContainer.style.marginTop = '8px'; // 確保按鈕有適當間距
-                        preBlock.parentNode.insertBefore(addButtonContainer, preBlock.nextSibling); // 插入到 preBlock 之後
+                        try{
+                          preBlock.parentNode.insertBefore(addButtonContainer, preBlock.nextSibling); // 插入到 preBlock 之後
+                        } catch (error) {
+                          console.error('無法附加程式碼：', error);
+                        }
 
                         if (document.body.contains(addButtonContainer)) {
                           ReactDOM.render(<AddCodeButton />, addButtonContainer);
