@@ -126,7 +126,11 @@ function ChatInterface({ viewState }) {
         if (element) {
           // 對每個 <pre><code> 元素進行高亮顯示並添加複製按鈕
           element.querySelectorAll('pre code').forEach((block, blockIndex) => {
-            hljs.highlightElement(block);
+            try {
+              hljs.highlightElement(block);
+            } catch (error) {
+              console.error("Syntax highlighting failed:", error);
+            }
 
             // 為每個代碼塊創建一個獨立的複製按鈕組件
             const CopyButton = () => {
@@ -172,10 +176,9 @@ function ChatInterface({ viewState }) {
               preBlock.appendChild(copyButtonContainer);
 
               // 渲染複製按鈕組件
-              ReactDOM.render(
-                <CopyButton />,
-                copyButtonContainer
-              );
+              if (document.body.contains(copyButtonContainer)) {
+                ReactDOM.render(<CopyButton />, copyButtonContainer);
+              }
             }
           });
         }
@@ -354,7 +357,6 @@ function ChatInterface({ viewState }) {
 //         });
 //     };
 // }, [chatLog]);
-
 
   useEffect(() => {
       const handlePythonEditorResponse = (event) => {
