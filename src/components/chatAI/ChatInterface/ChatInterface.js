@@ -566,7 +566,7 @@ function ChatInterface({ viewState }) {
         if (!isNaN(lineNum)) {
           positionRow1 = lineNum
           extractedCode = await getCodeFromIndexedDB(lineNum, lineNum); // 單行程式碼
-          extractedCode += '\n以下是全部程式碼：\n' + await getAllCodeFromIndexedDB() + '請你提供提取的程式碼的debug建議就好了';
+          extractedCode += '\n以下是全部程式碼：\n' + await getAllCodeFromIndexedDB() + `\n請你提供第 ${positionRow1} 行的程式碼 debug 建議就好了。`;
         }
       } else if (showInputFields?.type === 'range') {
         // 提取範圍內的程式碼
