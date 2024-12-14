@@ -139,32 +139,32 @@ function ChatInterface({ viewState }) {
                   element.querySelectorAll('pre code').forEach((block, blockIndex) => {
                     hljs.highlightElement(block);
                 
-                    const CopyButton = () => {
-                        const handleCopy = () => {
-                            if (!block || !block.innerText) {
-                                console.error('無法複製，block 或內容為空');
-                                return;
-                            }
-                            navigator.clipboard.writeText(block.innerText)
-                                .then(() => console.log('複製成功'))
-                                .catch(err => console.error('複製失敗', err));
-                        };
+                    // const CopyButton = () => {
+                    //     const handleCopy = () => {
+                    //         if (!block || !block.innerText) {
+                    //             console.error('無法複製，block 或內容為空');
+                    //             return;
+                    //         }
+                    //         navigator.clipboard.writeText(block.innerText)
+                    //             .then(() => console.log('複製成功'))
+                    //             .catch(err => console.error('複製失敗', err));
+                    //     };
                 
-                        return (
-                            <button
-                                style={{
-                                    position: 'absolute',
-                                    top: '8px',
-                                    right: '8px',
-                                    backgroundColor: 'transparent',
-                                    cursor: 'pointer',
-                                }}
-                                onClick={handleCopy}
-                            >
-                                複製
-                            </button>
-                        );
-                    };
+                    //     return (
+                    //         <button
+                    //             style={{
+                    //                 position: 'absolute',
+                    //                 top: '8px',
+                    //                 right: '8px',
+                    //                 backgroundColor: 'transparent',
+                    //                 cursor: 'pointer',
+                    //             }}
+                    //             onClick={handleCopy}
+                    //         >
+                    //             複製
+                    //         </button>
+                    //     );
+                    // };
                 
                     const AddCodeButton = () => {
                         const handleAddCode = async () => {
@@ -584,7 +584,7 @@ function ChatInterface({ viewState }) {
     });
   };
   
-  const addCodeToIndexedDB = async (code, replaceLine1 = null, replaceLine1 = null) => {
+  const addCodeToIndexedDB = async (code, replaceLine1 = null, replaceLine2 = null) => {
       return new Promise((resolve, reject) => {
           const openRequest = indexedDB.open('codeDatabase', 1);
 
@@ -795,6 +795,8 @@ function ChatInterface({ viewState }) {
   const sendQuestionToAI = async (content, includeAllCode = false) => {
     const currentTime = new Date().toLocaleTimeString('it-IT');
     let extractedCode = '';
+    const positionRow1 = -1
+    const positionRow2 = -1
   
     // 決定是否提取程式碼
     if (includeAllCode) {
@@ -802,6 +804,7 @@ function ChatInterface({ viewState }) {
         // 提取單行程式碼
         const lineNum = parseInt(singleLineInput, 10);
         if (!isNaN(lineNum)) {
+          positionRow1 = lineNum
           extractedCode = await getCodeFromIndexedDB(lineNum, lineNum); // 單行程式碼
           extractedCode += '\n以下是全部程式碼：\n' + await getAllCodeFromIndexedDB();
         }
@@ -809,6 +812,8 @@ function ChatInterface({ viewState }) {
         // 提取範圍內的程式碼
         const startLineNum = parseInt(startLine, 10);
         const endLineNum = parseInt(endLine, 10);
+        positionRow1 = startLineNum
+        positionRow2 = endLineNum
         if (!isNaN(startLineNum) && !isNaN(endLineNum)) {
           extractedCode = await getCodeFromIndexedDB(startLineNum, endLineNum);
         }
@@ -871,7 +876,12 @@ function ChatInterface({ viewState }) {
       const updatedChatLog = [
         ...chatLog,
         { role: 'user', content: displayContent, time: currentTime },
-        { role: 'assistant', content: airesponse},
+        {
+          role: 'assistant',
+          content: airesponse,
+          ...(positionRow1 !== -1 && { positionRow1 }), // 如果 positionRow1 不是 -1
+          ...(positionRow2 !== -1 && { positionRow2 }), // 如果 positionRow2 不是 -1
+        },
       ];
       setChatLog(updatedChatLog);
       saveChatLog(updatedChatLog);
