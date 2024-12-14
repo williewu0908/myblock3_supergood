@@ -141,8 +141,8 @@ function ChatInterface({ viewState }) {
                 
                     const CopyButton = () => {
                         const handleCopy = () => {
-                            if (!block.innerText) {
-                                console.error('無法複製，block 內容為空');
+                            if (!block || !block.innerText) {
+                                console.error('無法複製，block 或內容為空');
                                 return;
                             }
                             navigator.clipboard.writeText(block.innerText)
@@ -202,8 +202,12 @@ function ChatInterface({ viewState }) {
                         copyButtonContainer.id = `copy-button-${index}-${blockIndex}`;
                         preBlock.appendChild(copyButtonContainer);
                 
-                        const rootCopy = createRoot(copyButtonContainer);
-                        rootCopy.render(<CopyButton />);
+                        if (document.body.contains(copyButtonContainer)) {
+                            const rootCopy = createRoot(copyButtonContainer);
+                            rootCopy.render(<CopyButton />);
+                        } else {
+                            console.error("容器不存在於當前文檔中，無法渲染 CopyButton");
+                        }
                 
                         const addButtonContainer = document.createElement('div');
                         addButtonContainer.style.marginTop = '8px';
@@ -230,12 +234,15 @@ function ChatInterface({ viewState }) {
               const element = document.getElementById(`message-${index}`);
               if (element) {
                   element.querySelectorAll('pre').forEach((pre, blockIndex) => {
-                      const addButtonContainer = document.getElementById(`add-button-${index}-${blockIndex}`);
-                      const replaceButtonContainer = document.getElementById(`replace-button-${index}-${blockIndex}`);
-                      const commentButtonContainer = document.getElementById(`comment-button-${index}`);
-                      if (addButtonContainer) ReactDOM.unmountComponentAtNode(addButtonContainer);
-                      if (replaceButtonContainer) ReactDOM.unmountComponentAtNode(replaceButtonContainer);
-                      if (commentButtonContainer) ReactDOM.unmountComponentAtNode(commentButtonContainer);
+                      const containers = [
+                          `add-button-${index}-${blockIndex}`,
+                          `replace-button-${index}-${blockIndex}`,
+                          `comment-button-${index}`
+                      ];
+                      containers.forEach(containerId => {
+                          const container = document.getElementById(containerId);
+                          if (container) ReactDOM.unmountComponentAtNode(container);
+                      });
                   });
               }
           });
