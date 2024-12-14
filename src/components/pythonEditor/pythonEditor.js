@@ -83,7 +83,7 @@ function PythonEditor({pythonCode}) {
     // 接收到 blockUpdated 事件後，從 IndexedDB 取得 python 程式碼
     useEffect(() => {
         const handleBlockUpdate = async (event) => {
-            console.log('get blockUpdated');
+            // console.log('get blockUpdated');
             if (event.detail.source === 'BlocklyComponent' && !isEditorFocused) {
                 // 只有當編輯器沒有被聚焦時，才從 IndexedDB 取得程式碼
                 const updatedCode = await getPythonCodeFromIndexedDB();
@@ -140,7 +140,7 @@ function PythonEditor({pythonCode}) {
     useEffect(() => {
         const checkIsLoadingAndUpdate = async () => {
             if (localStorage.getItem('isLoading') === 'true') {
-                console.log("isLoading is true, updating code from IndexedDB...");
+                // console.log("isLoading is true, updating code from IndexedDB...");
                 const updatedCode = await getPythonCodeFromIndexedDB();
                 setCode(updatedCode);
                 setContextCode(updatedCode);
@@ -172,7 +172,7 @@ function PythonEditor({pythonCode}) {
         savePythonCodeToIndexedDB(newCode);
         // 觸發CodeExec對indexedDB是否為空的檢查
         window.dispatchEvent(new CustomEvent('checkCodeAvailabilityTrigger'));
-        console.log('codeUpdated:' + newCode);
+        // console.log('codeUpdated:' + newCode);
         window.dispatchEvent(new CustomEvent('codeUpdated', {
             detail: {
                 code: newCode,

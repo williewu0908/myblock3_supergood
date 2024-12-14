@@ -129,7 +129,7 @@ function ChatInterface({ viewState }) {
   useEffect(() => {
       chatLog.forEach((message, index) => {
           if (message.role === 'assistant') {
-              console.log(message);
+              // console.log(message);
               const element = document.getElementById(`message-${index}`);
               if (element) {
                   // 修正內容的標籤格式
@@ -478,7 +478,7 @@ function ChatInterface({ viewState }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log('encryptedApiKey', localStorage.getItem("encryptedApiKey"));
+    // console.log('encryptedApiKey', localStorage.getItem("encryptedApiKey"));
 
     const trimmedUserInput = userInput.trim();
     if (!trimmedUserInput) return;
