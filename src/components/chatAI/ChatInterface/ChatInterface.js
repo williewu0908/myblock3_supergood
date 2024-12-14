@@ -516,7 +516,6 @@ function ChatInterface({ viewState }) {
 
   // 泡泡按鈕點擊處理
   const handleBubbleClick = (question) => {
-    alert('handleBubbleClick')
     if (question.fullText.includes("{int}~{int}")) {
       setShowInputFields({ type: "range", fullText: question.fullText });
     } else if (question.fullText.includes("{int}")) {
@@ -534,6 +533,7 @@ function ChatInterface({ viewState }) {
   const confirmInputOnContainerClick = async () => {
     if (showInputFields?.type === 'range' && startLine && endLine) {
       const filledText = showInputFields.fullText.replace('{int}~{int}', `${startLine}~${endLine}`);
+      alert(filledText);
       await sendQuestionToAI(filledText); // 傳送包含行數範圍的問題
       resetInputs();
     } else if (showInputFields?.type === 'singleInt' && singleLineInput) {
