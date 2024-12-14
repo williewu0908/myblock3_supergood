@@ -119,11 +119,22 @@ function ChatInterface({ viewState }) {
     if (savedCharacter) setCharacter(savedCharacter);
   }, []);
   
+  const fixHTMLCodeBlocks = (content) => {
+    return content
+      .replace(/<code\/><pre\/>/g, '</code></pre>') // 修正閉合標籤
+      .replace(/<pre><code>/g, '<pre><code>') // 確保開頭標籤格式正確
+      .replace(/<\/code><\/pre>/g, '</code></pre>'); // 確保結尾標籤格式正確
+  };
+
   useEffect(() => {
     chatLog.forEach((message, index) => {
       if (message.role === 'assistant') {
         const element = document.getElementById(`message-${index}`);
         if (element) {
+          // 修正內容的標籤格式
+          const fixedContent = fixHTMLCodeBlocks(message.content);
+          element.innerHTML = fixedContent;
+
           // 對每個 <pre><code> 元素進行高亮顯示並添加複製按鈕
           element.querySelectorAll('pre code').forEach((block, blockIndex) => {
             try {
