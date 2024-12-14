@@ -166,33 +166,33 @@ function ChatInterface({ viewState }) {
                     //     );
                     // };
                 
-                    const AddCodeButton = () => {
-                        const handleAddCode = async () => {
-                            try {
-                                await addCodeToIndexedDB(block.innerText);
-                            } catch (error) {
-                                console.error('無法附加程式碼：', error);
-                            }
-                        };
+                    // const AddCodeButton = () => {
+                    //     const handleAddCode = async () => {
+                    //         try {
+                    //             await addCodeToIndexedDB(block.innerText);
+                    //         } catch (error) {
+                    //             console.error('無法附加程式碼：', error);
+                    //         }
+                    //     };
                 
-                        return (
-                            <button
-                                style={{
-                                    marginTop: '8px',
-                                    display: 'block',
-                                    backgroundColor: '#4CAF50',
-                                    color: 'white',
-                                    border: 'none',
-                                    padding: '5px 10px',
-                                    cursor: 'pointer',
-                                    borderRadius: '4px',
-                                }}
-                                onClick={handleAddCode}
-                            >
-                                加進程式碼
-                            </button>
-                        );
-                    };
+                    //     return (
+                    //         <button
+                    //             style={{
+                    //                 marginTop: '8px',
+                    //                 display: 'block',
+                    //                 backgroundColor: '#4CAF50',
+                    //                 color: 'white',
+                    //                 border: 'none',
+                    //                 padding: '5px 10px',
+                    //                 cursor: 'pointer',
+                    //                 borderRadius: '4px',
+                    //             }}
+                    //             onClick={handleAddCode}
+                    //         >
+                    //             加進程式碼
+                    //         </button>
+                    //     );
+                    // };
                 
                     const preBlock = block.closest('pre');
                     if (preBlock) {
@@ -203,9 +203,9 @@ function ChatInterface({ viewState }) {
                         preBlock.appendChild(copyButtonContainer);
                 
                         // 渲染複製按鈕組件
-                        if (document.body.contains(copyButtonContainer)) {
-                            ReactDOM.render(<CopyButton />, copyButtonContainer);
-                        }
+                        // if (document.body.contains(copyButtonContainer)) {
+                        //     ReactDOM.render(<CopyButton />, copyButtonContainer);
+                        // }
                 
                         const addButtonContainer = document.createElement('div');
                         addButtonContainer.style.marginTop = '8px';
@@ -213,9 +213,9 @@ function ChatInterface({ viewState }) {
                         preBlock.appendChild(addButtonContainer);
 
                         // 渲染加進程式按鈕組件
-                        if (document.body.contains(addButtonContainer)) {
-                          ReactDOM.render(<AddCodeButton />, addButtonContainer);
-                        }
+                        // if (document.body.contains(addButtonContainer)) {
+                        //   ReactDOM.render(<AddCodeButton />, addButtonContainer);
+                        // }
                     }
                 });
                 
@@ -795,8 +795,8 @@ function ChatInterface({ viewState }) {
   const sendQuestionToAI = async (content, includeAllCode = false) => {
     const currentTime = new Date().toLocaleTimeString('it-IT');
     let extractedCode = '';
-    const positionRow1 = -1
-    const positionRow2 = -1
+    let positionRow1 = -1
+    let positionRow2 = -1
   
     // 決定是否提取程式碼
     if (includeAllCode) {
