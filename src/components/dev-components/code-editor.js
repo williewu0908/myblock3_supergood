@@ -180,7 +180,7 @@ const CodeEditor = forwardRef(({ viewState, codeExecRef }, ref) => {
             <button id={styles.export} onClick={() => {
               window.dispatchEvent(new CustomEvent('exportFlowchart'));
             }}>
-              Export
+              匯出
             </button>
           </div>
           <div className={styles.boxcontainer}>
