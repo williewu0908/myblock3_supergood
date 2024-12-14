@@ -129,6 +129,7 @@ function ChatInterface({ viewState }) {
   useEffect(() => {
       chatLog.forEach((message, index) => {
           if (message.role === 'assistant') {
+              console.log(message);
               const element = document.getElementById(`message-${index}`);
               if (element) {
                   // 修正內容的標籤格式
