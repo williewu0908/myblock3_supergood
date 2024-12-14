@@ -132,12 +132,12 @@ function ChatInterface({ viewState }) {
               const element = document.getElementById(`message-${index}`);
               if (element) {
                   // 修正內容的標籤格式
-                  // const fixedContent = fixHTMLCodeBlocks(message.content);
-                  // element.innerHTML = fixedContent;
+                  const fixedContent = fixHTMLCodeBlocks(message.content);
+                  element.innerHTML = fixedContent;
 
                   // 處理每個高亮區塊
                   element.querySelectorAll('pre code').forEach((block, blockIndex) => {
-                    hljs.highlightElement(block);
+                    // hljs.highlightElement(block);
                 
                     // const CopyButton = () => {
                     //     const handleCopy = () => {
