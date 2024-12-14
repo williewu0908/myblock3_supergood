@@ -293,7 +293,7 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
             <AppBar position="static" sx={{ flexGrow: 1, p: 0, m: 0, backgroundColor: '#E3E1E1', color: 'rgb(60, 60, 60)'}}>
                 <Toolbar sx={{ p: 0, m: 0 }}>
                     <Box sx={{ flexGrow: 1, display: 'flex', height: 52, float: 'left', flexDirection: 'column', justifyContent: 'center' }}>
-                        <Typography variant="h1" component="div" sx={{ fontSize: 26 }}>
+                        <Typography variant="h1" component="div" sx={{ fontSize: 26 , fontFamily: '"Aref Ruqaa Ink", serif'}}>
                             myBlock3
                         </Typography>
                         <Typography variant="h6" component="div" sx={{ color: 'rgb(90, 90, 90)', fontSize: 10, paddingTop: 0.5 }}>
