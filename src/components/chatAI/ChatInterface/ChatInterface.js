@@ -754,79 +754,24 @@ function ChatInterface({ viewState }) {
   
   
   const checkSyntaxErrors = async () => {
-      try {
-          // 從 IndexedDB 獲取所有程式碼
-          const allCode = await getAllCodeFromIndexedDB();
-
-          // 如果沒有程式碼，提示用戶
-          if (!allCode) {
-              const updatedChatLog = [
-                  ...chatLog,
-                  { role: 'assistant', content: '目前無任何程式碼可以檢查。' },
-              ];
-              setChatLog(updatedChatLog);
-              saveChatLog(updatedChatLog);
-              return;
-          }
-
-          const currentTime = new Date().toLocaleTimeString('it-IT');
-          const newChatLog = [
-              ...chatLog,
-              { role: 'user', content: '請檢查以下程式碼的語法：\n' + allCode, time: currentTime },
-              { role: 'assistant', content: 'loading' },
-          ];
-          setChatLog(newChatLog);
-          saveChatLog(newChatLog);
-
-          const requestBody = {
-              chatLog: [
-                  { role: 'user', content: `請檢查以下程式碼的語法：\n${allCode}`, time: currentTime },
-              ],
-              selectedCharacter: character,
-              model: model,
-          };
-
-          // 添加加密的 API Key，僅當模型不是 Llama-3 8B
-          if (model !== 'Llama3-8B') {
-              const encryptedApiKey = localStorage.getItem("encryptedApiKey");
-              if (encryptedApiKey) {
-                  requestBody.encryptedApiKey = encryptedApiKey;
-              } else {
-                  console.error("加密的 API Key 丟失，請重新輸入。");
-                  setShowApiKeyModal(true);
-                  return;
-              }
-          }
-
-          const response = await fetch(API_ENDPOINT, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify(requestBody),
-          });
-
-          const data = await response.json();
-          const aiResponse = data.airesponse;
-
-          const updatedChatLog = [
-              ...chatLog,
-              { role: 'user', content: '請檢查以下程式碼的語法：\n' + allCode, time: currentTime },
-              { role: 'assistant', content: aiResponse},
-          ];
-          setChatLog(updatedChatLog);
-          saveChatLog(updatedChatLog);
-      } catch (error) {
-          console.error("Error:", error);
-          const updatedChatLog = [
-              ...chatLog,
-              { role: 'user', content: '請檢查以下程式碼的語法。' },
-              { role: 'assistant', content: 'Error: 檢查語法時發生錯誤。' },
-          ];
-          setChatLog(updatedChatLog);
-          saveChatLog(updatedChatLog);
-      }
+    try {
+      // 使用 sendQuestionToAI 發送請求
+      const prompt = '請檢查語法。'; // 簡單提示文字
+  
+      await sendQuestionToAI(prompt, true); // 呼叫共用的函數，傳遞包含程式碼的請求
+  
+    } catch (error) {
+      console.error("Error during syntax check:", error);
+      const updatedChatLog = [
+        ...chatLog,
+        { role: 'user', content: '請檢查語法。' },
+        { role: 'assistant', content: 'Error: 檢查語法時發生錯誤。' },
+      ];
+      setChatLog(updatedChatLog);
+      saveChatLog(updatedChatLog);
+    }
   };
+  
 
   return (
     <div className={styles.container}>
