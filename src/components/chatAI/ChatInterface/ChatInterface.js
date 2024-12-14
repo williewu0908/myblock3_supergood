@@ -137,87 +137,142 @@ function ChatInterface({ viewState }) {
 
                   // 處理每個高亮區塊
                   element.querySelectorAll('pre code').forEach((block, blockIndex) => {
-                    // hljs.highlightElement(block);
-                
-                    // const CopyButton = () => {
-                    //     const handleCopy = () => {
-                    //         if (!block || !block.innerText) {
-                    //             console.error('無法複製，block 或內容為空');
-                    //             return;
-                    //         }
-                    //         navigator.clipboard.writeText(block.innerText)
-                    //             .then(() => console.log('複製成功'))
-                    //             .catch(err => console.error('複製失敗', err));
-                    //     };
-                
-                    //     return (
-                    //         <button
-                    //             style={{
-                    //                 position: 'absolute',
-                    //                 top: '8px',
-                    //                 right: '8px',
-                    //                 backgroundColor: 'transparent',
-                    //                 cursor: 'pointer',
-                    //             }}
-                    //             onClick={handleCopy}
-                    //         >
-                    //             複製
-                    //         </button>
-                    //     );
-                    // };
-                
-                    // const AddCodeButton = () => {
-                    //     const handleAddCode = async () => {
-                    //         try {
-                    //             await addCodeToIndexedDB(block.innerText);
-                    //         } catch (error) {
-                    //             console.error('無法附加程式碼：', error);
-                    //         }
-                    //     };
-                
-                    //     return (
-                    //         <button
-                    //             style={{
-                    //                 marginTop: '8px',
-                    //                 display: 'block',
-                    //                 backgroundColor: '#4CAF50',
-                    //                 color: 'white',
-                    //                 border: 'none',
-                    //                 padding: '5px 10px',
-                    //                 cursor: 'pointer',
-                    //                 borderRadius: '4px',
-                    //             }}
-                    //             onClick={handleAddCode}
-                    //         >
-                    //             加進程式碼
-                    //         </button>
-                    //     );
-                    // };
-                
-                    const preBlock = block.closest('pre');
-                    if (preBlock) {
+                      try {
+                        hljs.highlightElement(block);
+                      } catch (error) {
+                        console.error("Syntax highlighting failed:", error);
+                      }
+          
+                      // 為每個代碼塊創建一個獨立的複製按鈕組件
+                      const CopyButton = () => {
+                        const [isCopied, setIsCopied] = useState(false);
+          
+                        const handleCopy = () => {
+                          navigator.clipboard.writeText(block.innerText)
+                            .then(() => {
+                              setIsCopied(true);
+                              setTimeout(() => setIsCopied(false), 2000);
+                            })
+                            .catch(err => console.error('複製失敗', err));
+                        };
+          
+                        return (
+                          <IconButton
+                            aria-label="copy"
+                            size="small"
+                            onClick={handleCopy}
+                            style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              backgroundColor: 'transparent',
+                            }}
+                          >
+                            {isCopied ?
+                              <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} /> :
+                              <ContentCopyIcon fontSize="inherit" />
+                            }
+                          </IconButton>
+                        );
+                      };
+          
+                      // 創建容器並設置定位
+                      const preBlock = block.closest('pre');
+                      if (preBlock) {
                         preBlock.style.position = 'relative';
-                
+          
+                        // 創建新的容器元素
                         const copyButtonContainer = document.createElement('div');
                         copyButtonContainer.id = `copy-button-${index}-${blockIndex}`;
                         preBlock.appendChild(copyButtonContainer);
-                
+          
                         // 渲染複製按鈕組件
-                        // if (document.body.contains(copyButtonContainer)) {
-                        //     ReactDOM.render(<CopyButton />, copyButtonContainer);
-                        // }
-                
-                        const addButtonContainer = document.createElement('div');
-                        addButtonContainer.style.marginTop = '8px';
-                        addButtonContainer.id = `add-button-${index}-${blockIndex}`;
-                        preBlock.appendChild(addButtonContainer);
+                        if (document.body.contains(copyButtonContainer)) {
+                          ReactDOM.render(<CopyButton />, copyButtonContainer);
+                        }
+                      }
 
-                        // 渲染加進程式按鈕組件
-                        // if (document.body.contains(addButtonContainer)) {
-                        //   ReactDOM.render(<AddCodeButton />, addButtonContainer);
-                        // }
-                    }
-                });
+                      
+                      // hljs.highlightElement(block);
+                  
+                      // const CopyButton = () => {
+                      //     const handleCopy = () => {
+                      //         if (!block || !block.innerText) {
+                      //             console.error('無法複製，block 或內容為空');
+                      //             return;
+                      //         }
+                      //         navigator.clipboard.writeText(block.innerText)
+                      //             .then(() => console.log('複製成功'))
+                      //             .catch(err => console.error('複製失敗', err));
+                      //     };
+                  
+                      //     return (
+                      //         <button
+                      //             style={{
+                      //                 position: 'absolute',
+                      //                 top: '8px',
+                      //                 right: '8px',
+                      //                 backgroundColor: 'transparent',
+                      //                 cursor: 'pointer',
+                      //             }}
+                      //             onClick={handleCopy}
+                      //         >
+                      //             複製
+                      //         </button>
+                      //     );
+                      // };
+                  
+                      // const AddCodeButton = () => {
+                      //     const handleAddCode = async () => {
+                      //         try {
+                      //             await addCodeToIndexedDB(block.innerText);
+                      //         } catch (error) {
+                      //             console.error('無法附加程式碼：', error);
+                      //         }
+                      //     };
+                  
+                      //     return (
+                      //         <button
+                      //             style={{
+                      //                 marginTop: '8px',
+                      //                 display: 'block',
+                      //                 backgroundColor: '#4CAF50',
+                      //                 color: 'white',
+                      //                 border: 'none',
+                      //                 padding: '5px 10px',
+                      //                 cursor: 'pointer',
+                      //                 borderRadius: '4px',
+                      //             }}
+                      //             onClick={handleAddCode}
+                      //         >
+                      //             加進程式碼
+                      //         </button>
+                      //     );
+                      // };
+                  
+                      // const preBlock = block.closest('pre');
+                      // if (preBlock) {
+                      //     preBlock.style.position = 'relative';
+                  
+                      //     const copyButtonContainer = document.createElement('div');
+                      //     copyButtonContainer.id = `copy-button-${index}-${blockIndex}`;
+                      //     preBlock.appendChild(copyButtonContainer);
+                  
+                      // 渲染複製按鈕組件
+                      // if (document.body.contains(copyButtonContainer)) {
+                      //     ReactDOM.render(<CopyButton />, copyButtonContainer);
+                      // }
+                  
+                      //     const addButtonContainer = document.createElement('div');
+                      //     addButtonContainer.style.marginTop = '8px';
+                      //     addButtonContainer.id = `add-button-${index}-${blockIndex}`;
+                      //     preBlock.appendChild(addButtonContainer);
+
+                      // 渲染加進程式按鈕組件
+                      // if (document.body.contains(addButtonContainer)) {
+                      //   ReactDOM.render(<AddCodeButton />, addButtonContainer);
+                      // }
+                  });
                 
               }
           }
