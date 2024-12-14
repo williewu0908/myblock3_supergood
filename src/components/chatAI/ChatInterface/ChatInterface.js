@@ -516,6 +516,7 @@ function ChatInterface({ viewState }) {
 
   // 泡泡按鈕點擊處理
   const handleBubbleClick = (question) => {
+    alert('handleBubbleClick')
     if (question.fullText.includes("{int}~{int}")) {
       setShowInputFields({ type: "range", fullText: question.fullText });
     } else if (question.fullText.includes("{int}")) {
