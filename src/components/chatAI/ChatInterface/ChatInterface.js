@@ -136,163 +136,163 @@ function ChatInterface({ viewState }) {
                   element.innerHTML = fixedContent;
 
                   // 處理每個高亮區塊
-                  // element.querySelectorAll('pre code').forEach((block, blockIndex) => {
-                  //     hljs.highlightElement(block);
+                  element.querySelectorAll('pre code').forEach((block, blockIndex) => {
+                      hljs.highlightElement(block);
 
-                  //     // 創建複製按鈕組件
-                  //     const CopyButton = () => {
-                  //         const [isCopied, setIsCopied] = useState(false);
+                      // 創建複製按鈕組件
+                      const CopyButton = () => {
+                          const [isCopied, setIsCopied] = useState(false);
 
-                  //         const handleCopy = () => {
-                  //             navigator.clipboard.writeText(block.innerText)
-                  //                 .then(() => {
-                  //                     setIsCopied(true);
-                  //                     setTimeout(() => setIsCopied(false), 2000);
-                  //                 })
-                  //                 .catch(err => console.error('複製失敗', err));
-                  //         };
+                          const handleCopy = () => {
+                              navigator.clipboard.writeText(block.innerText)
+                                  .then(() => {
+                                      setIsCopied(true);
+                                      setTimeout(() => setIsCopied(false), 2000);
+                                  })
+                                  .catch(err => console.error('複製失敗', err));
+                          };
 
-                  //         return (
-                  //             <IconButton
-                  //                 aria-label="copy"
-                  //                 size="small"
-                  //                 onClick={handleCopy}
-                  //                 style={{
-                  //                     position: 'absolute',
-                  //                     top: '8px',
-                  //                     right: '8px',
-                  //                     backgroundColor: 'transparent',
-                  //                 }}
-                  //             >
-                  //                 {isCopied ?
-                  //                     <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} /> :
-                  //                     <ContentCopyIcon fontSize="inherit" />
-                  //                 }
-                  //             </IconButton>
-                  //         );
-                  //     };
+                          return (
+                              <IconButton
+                                  aria-label="copy"
+                                  size="small"
+                                  onClick={handleCopy}
+                                  style={{
+                                      position: 'absolute',
+                                      top: '8px',
+                                      right: '8px',
+                                      backgroundColor: 'transparent',
+                                  }}
+                              >
+                                  {isCopied ?
+                                      <CheckIcon fontSize="inherit" style={{ color: '#4CAF50' }} /> :
+                                      <ContentCopyIcon fontSize="inherit" />
+                                  }
+                              </IconButton>
+                          );
+                      };
 
-                  //     // 創建「加進程式碼」按鈕
-                  //     const AddCodeButton = () => {
-                  //         const handleAddCode = async () => {
-                  //             try {
-                  //                 await addCodeToIndexedDB(block.innerText);
-                  //             } catch (error) {
-                  //                 console.error('無法附加程式碼：', error);
-                  //             }
-                  //         };
+                      // 創建「加進程式碼」按鈕
+                      // const AddCodeButton = () => {
+                      //     const handleAddCode = async () => {
+                      //         try {
+                      //             await addCodeToIndexedDB(block.innerText);
+                      //         } catch (error) {
+                      //             console.error('無法附加程式碼：', error);
+                      //         }
+                      //     };
 
-                  //         return (
-                  //             <button
-                  //                 style={{
-                  //                     marginTop: '8px',
-                  //                     display: 'block',
-                  //                     backgroundColor: '#4CAF50',
-                  //                     color: 'white',
-                  //                     border: 'none',
-                  //                     padding: '5px 10px',
-                  //                     cursor: 'pointer',
-                  //                     borderRadius: '4px',
-                  //                 }}
-                  //                 onClick={handleAddCode}
-                  //             >
-                  //                 加進程式碼
-                  //             </button>
-                  //         );
-                  //     };
+                      //     return (
+                      //         <button
+                      //             style={{
+                      //                 marginTop: '8px',
+                      //                 display: 'block',
+                      //                 backgroundColor: '#4CAF50',
+                      //                 color: 'white',
+                      //                 border: 'none',
+                      //                 padding: '5px 10px',
+                      //                 cursor: 'pointer',
+                      //                 borderRadius: '4px',
+                      //             }}
+                      //             onClick={handleAddCode}
+                      //         >
+                      //             加進程式碼
+                      //         </button>
+                      //     );
+                      // };
 
-                  //     const preBlock = block.closest('pre');
-                  //     if (preBlock) {
-                  //         preBlock.style.position = 'relative';
+                      const preBlock = block.closest('pre');
+                      if (preBlock) {
+                          preBlock.style.position = 'relative';
 
-                  //         // 創建「加進程式碼」按鈕
-                  //         const addButtonContainer = document.createElement('div');
-                  //         addButtonContainer.style.marginTop = '8px';
-                  //         addButtonContainer.id = `add-button-${index}-${blockIndex}`;
-                  //         preBlock.appendChild(addButtonContainer);
+                          // 創建「加進程式碼」按鈕
+                          const addButtonContainer = document.createElement('div');
+                          addButtonContainer.style.marginTop = '8px';
+                          addButtonContainer.id = `add-button-${index}-${blockIndex}`;
+                          preBlock.appendChild(addButtonContainer);
 
-                  //         ReactDOM.render(<AddCodeButton />, addButtonContainer);
+                          ReactDOM.render(<AddCodeButton />, addButtonContainer);
 
-                  //         // 特殊處理優化與除錯
-                  //         if (message.label === '優化' || message.label === '除錯') {
-                  //             const ReplaceCodeButton = () => {
-                  //                 const handleReplaceCode = async () => {
-                  //                     try {
-                  //                         const lines = message.label === '優化'
-                  //                             ? { start: message.startLine, end: message.endLine }
-                  //                             : { start: message.singleLine, end: message.singleLine };
-                  //                         await addCodeToIndexedDB(block.innerText, lines.start, lines.end);
-                  //                     } catch (error) {
-                  //                         console.error('無法取代程式碼：', error);
-                  //                     }
-                  //                 };
+                          // 特殊處理優化與除錯
+                          if (message.label === '優化' || message.label === '除錯') {
+                              const ReplaceCodeButton = () => {
+                                  const handleReplaceCode = async () => {
+                                      try {
+                                          const lines = message.label === '優化'
+                                              ? { start: message.startLine, end: message.endLine }
+                                              : { start: message.singleLine, end: message.singleLine };
+                                          await addCodeToIndexedDB(block.innerText, lines.start, lines.end);
+                                      } catch (error) {
+                                          console.error('無法取代程式碼：', error);
+                                      }
+                                  };
 
-                  //                 return (
-                  //                     <button
-                  //                         style={{
-                  //                             marginTop: '8px',
-                  //                             display: 'block',
-                  //                             backgroundColor: '#FF5722',
-                  //                             color: 'white',
-                  //                             border: 'none',
-                  //                             padding: '5px 10px',
-                  //                             cursor: 'pointer',
-                  //                             borderRadius: '4px',
-                  //                         }}
-                  //                         onClick={handleReplaceCode}
-                  //                     >
-                  //                         取代程式碼
-                  //                     </button>
-                  //                 );
-                  //             };
+                                  return (
+                                      <button
+                                          style={{
+                                              marginTop: '8px',
+                                              display: 'block',
+                                              backgroundColor: '#FF5722',
+                                              color: 'white',
+                                              border: 'none',
+                                              padding: '5px 10px',
+                                              cursor: 'pointer',
+                                              borderRadius: '4px',
+                                          }}
+                                          onClick={handleReplaceCode}
+                                      >
+                                          取代程式碼
+                                      </button>
+                                  );
+                              };
 
-                  //             const replaceButtonContainer = document.createElement('div');
-                  //             replaceButtonContainer.style.marginTop = '8px';
-                  //             replaceButtonContainer.id = `replace-button-${index}-${blockIndex}`;
-                  //             preBlock.appendChild(replaceButtonContainer);
+                              const replaceButtonContainer = document.createElement('div');
+                              replaceButtonContainer.style.marginTop = '8px';
+                              replaceButtonContainer.id = `replace-button-${index}-${blockIndex}`;
+                              preBlock.appendChild(replaceButtonContainer);
 
-                  //             ReactDOM.render(<ReplaceCodeButton />, replaceButtonContainer);
+                              ReactDOM.render(<ReplaceCodeButton />, replaceButtonContainer);
 
-                  //             if (message.label === '除錯') {
-                  //                 const CommentLineButton = () => {
-                  //                     const handleCommentLine = async () => {
-                  //                         try {
-                  //                             const line = message.singleLine;
-                  //                             await addCodeToIndexedDB(`# ${line}`, line);
-                  //                         } catch (error) {
-                  //                             console.error('無法註解此行：', error);
-                  //                         }
-                  //                     };
+                              if (message.label === '除錯') {
+                                  const CommentLineButton = () => {
+                                      const handleCommentLine = async () => {
+                                          try {
+                                              const line = message.singleLine;
+                                              await addCodeToIndexedDB(`# ${line}`, line);
+                                          } catch (error) {
+                                              console.error('無法註解此行：', error);
+                                          }
+                                      };
 
-                  //                     return (
-                  //                         <button
-                  //                             style={{
-                  //                                 marginTop: '8px',
-                  //                                 display: 'block',
-                  //                                 backgroundColor: '#2196F3',
-                  //                                 color: 'white',
-                  //                                 border: 'none',
-                  //                                 padding: '5px 10px',
-                  //                                 cursor: 'pointer',
-                  //                                 borderRadius: '4px',
-                  //                             }}
-                  //                             onClick={handleCommentLine}
-                  //                         >
-                  //                             註解此行
-                  //                         </button>
-                  //                     );
-                  //                 };
+                                      return (
+                                          <button
+                                              style={{
+                                                  marginTop: '8px',
+                                                  display: 'block',
+                                                  backgroundColor: '#2196F3',
+                                                  color: 'white',
+                                                  border: 'none',
+                                                  padding: '5px 10px',
+                                                  cursor: 'pointer',
+                                                  borderRadius: '4px',
+                                              }}
+                                              onClick={handleCommentLine}
+                                          >
+                                              註解此行
+                                          </button>
+                                      );
+                                  };
 
-                  //                 const commentButtonContainer = document.createElement('div');
-                  //                 commentButtonContainer.style.marginTop = '8px';
-                  //                 commentButtonContainer.id = `comment-button-${index}`;
-                  //                 element.appendChild(commentButtonContainer);
+                                  const commentButtonContainer = document.createElement('div');
+                                  commentButtonContainer.style.marginTop = '8px';
+                                  commentButtonContainer.id = `comment-button-${index}`;
+                                  element.appendChild(commentButtonContainer);
 
-                  //                 ReactDOM.render(<CommentLineButton />, commentButtonContainer);
-                  //             }
-                  //         }
-                  //     }
-                  // });
+                                  ReactDOM.render(<CommentLineButton />, commentButtonContainer);
+                              }
+                          }
+                      }
+                  });
               }
           }
 
