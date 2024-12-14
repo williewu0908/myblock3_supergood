@@ -132,8 +132,8 @@ function ChatInterface({ viewState }) {
               const element = document.getElementById(`message-${index}`);
               if (element) {
                   // 修正內容的標籤格式
-                  const fixedContent = fixHTMLCodeBlocks(message.content);
-                  element.innerHTML = fixedContent;
+                  // const fixedContent = fixHTMLCodeBlocks(message.content);
+                  // element.innerHTML = fixedContent;
 
                   // 處理每個高亮區塊
                   element.querySelectorAll('pre code').forEach((block, blockIndex) => {
@@ -491,34 +491,6 @@ function ChatInterface({ viewState }) {
 //         });
 //     };
 // }, [chatLog]);
-
-  useEffect(() => {
-      const handlePythonEditorResponse = (event) => {
-          const { userMessage, aiResponse, time, positionRow } = event.detail;
-
-          // 新增對話記錄，包含行數
-          const updatedChatLog = [
-              ...chatLog,
-              { role: 'user', content: userMessage, time },
-              { 
-                  role: 'assistant', 
-                  content: aiResponse, 
-                  time, 
-                  positionRow, // 傳遞行數
-                  hasAddCodeButton: true, // 標記需要[加進程式碼]按鈕
-                  hasCommentButton: true // 標記需要[註解此行]按鈕
-              },
-          ];
-          setChatLog(updatedChatLog);
-          saveChatLog(updatedChatLog);
-      };
-
-      window.addEventListener('pythonEditorResponse', handlePythonEditorResponse);
-
-      return () => {
-          window.removeEventListener('pythonEditorResponse', handlePythonEditorResponse);
-      };
-  }, [chatLog]);
 
   const getCodeFromIndexedDB = async (startLine, endLine) => {
     return new Promise((resolve, reject) => {
