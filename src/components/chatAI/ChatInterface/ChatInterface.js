@@ -533,7 +533,6 @@ function ChatInterface({ viewState }) {
   const confirmInputOnContainerClick = async () => {
     if (showInputFields?.type === 'range' && startLine && endLine) {
       const filledText = showInputFields.fullText.replace('{int}~{int}', `${startLine}~${endLine}`);
-      alert(filledText);
       await sendQuestionToAI(filledText, true); // 傳送包含行數範圍的問題
       resetInputs();
     } else if (showInputFields?.type === 'singleInt' && singleLineInput) {
