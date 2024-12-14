@@ -223,6 +223,32 @@ function ChatInterface({ viewState }) {
                               </button>
                           );
                       };
+
+                      const CommentLineButton = () => {
+                          const handleComment = () => {
+                              if (message.positionRow1 !== -1 && message.positionRow2 === undefined) {
+                                  handleCommentLine(message.positionRow1); // 使用提供的函式
+                              }
+                          };
+
+                          return (
+                              <button
+                                  style={{
+                                      marginTop: '8px',
+                                      display: 'block',
+                                      backgroundColor: '#FF5722',
+                                      color: 'white',
+                                      border: 'none',
+                                      padding: '5px 10px',
+                                      cursor: 'pointer',
+                                      borderRadius: '4px',
+                                  }}
+                                  onClick={handleComment}
+                              >
+                                  註解此行
+                              </button>
+                          );
+                      };
           
                       // 創建容器並設置定位
                       const preBlock = block.closest('pre');
@@ -251,6 +277,17 @@ function ChatInterface({ viewState }) {
 
                         if (document.body.contains(addButtonContainer)) {
                           ReactDOM.render(<AddCodeButton />, addButtonContainer);
+                        }
+
+                        if (message.positionRow1 !== -1 && message.positionRow2 === undefined) {
+                            const commentButtonContainer = document.createElement('div');
+                            commentButtonContainer.id = `comment-button-${index}`;
+                            commentButtonContainer.style.marginTop = '8px';
+                            element.appendChild(commentButtonContainer);
+
+                            if (document.body.contains(commentButtonContainer)) {
+                                ReactDOM.render(<CommentLineButton />, commentButtonContainer);
+                            }
                         }
                       }
                   });
@@ -423,7 +460,6 @@ function ChatInterface({ viewState }) {
           };
       });
   };
-
 
   const saveChatLog = (chatLog) => {
     const expirationTime = new Date();
