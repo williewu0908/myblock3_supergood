@@ -193,7 +193,7 @@ function ChatInterface({ viewState }) {
                                   if (codeBlocks.length === 1 && message.positionRow1 !== -1 && message.positionRow2 !== -1) {
                                       // 單個代碼塊且有多行範圍 -> 多行替換
                                       await addCodeToIndexedDB(block.innerText, message.positionRow1, message.positionRow2);
-                                  } else if (message.positionRow1 !== -1 && message.positionRow2 === undefined) {
+                                  } else if (message.positionRow1 !== undefined && message.positionRow1 !== -1 && message.positionRow2 === undefined) {
                                       // 單行替換
                                       await addCodeToIndexedDB(block.innerText, message.positionRow1);
                                   } else {
@@ -257,7 +257,7 @@ function ChatInterface({ viewState }) {
 
                   const CommentLineButton = () => {
                       const handleComment = () => {
-                          if (message.positionRow1 !== -1 && message.positionRow2 === undefined) {
+                          if (message.positionRow1 !== undefined && message.positionRow1 !== -1 && message.positionRow2 === undefined) {
                               handleCommentLine(message.positionRow1); // 使用提供的函式
                           }
                       };
@@ -280,8 +280,8 @@ function ChatInterface({ viewState }) {
                           </button>
                       );
                   };
-                  
-                  if (message.positionRow1 !== -1 && message.positionRow2 === undefined) {
+
+                  if (message.positionRow1 !== undefined && message.positionRow1 !== -1 && message.positionRow2 === undefined) {
                       const commentButtonContainer = document.createElement('div');
                       commentButtonContainer.id = `comment-button-${index}`;
                       commentButtonContainer.style.marginTop = '8px';
@@ -291,7 +291,6 @@ function ChatInterface({ viewState }) {
                           ReactDOM.render(<CommentLineButton />, commentButtonContainer);
                       }
                   }
-                
               }
           }
 
