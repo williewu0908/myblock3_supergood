@@ -175,6 +175,34 @@ function ChatInterface({ viewState }) {
                           </IconButton>
                         );
                       };
+
+                      const AddCodeButton = () => {
+                          const handleAddCode = async () => {
+                              try {
+                                  await addCodeToIndexedDB(block.innerText);
+                              } catch (error) {
+                                  console.error('無法附加程式碼：', error);
+                              }
+                          };
+                  
+                          return (
+                              <button
+                                  style={{
+                                      marginTop: '8px',
+                                      display: 'block',
+                                      backgroundColor: '#4CAF50',
+                                      color: 'white',
+                                      border: 'none',
+                                      padding: '5px 10px',
+                                      cursor: 'pointer',
+                                      borderRadius: '4px',
+                                  }}
+                                  onClick={handleAddCode}
+                              >
+                                  加進程式碼
+                              </button>
+                          );
+                      };
           
                       // 創建容器並設置定位
                       const preBlock = block.closest('pre');
@@ -189,6 +217,16 @@ function ChatInterface({ viewState }) {
                         // 渲染複製按鈕組件
                         if (document.body.contains(copyButtonContainer)) {
                           ReactDOM.render(<CopyButton />, copyButtonContainer);
+                        }
+
+                        // 創建一個新的容器元素，用於渲染 AddCodeButton
+                        const addButtonContainer = document.createElement('div');
+                        addButtonContainer.id = `add-button-${index}-${blockIndex}`;
+                        addButtonContainer.style.marginTop = '8px'; // 確保按鈕有適當間距
+                        preBlock.parentNode.insertBefore(addButtonContainer, preBlock.nextSibling); // 插入到 preBlock 之後
+
+                        if (document.body.contains(addButtonContainer)) {
+                          ReactDOM.render(<AddCodeButton />, addButtonContainer);
                         }
                       }
 
