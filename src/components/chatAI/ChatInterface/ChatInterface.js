@@ -182,9 +182,9 @@ function ChatInterface({ viewState }) {
                       const AddCodeButton = () => {
                           let buttonLabel = "加進程式碼";
 
-                          if (codeBlocks.length === 1 && message.positionRow1 !== -1 && message.positionRow2 !== -1) {
+                          if (codeBlocks.length === 1 && message.positionRow1 && message.positionRow2) {
                               buttonLabel = `替換第 ${message.positionRow1} 行到第 ${message.positionRow2} 行`;
-                          } else if (message.positionRow1 !== -1 && message.positionRow2 === -1) {
+                          } else if (message.positionRow1 && message.positionRow2 === undefined) {
                               buttonLabel = `替換第 ${message.positionRow1} 行`;
                           }
 
@@ -193,7 +193,7 @@ function ChatInterface({ viewState }) {
                                   if (codeBlocks.length === 1 && message.positionRow1 !== -1 && message.positionRow2 !== -1) {
                                       // 單個代碼塊且有多行範圍 -> 多行替換
                                       await addCodeToIndexedDB(block.innerText, message.positionRow1, message.positionRow2);
-                                  } else if (message.positionRow1 !== -1 && message.positionRow2 === -1) {
+                                  } else if (message.positionRow1 !== -1 && message.positionRow2 === undefined) {
                                       // 單行替換
                                       await addCodeToIndexedDB(block.innerText, message.positionRow1);
                                   } else {
@@ -566,7 +566,7 @@ function ChatInterface({ viewState }) {
         if (!isNaN(lineNum)) {
           positionRow1 = lineNum
           extractedCode = await getCodeFromIndexedDB(lineNum, lineNum); // 單行程式碼
-          extractedCode += '\n以下是全部程式碼：\n' + await getAllCodeFromIndexedDB();
+          extractedCode += '\n以下是全部程式碼：\n' + await getAllCodeFromIndexedDB() + '請你提供提取的程式碼的debug建議就好了';
         }
       } else if (showInputFields?.type === 'range') {
         // 提取範圍內的程式碼
@@ -575,7 +575,7 @@ function ChatInterface({ viewState }) {
         positionRow1 = startLineNum
         positionRow2 = endLineNum
         if (!isNaN(startLineNum) && !isNaN(endLineNum)) {
-          extractedCode = await getCodeFromIndexedDB(startLineNum, endLineNum);
+          extractedCode = await getCodeFromIndexedDB(startLineNum, endLineNum) + '請你全部放到同一個<pre><code>...</code></pre>區塊中';
         }
       } else {
         // 提取所有程式碼
