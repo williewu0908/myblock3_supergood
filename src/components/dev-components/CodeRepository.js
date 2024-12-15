@@ -159,6 +159,9 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
 
         setUserInput('');
         handleClose();
+        if(isNewProject == '新專案'){
+            window.location.reload();
+        }
     };
 
     return (
