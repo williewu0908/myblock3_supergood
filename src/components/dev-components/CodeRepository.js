@@ -84,7 +84,6 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
         }
 
         try {
-            console.log('isNewProject:', isNewProject);
             if (isNewProject) {
                 // 若沒專案，儲存畫面上的程式碼
                 const requestBody = {
@@ -159,7 +158,7 @@ function NewCodeDialog({ open, handleClose, fetchProjects, existingProjects, set
 
         setUserInput('');
         handleClose();
-        if(isNewProject == '新專案'){
+        if(isNewProject){
             window.location.reload();
         }
     };
