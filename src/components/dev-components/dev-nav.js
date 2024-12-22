@@ -318,6 +318,12 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                     >
                         畫面選項
                     </Button>
+                    <Button
+                        color="inherit"
+                        onClick={() => window.location.href = 'https://youtu.be/FMUitA3-9YY?si=k2lGAF9l6WlL3tb1'}
+                    >
+                        教學影片
+                    </Button>
                     <Menu
                         id="changeUI"
                         anchorEl={anchorEl}
