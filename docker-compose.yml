@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: myblock3-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"  # 開放給本機連線
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - myblock3_network
+
+  # 2. 後端服務 (Python)
+  backend:
+    build: 
+      context: ./backend
+    container_name: myblock3-backend
+    restart: always
+    ports:
+      - "5500:5500"
+    depends_on:
+      - db  # 確保資料庫先啟動
+    environment:
+      # 在這裡設定資料庫連線資訊
+      DB_HOST: db            # 這裡是 service name，不是 localhost
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST} 
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - myblock3_network
+      - sso_network
+
+  # 3. 前端服務 (Next.js)
+  frontend:
+    build:
+      context: ./src
+    container_name: myblock3-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # 如果前端是 SSR，這裡指向後端容器名稱
+      NEXT_PUBLIC_API_URL: http://backend:5500
+    depends_on:
+      - backend
+    networks:
+      - myblock3_network
+
+volumes:
+  db_data:
+
+networks:
+  myblock3_network:
+    driver: bridge
+  sso_network:
+    external: true
+    name: mylogin2_network

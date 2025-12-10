@@ -10,14 +10,24 @@ from pyflowchart import Flowchart
 app = Flask(__name__)
 
 # Redis 連接設置
-redis_client = redis.Redis(host='127.0.0.1', port=6379, db=0)
+# 讀取環境變數，如果沒讀到則使用預設值
+redis_host = os.environ.get('REDIS_HOST', '127.0.0.1')
+redis_port = int(os.environ.get('REDIS_PORT', 6379))
+redis_password = os.environ.get('REDIS_PASSWORD', None)
+
+redis_client = redis.Redis(
+    host=redis_host, 
+    port=redis_port, 
+    password=redis_password, 
+    db=0
+)
 
 # MySQL 連接設置
 db_config = {
-    'host': '140.127.74.13',
-    'user': 'edutool',
-    'password': 'EduTool97531!',
-    'database': 'edutool'
+    'host': os.environ.get('DB_HOST', 'db'), # 對應 docker-compose 的 service name
+    'user': os.environ.get('DB_USER', 'edutool'),
+    'password': os.environ.get('DB_PASSWORD', 'EduTool97531!'),
+    'database': os.environ.get('DB_NAME', 'edutool')
 }
 
 LOGIN_URL = 'https://sw-hie-ie.nknu.edu.tw/myLogin/index.html'
@@ -376,7 +386,11 @@ def handler():
         selected_character = data.get('selectedCharacter', 'CodingExpert')
         model = data.get('model', 'GPT3.5')
 
-        api_key = config["API-KEY"]
+        api_key = os.environ.get("API_KEY")
+        if not api_key:
+             config = dotenv_values(".env")
+             api_key = config.get("API-KEY")
+
         url = "https://api.openai.com/v1/"
 
         if model == 'Llama3-8B':
