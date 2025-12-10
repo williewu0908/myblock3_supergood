@@ -44,7 +44,7 @@ services:
   # 3. 前端服務 (Next.js)
   frontend:
     build:
-      context: ./src
+      context: ./
     container_name: myblock3-frontend
     restart: always
     ports:
