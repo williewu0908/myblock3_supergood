@@ -24,7 +24,7 @@ function Modal({ showModal, onConfirm, onCancel }) {
     return (
         <div className={`${styles.modal} ${shouldRender ? styles.show : styles.hide}`}>
             <div ref={modalContentRef} id={styles.modalContent} className={styles.modalContent}>
-                <Image src="/myblock3c/AIchat/media/cleanrobot.png" width={120} height={120} className={styles.cleanRobot} alt="Clean Robot" />
+                <Image src="/AIchat/media/cleanrobot.png" width={120} height={120} className={styles.cleanRobot} alt="Clean Robot" />
                 <p>你確定要刪除所有對話嗎？</p>
                 <div className={styles.modalButtons}>
                     <button id={styles.confirmDelete} className={styles.modalButton} onClick={onConfirm}>確定</button>
