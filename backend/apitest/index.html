@@ -85,7 +85,7 @@
 
         async function getCurrentUser() {
             try {
-                const response = await axios.get('/myblock3/whois');
+                const response = await axios.get('/myblock3/api/whois');
                 showResponse('userResponse', response.data);
             } catch (error) {
                 handleError('userResponse', error);

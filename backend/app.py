@@ -410,7 +410,7 @@ def handler():
     else:
         return jsonify({"error": f"Method {request.method} Not Allowed"}), 405
 
-@app.route('/whois')
+@app.route('/api/whois')
 def index():
     user, error = get_user_from_session()
     if error:
