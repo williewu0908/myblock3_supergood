@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, jsonify, redirect
 import redis
 import mysql.connector
+from flask_session import Session
 from datetime import datetime
 import os
 import openai
@@ -10,17 +11,19 @@ from pyflowchart import Flowchart
 app = Flask(__name__)
 
 # Redis 連接設置
-# 讀取環境變數，如果沒讀到則使用預設值
-redis_host = os.environ.get('REDIS_HOST', '127.0.0.1')
-redis_port = int(os.environ.get('REDIS_PORT', 6379))
-redis_password = os.environ.get('REDIS_PASSWORD', None)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or '請確保這裡的Key跟SSO系統完全一樣'
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_PERMANENT'] = True
+app.config['SESSION_USE_SIGNER'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = 86400
+app.config['SESSION_COOKIE_SECURE'] = False # 如果有 HTTPS 建議設為 True (需跟 SSO 一致)
 
-redis_client = redis.Redis(
-    host=redis_host, 
-    port=redis_port, 
-    password=redis_password, 
-    db=0
-)
+REDIS_URL = os.environ.get('REDIS_URL') or 'redis://mylogin2_redis_service:6379' 
+app.config['SESSION_REDIS'] = redis.from_url(REDIS_URL)
+redis_client = redis.Redis.from_url(REDIS_URL)
+
+# 初始化 Flask-Session
+server_session = Session(app)
 
 # MySQL 連接設置
 db_config = {
@@ -33,43 +36,54 @@ db_config = {
 LOGIN_URL = 'https://sw-hie-ie.nknu.edu.tw/myLogin/index.html'
 
 def get_user_from_session():
-    """通用函數：從 session 獲取用戶信息"""
-    php_session_id = request.cookies.get('PHPSESSID')
-    if not php_session_id:
-        return None, "No PHP Session ID found"
+    """
+    修改版：直接從 Flask Session 獲取 SSO 系統寫入的 user_id
+    """
+    # 檢查 Session 中是否有 user_id (這是 SSO 登入成功後寫入的)
+    if 'user_id' not in session:
+        return None, "Unauthorized"
+
+    user_id = session.get('user_id')
     
-    session_data = redis_client.get(f"php_session:{php_session_id}")
-    if not session_data:
-        return None, "No session data found"
-    
-    session_data = session_data.decode('utf-8')
-    token = eval(session_data).get('Token')
-    if not token:
-        return None, "No token found in session"
-    
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor(dictionary=True)
-    
-    cursor.execute("SELECT * FROM users WHERE Token_Login = %s", (token,))
-    user = cursor.fetchone()
-    
-    cursor.close()
-    conn.close()
-    
-    if not user:
-        return None, "User not found"
-    
-    return user, None
+    # 連線資料庫查詢使用者詳情
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # [修改] SSO 系統存的是 UUID (id)，所以這裡改用 id 查詢
+        # 注意：請確認你的資料庫 users 表格結構是否已經跟 SSO 的 User Model 同步
+        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if not user:
+            return None, "User not found in DB"
+        
+        return user, None
+        
+    except mysql.connector.Error as err:
+        return None, f"Database Error: {err}"
 
 def login_required(f):
     """裝飾器：檢查用戶是否已登入"""
     def decorated_function(*args, **kwargs):
+        # 因為使用了 Flask-Session，這裡可以直接檢查 session 變數
+        if 'user_id' not in session:
+             return jsonify({
+                'error': 'Unauthorized',
+                'message': '請先登入'
+            }), 401
+            
+        # 雖然 session 有 id，但我們還是去資料庫撈完整資料確保帳號有效
         user, error = get_user_from_session()
         if error:
             return jsonify({
                 'error': 'Unauthorized',
-                'message': '請先登入'
+                'message': '使用者無效或連線錯誤'
             }), 401
+            
         return f(*args, **kwargs)
     decorated_function.__name__ = f.__name__ 
     return decorated_function
