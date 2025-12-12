@@ -4,7 +4,7 @@ import Image from 'next/image';
 export default function DropDownMenu({ character, model, countTrueValues, onGetModel, onGetCharacter, onGetShowModal, includeChatHistory, setIncludeChatHistory }) {
     return (
         <nav className="navBox">
-            <Image src="/AIchat/media/robot.jpg" width={20} height={20} className={styles.characterTitleImg} alt="robot" />
+            <Image src="/myblock3/AIchat/media/robot.jpg" width={20} height={20} className={styles.characterTitleImg} alt="robot" />
             <h1 className={styles.title}>Chat with AI</h1>
             <div className={styles.subtitle}>
                 <span id={styles.showCharacter}>{character}</span>（<span id={styles.showModel}>{model}</span>）

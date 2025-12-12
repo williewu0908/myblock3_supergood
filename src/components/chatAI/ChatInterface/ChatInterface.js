@@ -728,7 +728,7 @@ function ChatInterface({ viewState }) {
           <div key={index} className={`${styles[`${content.role}ReplyContainer`]}`}>
             {content.role === 'assistant' && (
               <div>
-                <Image src="/AIchat/media/robot.jpg" width={30} height={30} className={styles.characterImg} alt="robot" />
+                <Image src="/myblock3/AIchat/media/robot.jpg" width={30} height={30} className={styles.characterImg} alt="robot" />
                 <p className={styles.characterName}>AI-robot</p>
               </div>
             )}
