@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify, redirect
+from flask import Flask, request, render_template, jsonify, redirect, session
 import redis
 import mysql.connector
 from flask_session import Session
@@ -37,7 +37,7 @@ LOGIN_URL = 'https://sw-hie-ie.nknu.edu.tw/myLogin/index.html'
 
 def get_user_from_session():
     """
-    修改版：直接從 Flask Session 獲取 SSO 系統寫入的 user_id
+    從 Flask Session 獲取 SSO 系統寫入的 user_id
     """
     # 檢查 Session 中是否有 user_id (這是 SSO 登入成功後寫入的)
     if 'user_id' not in session:
