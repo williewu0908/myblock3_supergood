@@ -40,11 +40,17 @@ def get_user_from_session():
     從 Flask Session 獲取 SSO 系統寫入的 user_id
     """
     # 檢查 Session 中是否有 user_id (這是 SSO 登入成功後寫入的)
+    # --- [Debug 開始] ---
+    print(f"DEBUG: 目前的 Session 內容: {dict(session)}")
+    print(f"DEBUG: 請求的 Cookies: {request.cookies}")
+    # --- [Debug 結束] ---
+
     if 'user_id' not in session:
+        print("DEBUG: 失敗 - session 中沒有 user_id")
         return None, "Unauthorized"
 
     user_id = session.get('user_id')
-    
+    print(f"DEBUG: 成功取得 user_id: {user_id}")
     # 連線資料庫查詢使用者詳情
     try:
         conn = mysql.connector.connect(**db_config)
