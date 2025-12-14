@@ -39,12 +39,6 @@ def get_user_from_session():
     """
     從 Flask Session 獲取 SSO 系統寫入的 user_id
     """
-    # 檢查 Session 中是否有 user_id (這是 SSO 登入成功後寫入的)
-    # --- [Debug 開始] ---
-    print(f"DEBUG: 目前的 Session 內容: {dict(session)}")
-    print(f"DEBUG: 請求的 Cookies: {request.cookies}")
-    # --- [Debug 結束] ---
-
     if 'user_id' not in session:
         print("DEBUG: 失敗 - session 中沒有 user_id")
         return None, "Unauthorized"
@@ -75,6 +69,13 @@ def get_user_from_session():
 def login_required(f):
     """裝飾器：檢查用戶是否已登入"""
     def decorated_function(*args, **kwargs):
+        # --- [DEBUG] 強制印出目前狀態 ---
+        print(f"DEBUG: [請求路徑] {request.path}", flush=True)
+        print(f"DEBUG: [Cookies] {request.cookies}", flush=True)
+        # 用 dict(session) 把 session 內容轉成字典印出來，不然看不到
+        print(f"DEBUG: [Session內容] {dict(session)}", flush=True)
+        print("="*30, flush=True)
+        # -----------------------------
         # 因為使用了 Flask-Session，這裡可以直接檢查 session 變數
         if 'user_id' not in session:
              return jsonify({
