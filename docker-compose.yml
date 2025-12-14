@@ -48,6 +48,7 @@ services:
       REDIS_HOST: ${REDIS_HOST} 
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_URL: ${REDIS_URL}
     networks:
       - myblock3_network
       - sso_network
