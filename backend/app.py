@@ -11,14 +11,14 @@ from pyflowchart import Flowchart
 app = Flask(__name__)
 
 # Redis 連接設置
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or '請確保這裡的Key跟SSO系統完全一樣'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24).hex()
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = 86400
 app.config['SESSION_COOKIE_SECURE'] = False # 如果有 HTTPS 建議設為 True (需跟 SSO 一致)
 
-REDIS_URL = os.environ.get('REDIS_URL') or 'redis://mylogin2_redis_service:6379' 
+REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379'
 app.config['SESSION_REDIS'] = redis.from_url(REDIS_URL)
 redis_client = redis.Redis.from_url(REDIS_URL)
 
