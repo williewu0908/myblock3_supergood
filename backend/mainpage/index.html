@@ -225,7 +225,7 @@
                 if (!response.ok) {
                     if (response.status === 401) {
                         // 如果是401錯誤(未授權),直接重定向
-                        window.location.href = 'https://sw-hie-ie.nknu.edu.tw';
+                        window.location.href = 'https://py.nknu.edu.tw/';
                         return;
                     }
                     throw new Error('獲取用戶資訊失敗');
@@ -236,7 +236,7 @@
             } catch (error) {
                 console.error('Error:', error);
                 // 如果發生任何錯誤,也重定向到指定URL
-                window.location.href = 'https://sw-hie-ie.nknu.edu.tw';
+                window.location.href = 'https://py.nknu.edu.tw/';
             }
         }
 

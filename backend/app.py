@@ -34,7 +34,6 @@ db_config = {
     'database': os.environ.get('DB_NAME', 'edutool')
 }
 
-LOGIN_URL = 'https://sw-hie-ie.nknu.edu.tw/myLogin/index.html'
 
 def get_user_from_session():
     """

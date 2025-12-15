@@ -4,12 +4,12 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-Welcome to [EduTools](https://sw-hie-ie.nknu.edu.tw/myLogin/index.html)! 
+Welcome to [EduTools](https://py.nknu.edu.tw/myLogin/index.html)! 
 
 Our platform is designed to make programming learning simple and interactive. To start using myBlock3:
 
 1. **Visit Our Website**  
-   Go to [https://sw-hie-ie.nknu.edu.tw/myLogin/index.html](https://sw-hie-ie.nknu.edu.tw/myLogin/index.html).
+   Go to [https://py.nknu.edu.tw/myLogin/index.html](https://py.nknu.edu.tw/myLogin/index.html).
    
 2. **Register or Log In**  
    Create an account or log in to access the full features of the myBlock3 system.

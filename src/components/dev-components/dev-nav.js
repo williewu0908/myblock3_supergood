@@ -302,7 +302,7 @@ export default function DevNavBar({ toggleViewState, handlegenerateXML }) {
                     </Box>
                     <Button
                         color="inherit"
-                        onClick={() => window.location.href = 'https://sw-hie-ie.nknu.edu.tw/'}
+                        onClick={() => window.location.href = 'https://py.nknu.edu.tw/'}
                     >
                         首頁
                     </Button>
