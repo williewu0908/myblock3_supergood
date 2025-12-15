@@ -7,6 +7,7 @@ import os
 import openai
 from dotenv import dotenv_values
 from pyflowchart import Flowchart
+from functools import wraps
 
 app = Flask(__name__)
 
@@ -37,62 +38,27 @@ LOGIN_URL = 'https://sw-hie-ie.nknu.edu.tw/myLogin/index.html'
 
 def get_user_from_session():
     """
-    從 Flask Session 獲取 SSO 系統寫入的 user_id
+    從 Redis Session 拿 ID
     """
-    if 'user_id' not in session:
-        print("DEBUG: 失敗 - session 中沒有 user_id")
-        return None, "Unauthorized"
-
-    user_id = session.get('user_id')
-    print(f"DEBUG: 成功取得 user_id: {user_id}")
-    # 連線資料庫查詢使用者詳情
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
-        # [修改] SSO 系統存的是 UUID (id)，所以這裡改用 id 查詢
-        # 注意：請確認你的資料庫 users 表格結構是否已經跟 SSO 的 User Model 同步
-        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
-        user = cursor.fetchone()
-        
-        cursor.close()
-        conn.close()
-        
-        if not user:
-            return None, "User not found in DB"
-        
-        return user, None
-        
-    except mysql.connector.Error as err:
-        return None, f"Database Error: {err}"
+    return {
+        'id': session.get('user_id'),
+        'username': session.get('username')
+    }
 
 def login_required(f):
     """裝飾器：檢查用戶是否已登入"""
+    @wraps(f) # 這是 Flask 裝飾器的最佳實踐
     def decorated_function(*args, **kwargs):
-        # --- [DEBUG] 強制印出目前狀態 ---
-        print(f"DEBUG: [請求路徑] {request.path}", flush=True)
-        print(f"DEBUG: [Cookies] {request.cookies}", flush=True)
-        # 用 dict(session) 把 session 內容轉成字典印出來，不然看不到
-        print(f"DEBUG: [Session內容] {dict(session)}", flush=True)
-        print("="*30, flush=True)
+        # --- [DEBUG] ---
+        # print(f"DEBUG: [Session內容] {dict(session)}", flush=True)
         # -----------------------------
-        # 因為使用了 Flask-Session，這裡可以直接檢查 session 變數
         if 'user_id' not in session:
              return jsonify({
                 'error': 'Unauthorized',
                 'message': '請先登入'
             }), 401
             
-        # 雖然 session 有 id，但我們還是去資料庫撈完整資料確保帳號有效
-        user, error = get_user_from_session()
-        if error:
-            return jsonify({
-                'error': 'Unauthorized',
-                'message': '使用者無效或連線錯誤'
-            }), 401
-            
         return f(*args, **kwargs)
-    decorated_function.__name__ = f.__name__ 
     return decorated_function
 
 
@@ -105,7 +71,7 @@ def list_projects():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
     
-    cursor.execute("SELECT id, project_name, created_at, updated_at FROM blockly_projects WHERE user_id = %s", (user['Id'],))
+    cursor.execute("SELECT id, project_name, created_at, updated_at FROM blockly_projects WHERE user_id = %s", (user['id'],))
     projects = cursor.fetchall()
     
     cursor.close()
@@ -436,7 +402,7 @@ def index():
     user, error = get_user_from_session()
     if error:
         return error
-    return jsonify({'username': user['Username']})
+    return jsonify({'username': user['username']})
 
 if __name__ == '__main__':
     app.run(port=5500, debug=True)
