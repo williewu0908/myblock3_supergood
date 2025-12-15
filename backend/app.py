@@ -66,7 +66,7 @@ def login_required(f):
 @login_required
 def list_projects():
     """列出使用者所有專案"""
-    user, _ = get_user_from_session()  # 已經在裝飾器中確認過用戶存在
+    user = get_user_from_session()  # 已經在裝飾器中確認過用戶存在
     
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
@@ -83,7 +83,7 @@ def list_projects():
 @login_required
 def create_project():
     """新增專案"""
-    user, _ = get_user_from_session()
+    user = get_user_from_session()
     
     data = request.get_json()
     if not data or 'project_name' not in data:
@@ -124,7 +124,7 @@ def create_project():
 @login_required
 def get_project_code(project_name):
     """獲取專案程式碼"""
-    user, _ = get_user_from_session()
+    user = get_user_from_session()
     
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
@@ -155,7 +155,7 @@ def get_project_code(project_name):
 @login_required
 def delete_project(project_name):
     """刪除專案"""
-    user, _ = get_user_from_session()
+    user = get_user_from_session()
     
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
@@ -188,7 +188,7 @@ def delete_project(project_name):
 @login_required
 def update_project_name(old_project_name):
     """修改專案名稱"""
-    user, _ = get_user_from_session()
+    user = get_user_from_session()
     
     data = request.get_json()
     if not data or 'project_name' not in data:
@@ -237,7 +237,7 @@ def update_project_name(old_project_name):
 @login_required
 def update_project_content(project_name):
     """更新專案內容"""
-    user, _ = get_user_from_session()
+    user = get_user_from_session()
     
     data = request.get_json()
     if not data or ('code' not in data and 'blockly_code' not in data):
@@ -399,9 +399,11 @@ def handler():
 
 @app.route('/api/whois')
 def index():
-    user, error = get_user_from_session()
-    if error:
-        return error
+    # 這裡也要手動檢查，因為沒有掛 @login_required
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user = get_user_from_session()
     return jsonify({'username': user['username']})
 
 if __name__ == '__main__':
