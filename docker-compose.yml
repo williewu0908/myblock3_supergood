@@ -40,8 +40,8 @@ services:
     depends_on:
       - db  # 確保資料庫先啟動
     environment:
-      DB_HOST: db            # 這裡是 service name，不是 localhost
-      DB_PORT: 3306
+      DB_HOST: ${DB_HOST}            # 這裡是 service name，不是 localhost
+      DB_PORT: ${DB_PORT}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -49,6 +49,8 @@ services:
       REDIS_PORT: ${REDIS_PORT}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       REDIS_URL: ${REDIS_URL}
+      SECRET_KEY: ${SECRET_KEY}
+      API-KEY: ${API-KEY}
     networks:
       - myblock3_network
       - sso_network
