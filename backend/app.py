@@ -95,7 +95,7 @@ def create_project():
         # 檢查是否已存在同名專案
         cursor.execute(
             "SELECT id FROM blockly_projects WHERE user_id = %s AND project_name = %s",
-            (user['Id'], data['project_name'])
+            (user['id'], data['project_name'])
         )
         existing_project = cursor.fetchone()
         
@@ -104,7 +104,7 @@ def create_project():
         
         cursor.execute(
             "INSERT INTO blockly_projects (user_id, project_name, code, blockly_code) VALUES (%s, %s, %s, %s)",
-            (user['Id'], data['project_name'], data.get('code', ''), data.get('blockly_code', ''))
+            (user['id'], data['project_name'], data.get('code', ''), data.get('blockly_code', ''))
         )
         conn.commit()
         new_project_id = cursor.lastrowid
@@ -132,7 +132,7 @@ def get_project_code(project_name):
         # 檢查專案是否存在且屬於該用戶
         cursor.execute(
             "SELECT code, blockly_code FROM blockly_projects WHERE project_name = %s AND user_id = %s",
-            (project_name, user['Id'])
+            (project_name, user['id'])
         )
         project = cursor.fetchone()
         
@@ -163,7 +163,7 @@ def delete_project(project_name):
         # 檢查專案是否存在且屬於該用戶
         cursor.execute(
             "SELECT id FROM blockly_projects WHERE project_name = %s AND user_id = %s",
-            (project_name, user['Id'])
+            (project_name, user['id'])
         )
         project = cursor.fetchone()
         
@@ -172,7 +172,7 @@ def delete_project(project_name):
         
         cursor.execute(
             "DELETE FROM blockly_projects WHERE project_name = %s AND user_id = %s",
-            (project_name, user['Id'])
+            (project_name, user['id'])
         )
         conn.commit()
         
@@ -202,7 +202,7 @@ def update_project_name(old_project_name):
         # 檢查專案是否存在且屬於該用戶
         cursor.execute(
             "SELECT id FROM blockly_projects WHERE project_name = %s AND user_id = %s",
-            (old_project_name, user['Id'])
+            (old_project_name, user['id'])
         )
         project = cursor.fetchone()
         
@@ -212,7 +212,7 @@ def update_project_name(old_project_name):
         # 檢查新名稱是否已被使用
         cursor.execute(
             "SELECT id FROM blockly_projects WHERE project_name = %s AND user_id = %s AND project_name != %s",
-            (new_project_name, user['Id'], old_project_name)
+            (new_project_name, user['id'], old_project_name)
         )
         existing_project = cursor.fetchone()
         
@@ -221,7 +221,7 @@ def update_project_name(old_project_name):
         
         cursor.execute(
             "UPDATE blockly_projects SET project_name = %s WHERE project_name = %s AND user_id = %s",
-            (new_project_name, old_project_name, user['Id'])
+            (new_project_name, old_project_name, user['id'])
         )
         conn.commit()
         
@@ -249,7 +249,7 @@ def update_project_content(project_name):
         # 檢查專案是否存在且屬於該用戶
         cursor.execute(
             "SELECT id FROM blockly_projects WHERE project_name = %s AND user_id = %s",
-            (project_name, user['Id'])
+            (project_name, user['id'])
         )
         project = cursor.fetchone()
         
@@ -265,7 +265,7 @@ def update_project_content(project_name):
             update_fields.append("blockly_code = %s")
             values.append(data['blockly_code'])
         
-        values.extend([project_name, user['Id']])
+        values.extend([project_name, user['id']])
         cursor.execute(
             f"UPDATE blockly_projects SET {', '.join(update_fields)} WHERE project_name = %s AND user_id = %s",
             tuple(values)
